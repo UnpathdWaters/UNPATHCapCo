@@ -10,8 +10,8 @@ public class MenuLandscapeImport : MonoBehaviour
     protected FileInfo surfaceFile = null;
     protected StreamReader surfaceStream = null;
     protected string inputLine = " ";
-    int widthX = 4096;
-    int heightZ = 4096;
+    int widthX = 260;
+    int heightZ = 260;
     float[,] depths;
     string[,] headerText;
     int totCols;
@@ -39,18 +39,19 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Assets/surface.asc");
+        surfaceFile = new FileInfo ("Assets/surface260.csv");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
         headerText = new string[2,6];
         float thisval = 0.0f;
+        char[] separators = new char[] { ' ', '.', '\t', ',' };
 
         //Read ESRI ASCII header
         for (int headline = 0; headline < 6; headline++)
         {
             inputLine = surfaceStream.ReadLine();
-            hdrArray = inputLine.Split(' ');
+            hdrArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
             headerText[0,headline] = hdrArray[0];
             headerText[1,headline] = hdrArray[1];
         }
@@ -74,8 +75,8 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             inputLine = surfaceStream.ReadLine();
             xCount = 0;
-            readArray = inputLine.Split(' ');
-            for (int x = 0; x < 4096; x++)
+            readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+            for (int x = 0; x < totCols; x++)
             {
                 thisval = float.Parse(readArray[x]);
                 depths[xCount, zCount] = thisval;
@@ -148,14 +149,12 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void UpdateMeshColors()
     {
-        float vertHeight;
         // Assign colours to vertices
         for (int z = 0; z < heightZ; z++)
         {
             for (int x = 0; x < widthX; x++)
             {
-                vertHeight = Mathf.InverseLerp(minVal, maxVal, vertices[x + (z * widthX)].y);
-                colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
+                colours[x + (z*widthX)] = Color.green;
             }
         }
         mesh.colors = colours;
