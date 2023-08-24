@@ -10,8 +10,8 @@ public class MenuLandscapeImport : MonoBehaviour
     protected FileInfo surfaceFile = null;
     protected StreamReader surfaceStream = null;
     protected string inputLine = " ";
-    int widthX = 260;
-    int heightZ = 260;
+    int widthX = 400;
+    int heightZ = 400;
     float[,] depths;
     string[,] headerText;
     int totCols;
@@ -39,7 +39,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Assets/surface260.csv");
+        surfaceFile = new FileInfo ("Assets/surface400.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
