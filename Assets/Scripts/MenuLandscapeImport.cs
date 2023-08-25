@@ -10,8 +10,8 @@ public class MenuLandscapeImport : MonoBehaviour
     protected FileInfo surfaceFile = null;
     protected StreamReader surfaceStream = null;
     protected string inputLine = " ";
-    int widthX = 400;
-    int heightZ = 400;
+    int widthX = 600;
+    int heightZ = 600;
     float[,] depths;
     string[,] headerText;
     int totCols;
@@ -39,7 +39,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Assets/surface400.asc");
+        surfaceFile = new FileInfo ("Assets/surface600.csv");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
@@ -127,7 +127,7 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                float vertHeight = Mathf.InverseLerp(minVal, maxVal, vertices[x + (z * widthX)].y);
+                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
                 colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
             }
         }
@@ -154,7 +154,8 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                colours[x + (z*widthX)] = Color.green;
+                float vertHeight = Mathf.InverseLerp(minVal, maxVal, vertices[x + (z * widthX)].y);
+                colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
             }
         }
         mesh.colors = colours;
@@ -162,7 +163,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void Update()
     {
-        UpdateMeshColors();
+//        UpdateMeshColors();
     }
    
 }
