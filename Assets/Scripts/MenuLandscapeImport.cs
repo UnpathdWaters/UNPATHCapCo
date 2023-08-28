@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.IO;
 using TMPro;
 
@@ -20,11 +21,26 @@ public class MenuLandscapeImport : MonoBehaviour
     Vector3[] vertices;
     int[] triangles;
     Color[] colours;
+    Color[] basecol;
     Mesh mesh;
     public Gradient gradient;
     float maxVal = -9999;
     float minVal = 9999;
     public float zScale = 0.1f;
+    int year, day;
+    private int SEASONLENGTH = 91;
+    [SerializeField]
+    GameObject springImage;
+    [SerializeField]
+    GameObject summerImage;
+    [SerializeField]
+    GameObject autumnImage;
+    [SerializeField]
+    GameObject winterImage;
+
+
+    enum Seasons { Winter, Spring, Summer, Autumn };
+    Seasons season;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +49,7 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
         ImportData();
+        InitTimeManagement();
         CreateMesh();
         UpdateMesh();
     }
@@ -101,6 +118,7 @@ public class MenuLandscapeImport : MonoBehaviour
         vertices = new Vector3[widthX * heightZ];
         triangles = new int[(1 + widthX * heightZ) * 6];
         colours = new Color[vertices.Length];
+        basecol = new Color[vertices.Length];
         
         // Create vertices from depth array
         for (int z = 0; z < heightZ; z++)
@@ -129,6 +147,8 @@ public class MenuLandscapeImport : MonoBehaviour
             {
                 float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
                 colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
+                basecol[x + (z * widthX)] = gradient.Evaluate(vertHeight);
+
             }
         }
 
@@ -143,19 +163,87 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
+    void InitTimeManagement()
+    {
+        year = 20000;
+        day = 1;
+        season = Seasons.Winter;
+    }
+
+    void IncrementTime()
+    {
+        day++;
+        if (day > 365) {
+            year--;
+            day = 1;
+        }
+        season = (Seasons) (day / SEASONLENGTH);
+        switch (season)
+        {
+            case Seasons.Spring:
+                springImage.SetActive(true);
+                summerImage.SetActive(false);
+                autumnImage.SetActive(false);
+                winterImage.SetActive(false);
+                break;
+            case Seasons.Summer:
+                springImage.SetActive(false);
+                summerImage.SetActive(true);
+                autumnImage.SetActive(false);
+                winterImage.SetActive(false);
+                break;
+            case Seasons.Autumn:
+                springImage.SetActive(false);
+                summerImage.SetActive(false);
+                autumnImage.SetActive(true);
+                winterImage.SetActive(false);
+                break;
+            case Seasons.Winter:
+                springImage.SetActive(false);
+                summerImage.SetActive(false);
+                autumnImage.SetActive(false);
+                winterImage.SetActive(true);
+                break;
+            default:
+                break;
+        }
+    }
 
 
 
 
     void UpdateMeshColors()
     {
+        float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
+//        Debug.Log("Time through season is " + timeThroughSeason);
+
+
         // Assign colours to vertices
         for (int z = 0; z < heightZ; z++)
         {
             for (int x = 0; x < widthX; x++)
             {
-                float vertHeight = Mathf.InverseLerp(minVal, maxVal, vertices[x + (z * widthX)].y);
-                colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
+//                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
+//                colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
+
+
+                switch (season)
+                {
+                    case Seasons.Spring:
+                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.green, timeThroughSeason);
+                        break;
+                    case Seasons.Summer:
+                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, timeThroughSeason);
+                        break;
+                    case Seasons.Autumn:
+                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.red, timeThroughSeason);
+                        break;
+                    case Seasons.Winter:
+                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, timeThroughSeason);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         mesh.colors = colours;
@@ -163,7 +251,8 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void Update()
     {
-//        UpdateMeshColors();
+        UpdateMeshColors();
+        IncrementTime();
     }
    
 }
