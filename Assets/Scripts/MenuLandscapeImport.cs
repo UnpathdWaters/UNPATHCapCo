@@ -37,6 +37,15 @@ public class MenuLandscapeImport : MonoBehaviour
     GameObject autumnImage;
     [SerializeField]
     GameObject winterImage;
+    [SerializeField]
+    GameObject sea;
+    [SerializeField]
+    float depthScale;
+
+    float seaPos;
+    Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
+    Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
+
 
 
     enum Seasons { Winter, Spring, Summer, Autumn };
@@ -146,8 +155,8 @@ public class MenuLandscapeImport : MonoBehaviour
             for (int x = 0; x < widthX; x++)
             {
                 float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
-                basecol[x + (z * widthX)] = gradient.Evaluate(vertHeight);
+                colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
+                basecol[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
 
             }
         }
@@ -168,6 +177,30 @@ public class MenuLandscapeImport : MonoBehaviour
         year = 20000;
         day = 1;
         season = Seasons.Winter;
+        seaPos = -32.0f;
+    }
+
+    Color AddNoiseToColor(Color inColor)
+    {
+        float rRand = Random.Range(-0.03f, 0.04f);
+        float gRand = Random.Range(-0.03f, 0.04f);
+        float bRand = Random.Range(-0.03f, 0.04f);
+        float newR = ColNormal(inColor.r + rRand);
+        float newG = ColNormal(inColor.g + gRand);
+        float newB = ColNormal(inColor.b + bRand);
+        Color retCol = new Color(newR, newG, newB, 1);
+        return retCol;        
+    }
+
+    float ColNormal(float inNum)
+    {
+        if (inNum < 0.0f) {
+            return 0.0f;
+        } else if (inNum > 1.0f) {
+            return 1.0f;
+        } else {
+            return inNum;
+        }
     }
 
     void IncrementTime()
@@ -215,6 +248,9 @@ public class MenuLandscapeImport : MonoBehaviour
     void UpdateMeshColors()
     {
         float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
+        if (timeThroughSeason > 0.5f) {
+            timeThroughSeason = 0.5f - (timeThroughSeason - 0.5f);
+        }
 //        Debug.Log("Time through season is " + timeThroughSeason);
 
 
@@ -225,34 +261,48 @@ public class MenuLandscapeImport : MonoBehaviour
             {
 //                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
 //                colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
-
-
-                switch (season)
-                {
-                    case Seasons.Spring:
-                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.green, timeThroughSeason);
-                        break;
-                    case Seasons.Summer:
-                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, timeThroughSeason);
-                        break;
-                    case Seasons.Autumn:
-                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.red, timeThroughSeason);
-                        break;
-                    case Seasons.Winter:
-                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, timeThroughSeason);
-                        break;
-                    default:
-                        break;
+//                Debug.Log("Depth is " + depths[x, z] + "and seaPos is " + seaPos);
+                if (depths[x, z] < seaPos) {
+                    colours[x + (z * widthX)] = seaCol;
+                } else if (depths[x, z] - seaPos < 1) {
+                    colours[x + (z * widthX)] = coastCol;
+                } else {
+                    switch (season)
+                    {
+                        case Seasons.Spring:
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.green, timeThroughSeason);
+                            break;
+                        case Seasons.Summer:
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, timeThroughSeason);
+                            break;
+                        case Seasons.Autumn:
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.red, timeThroughSeason);
+                            break;
+                        case Seasons.Winter:
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, timeThroughSeason);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
         mesh.colors = colours;
     }
 
+    void SetSeaPos()
+    {
+        float xPos = sea.transform.position.x;
+        float zPos = sea.transform.position.z;
+        Vector3 newPos = new Vector3(xPos, seaPos * depthScale, zPos);
+        sea.transform.position = newPos;
+    }
+
     void Update()
     {
         UpdateMeshColors();
         IncrementTime();
+        SetSeaPos();
     }
    
 }
