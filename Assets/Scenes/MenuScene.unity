@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44966722, g: 0.4968037, b: 0.55987746, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1501,7 +1501,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.788, g: -0.5, b: 0.003030303, a: 1}
-    - _DetailWindDirection: {r: 0.010299999, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.04224003, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
@@ -1512,7 +1512,7 @@ Material:
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
-    - _WindDirection: {r: 0.010299999, g: 0, b: 0, a: 0}
+    - _WindDirection: {r: 0.04224003, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!1 &546690808
 GameObject:
@@ -1588,7 +1588,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.8
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1645,14 +1645,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 30, z: 0}
+  m_LocalRotation: {x: 0.17046992, y: -0.25475648, z: 0.04567727, w: 0.9507643}
+  m_LocalPosition: {x: -39, y: 241, z: 68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 20.33, y: -30, z: 0}
 --- !u!114 &705507996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3012,15 +3012,15 @@ MonoBehaviour:
     key3: {r: 0.012014948, g: 0.2830189, b: 0.04646058, a: 0}
     key4: {r: 0.029369887, g: 0.5660378, b: 0.050072584, a: 0}
     key5: {r: 0.33241364, g: 0.8490566, b: 0.3515486, a: 0}
-    key6: {r: 0.5, g: 0.4976415, b: 0.4976415, a: 0}
+    key6: {r: 1, g: 1, b: 1, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
     ctime1: 34936
     ctime2: 35590
     ctime3: 36237
     ctime4: 36572
-    ctime5: 57108
-    ctime6: 61281
+    ctime5: 40003
+    ctime6: 40697
     ctime7: 0
     atime0: 0
     atime1: 65535
@@ -3040,6 +3040,8 @@ MonoBehaviour:
   winterImage: {fileID: 163663712}
   sea: {fileID: 106031702}
   depthScale: 0.01
+  coastSize: 2
+  snowline: 150
 --- !u!33 &1445257515
 MeshFilter:
   m_ObjectHideFlags: 0

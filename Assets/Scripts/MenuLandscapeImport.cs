@@ -14,6 +14,8 @@ public class MenuLandscapeImport : MonoBehaviour
     int widthX = 600;
     int heightZ = 600;
     float[,] depths;
+    bool [,] trees;
+    bool treeSet;
     string[,] headerText;
     int totCols;
     int totRows;
@@ -41,10 +43,15 @@ public class MenuLandscapeImport : MonoBehaviour
     GameObject sea;
     [SerializeField]
     float depthScale;
+    [SerializeField]
+    float coastSize;
+    [SerializeField]
+    float snowline;
 
     float seaPos;
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
     Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
+    Color autumnTrees = new Color(0.9f, 0.2f, 0.0f, 1.0f);
 
 
 
@@ -69,6 +76,8 @@ public class MenuLandscapeImport : MonoBehaviour
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
+        trees = new bool[widthX, heightZ];
+        treeSet = false;
         headerText = new string[2,6];
         float thisval = 0.0f;
         char[] separators = new char[] { ' ', '.', '\t', ',' };
@@ -251,6 +260,17 @@ public class MenuLandscapeImport : MonoBehaviour
         if (timeThroughSeason > 0.5f) {
             timeThroughSeason = 0.5f - (timeThroughSeason - 0.5f);
         }
+
+        float timeThroughYear = (float) day / (float) 365;
+        if (timeThroughYear > 0.5f) {
+            timeThroughYear = 0.5f - (timeThroughYear - 0.5f);
+        }
+
+        if (day % SEASONLENGTH == 1 && season == Seasons.Autumn) {
+            treeSet = false;
+        } else {
+            treeSet = true;
+        }
 //        Debug.Log("Time through season is " + timeThroughSeason);
 
 
@@ -259,30 +279,52 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-//                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-//                colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
-//                Debug.Log("Depth is " + depths[x, z] + "and seaPos is " + seaPos);
                 if (depths[x, z] < seaPos) {
                     colours[x + (z * widthX)] = seaCol;
-                } else if (depths[x, z] - seaPos < 1) {
+                } else if (depths[x, z] - seaPos < coastSize) {
                     colours[x + (z * widthX)] = coastCol;
                 } else {
                     switch (season)
                     {
                         case Seasons.Spring:
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.green, timeThroughSeason);
+                            colours[x + (z * widthX)] = basecol[x + (z * widthX)];
                             break;
                         case Seasons.Summer:
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, timeThroughSeason);
+                            if (depths[x, z] < snowline)
+                            {
+                                colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, (timeThroughSeason / 4.0f));
+                            }
                             break;
                         case Seasons.Autumn:
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.red, timeThroughSeason);
+                            if (!treeSet) {
+                                if (depths[x, z] < snowline && depths[x, z] > (seaPos + (coastSize * 5))) {
+                                    if (Random.Range(0, 100) < 15) {
+                                        trees[x, z] = true;
+                                    } else {
+                                        trees[x, z] = false;
+                                    }
+                                } else {
+                                    trees[x, z] = false;
+                                }    
+                            }
+                            if (trees[x, z]) {
+                                colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, timeThroughSeason);
+                            } else if (depths[x, z] > (seaPos + (coastSize * 5))) {
+                                colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, (timeThroughSeason / 4.0f));
+                            } else {
+                                colours[x + (z * widthX)] = basecol[x + (z * widthX)];
+                            }
                             break;
                         case Seasons.Winter:
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, timeThroughSeason);
+                            float heightFac = (depths[x, z] - seaPos) / (snowline - seaPos);
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, (timeThroughSeason + (heightFac / 2.0f)) / 1.5f);
                             break;
                         default:
                             break;
+                    }
+                    if (depths[x, z] < snowline)
+                    {
+                        colours[x + (z * widthX)] = Color.Lerp(colours[x + (z * widthX)], Color.green, (timeThroughYear / 4.0f));
                     }
                 }
             }
@@ -303,6 +345,7 @@ public class MenuLandscapeImport : MonoBehaviour
         UpdateMeshColors();
         IncrementTime();
         SetSeaPos();
+
     }
    
 }
