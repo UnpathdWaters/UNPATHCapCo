@@ -16,6 +16,7 @@ public class MenuLandscapeImport : MonoBehaviour
     float[,] depths;
     bool [,] trees;
     bool treeSet;
+    bool pause;
     string[,] headerText;
     int totCols;
     int totRows;
@@ -47,13 +48,13 @@ public class MenuLandscapeImport : MonoBehaviour
     float coastSize;
     [SerializeField]
     float snowline;
+    [SerializeField]
+    Camera cam;
 
     float seaPos;
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
     Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
     Color autumnTrees = new Color(0.9f, 0.2f, 0.0f, 1.0f);
-
-
 
     enum Seasons { Winter, Spring, Summer, Autumn };
     Seasons season;
@@ -68,6 +69,7 @@ public class MenuLandscapeImport : MonoBehaviour
         InitTimeManagement();
         CreateMesh();
         UpdateMesh();
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     void ImportData()
@@ -340,12 +342,33 @@ public class MenuLandscapeImport : MonoBehaviour
         sea.transform.position = newPos;
     }
 
+    void TogglePause()
+    {
+        if (pause) {
+            pause = false;
+        } else {
+            pause = true;
+        }
+    }
+
     void Update()
     {
-        UpdateMeshColors();
-        IncrementTime();
-        SetSeaPos();
-
+        if (!pause) {
+            UpdateMeshColors();
+            IncrementTime();
+            SetSeaPos();
+        }
+        if (Input.GetKeyDown(KeyCode.P)) TogglePause();
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+        if (Input.GetMouseButtonDown(0)) {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit)) {
+                Debug.Log ("CLICKED " + hit.collider.name + " at " + hit.point);
+            } else {
+                Debug.Log("Missed");
+            }
+        }
     }
    
 }
