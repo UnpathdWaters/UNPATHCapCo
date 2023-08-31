@@ -43,8 +43,6 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField]
     GameObject sea;
     [SerializeField]
-    float depthScale;
-    [SerializeField]
     float coastSize;
     [SerializeField]
     float snowline;
@@ -69,7 +67,7 @@ public class MenuLandscapeImport : MonoBehaviour
         InitTimeManagement();
         CreateMesh();
         UpdateMesh();
-        GetComponent<MeshCollider>().sharedMesh = mesh;
+//        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     void ImportData()
@@ -338,7 +336,7 @@ public class MenuLandscapeImport : MonoBehaviour
     {
         float xPos = sea.transform.position.x;
         float zPos = sea.transform.position.z;
-        Vector3 newPos = new Vector3(xPos, seaPos * depthScale, zPos);
+        Vector3 newPos = new Vector3(xPos, seaPos * zScale, zPos);
         sea.transform.position = newPos;
     }
 
@@ -364,7 +362,7 @@ public class MenuLandscapeImport : MonoBehaviour
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit)) {
-                Debug.Log ("CLICKED " + hit.collider.name + " at " + hit.point);
+                Debug.Log ("CLICKED " + hit.collider.name + " at " + hit.point + " of depth " + depths[(int) hit.point.x, (int) hit.point.z]);
             } else {
                 Debug.Log("Missed");
             }

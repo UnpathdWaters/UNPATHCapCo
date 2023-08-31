@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 106031706}
   - component: {fileID: 106031705}
   - component: {fileID: 106031704}
-  - component: {fileID: 106031703}
   m_Layer: 0
   m_Name: Sea
   m_TagString: Untagged
@@ -142,20 +141,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!64 &106031703
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 106031702}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &106031704
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1501,7 +1486,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.788, g: -0.5, b: 0.003030303, a: 1}
-    - _DetailWindDirection: {r: 0.024263352, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.015299999, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
@@ -1512,7 +1497,7 @@ Material:
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
-    - _WindDirection: {r: 0.024263352, g: 0, b: 0, a: 0}
+    - _WindDirection: {r: 0.015299999, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!1 &546690808
 GameObject:
@@ -3035,13 +3020,12 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
-  zScale: 0.005
+  zScale: 0.001
   springImage: {fileID: 1464166179}
   summerImage: {fileID: 290967234}
   autumnImage: {fileID: 107799871}
   winterImage: {fileID: 163663712}
   sea: {fileID: 106031702}
-  depthScale: 0.01
   coastSize: 2
   snowline: 150
   cam: {fileID: 465708542}
@@ -3053,8 +3037,8 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1445257511}
   m_Mesh: {fileID: 0}
---- !u!64 &1445257516
-MeshCollider:
+--- !u!65 &1445257516
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3063,10 +3047,9 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  serializedVersion: 2
+  m_Size: {x: 600, y: 1, z: 600}
+  m_Center: {x: 300, y: 0, z: 300}
 --- !u!1 &1464166179
 GameObject:
   m_ObjectHideFlags: 0
