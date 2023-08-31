@@ -45,9 +45,25 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField]
     float coastSize;
     [SerializeField]
-    float snowline;
+    float baseSnowline;
     [SerializeField]
     Camera cam;
+    [SerializeField]
+    GameObject arrow1;
+    [SerializeField]
+    GameObject arrow2;
+    [SerializeField]
+    GameObject arrow3;
+    [SerializeField]
+    GameObject arrow4;
+    [SerializeField]
+    GameObject arrow5;
+    [SerializeField]
+    GameObject arrow6;
+    [SerializeField]
+    GameObject arrow7;
+    [SerializeField]
+    GameObject glaciers1;
 
     float seaPos;
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
@@ -56,10 +72,12 @@ public class MenuLandscapeImport : MonoBehaviour
 
     enum Seasons { Winter, Spring, Summer, Autumn };
     Seasons season;
+    float snowline;
 
     // Start is called before the first frame update
     void Start()
     {
+        snowline = baseSnowline;
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
@@ -67,7 +85,6 @@ public class MenuLandscapeImport : MonoBehaviour
         InitTimeManagement();
         CreateMesh();
         UpdateMesh();
-//        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     void ImportData()
@@ -157,13 +174,18 @@ public class MenuLandscapeImport : MonoBehaviour
 
             }
         }
+    EvaluateBaseColours();
+    }
 
+    void EvaluateBaseColours()
+    {
         // Assign colours to vertices
         for (int z = 0; z < heightZ; z++)
         {
             for (int x = 0; x < widthX; x++)
             {
-                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
+//                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
+                float vertHeight = Mathf.InverseLerp(seaPos, seaPos + snowline, depths[x, z]);
                 colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                 basecol[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
 
@@ -186,7 +208,7 @@ public class MenuLandscapeImport : MonoBehaviour
         year = 20000;
         day = 1;
         season = Seasons.Winter;
-        seaPos = -32.0f;
+        seaPos = -96.0f;
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -227,24 +249,28 @@ public class MenuLandscapeImport : MonoBehaviour
                 summerImage.SetActive(false);
                 autumnImage.SetActive(false);
                 winterImage.SetActive(false);
+                snowline = baseSnowline;
                 break;
             case Seasons.Summer:
                 springImage.SetActive(false);
                 summerImage.SetActive(true);
                 autumnImage.SetActive(false);
                 winterImage.SetActive(false);
+                snowline = baseSnowline * 2;
                 break;
             case Seasons.Autumn:
                 springImage.SetActive(false);
                 summerImage.SetActive(false);
                 autumnImage.SetActive(true);
                 winterImage.SetActive(false);
+                snowline = baseSnowline;
                 break;
             case Seasons.Winter:
                 springImage.SetActive(false);
                 summerImage.SetActive(false);
                 autumnImage.SetActive(false);
                 winterImage.SetActive(true);
+                snowline = baseSnowline / 2;
                 break;
             default:
                 break;
@@ -290,14 +316,14 @@ public class MenuLandscapeImport : MonoBehaviour
                             colours[x + (z * widthX)] = basecol[x + (z * widthX)];
                             break;
                         case Seasons.Summer:
-                            if (depths[x, z] < snowline)
+                            if (depths[x, z] < (snowline + seaPos))
                             {
                                 colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, (timeThroughSeason / 4.0f));
                             }
                             break;
                         case Seasons.Autumn:
                             if (!treeSet) {
-                                if (depths[x, z] < snowline && depths[x, z] > (seaPos + (coastSize * 5))) {
+                                if (depths[x, z] < (snowline + seaPos) && depths[x, z] > (seaPos + (coastSize * 5))) {
                                     if (Random.Range(0, 100) < 15) {
                                         trees[x, z] = true;
                                     } else {
@@ -322,7 +348,7 @@ public class MenuLandscapeImport : MonoBehaviour
                         default:
                             break;
                     }
-                    if (depths[x, z] < snowline)
+                    if (depths[x, z] < (snowline + seaPos))
                     {
                         colours[x + (z * widthX)] = Color.Lerp(colours[x + (z * widthX)], Color.green, (timeThroughYear / 4.0f));
                     }
@@ -367,6 +393,90 @@ public class MenuLandscapeImport : MonoBehaviour
                 Debug.Log("Missed");
             }
         }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            seaPos = -96.0f;
+            arrow1.SetActive(true);
+            arrow2.SetActive(false);
+            arrow3.SetActive(false);
+            arrow4.SetActive(false);
+            arrow5.SetActive(false);
+            arrow6.SetActive(false);
+            arrow7.SetActive(false);
+            glaciers1.SetActive(true);
+            EvaluateBaseColours();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            seaPos = -94.0f;
+            arrow1.SetActive(false);
+            arrow2.SetActive(true);
+            arrow3.SetActive(false);
+            arrow4.SetActive(false);
+            arrow5.SetActive(false);
+            arrow6.SetActive(false);
+            arrow7.SetActive(false);
+            glaciers1.SetActive(false);
+            EvaluateBaseColours();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            seaPos = -85.0f;
+            arrow1.SetActive(false);
+            arrow2.SetActive(false);
+            arrow3.SetActive(true);
+            arrow4.SetActive(false);
+            arrow5.SetActive(false);
+            arrow6.SetActive(false);
+            arrow7.SetActive(false);
+            glaciers1.SetActive(false);
+            EvaluateBaseColours();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4)) {
+            seaPos = -55.0f;
+            arrow1.SetActive(false);
+            arrow2.SetActive(false);
+            arrow3.SetActive(false);
+            arrow4.SetActive(true);
+            arrow5.SetActive(false);
+            arrow6.SetActive(false);
+            arrow7.SetActive(false);
+            glaciers1.SetActive(false);
+            EvaluateBaseColours();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5)) {
+            seaPos = -33.0f;
+            arrow1.SetActive(false);
+            arrow2.SetActive(false);
+            arrow3.SetActive(false);
+            arrow4.SetActive(false);
+            arrow5.SetActive(true);
+            arrow6.SetActive(false);
+            arrow7.SetActive(false);
+            glaciers1.SetActive(false);
+            EvaluateBaseColours();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6)) {
+            seaPos = -14.0f;
+            arrow1.SetActive(false);
+            arrow2.SetActive(false);
+            arrow3.SetActive(false);
+            arrow4.SetActive(false);
+            arrow5.SetActive(false);
+            arrow6.SetActive(true);
+            arrow7.SetActive(false);
+            glaciers1.SetActive(false);
+            EvaluateBaseColours();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7)) {
+            seaPos = -5.0f;
+            arrow1.SetActive(false);
+            arrow2.SetActive(false);
+            arrow3.SetActive(false);
+            arrow4.SetActive(false);
+            arrow5.SetActive(false);
+            arrow6.SetActive(false);
+            arrow7.SetActive(true);
+            glaciers1.SetActive(false);
+            EvaluateBaseColours();
+
+        }
     }
-   
 }
