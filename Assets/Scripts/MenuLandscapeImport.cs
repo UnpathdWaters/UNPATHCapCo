@@ -31,6 +31,7 @@ public class MenuLandscapeImport : MonoBehaviour
     float minVal = 9999;
     public float zScale = 0.1f;
     int year, day;
+    Vector2 clickedPoint;
     private int SEASONLENGTH = 91;
     [SerializeField]
     GameObject springImage;
@@ -69,9 +70,11 @@ public class MenuLandscapeImport : MonoBehaviour
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
     Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
     Color autumnTrees = new Color(0.9f, 0.2f, 0.0f, 1.0f);
+    Color clickCol = new Color(0.9f, 0.0f, 0.9f, 1.0f);
+    Color clickNeighbour = new Color(0.9f, 0.3f, 0.9f, 1.0f);
 
     enum Seasons { Winter, Spring, Summer, Autumn };
-    Seasons season;
+    Seasons season, lastSeason;
     float snowline;
 
     // Start is called before the first frame update
@@ -98,6 +101,7 @@ public class MenuLandscapeImport : MonoBehaviour
         headerText = new string[2,6];
         float thisval = 0.0f;
         char[] separators = new char[] { ' ', '.', '\t', ',' };
+        clickedPoint = new Vector2(0, 0);
 
         //Read ESRI ASCII header
         for (int headline = 0; headline < 6; headline++)
@@ -208,6 +212,7 @@ public class MenuLandscapeImport : MonoBehaviour
         year = 20000;
         day = 1;
         season = Seasons.Winter;
+        lastSeason = season;
         seaPos = -96.0f;
     }
 
@@ -242,42 +247,61 @@ public class MenuLandscapeImport : MonoBehaviour
             day = 1;
         }
         season = (Seasons) (day / SEASONLENGTH);
-        switch (season)
-        {
-            case Seasons.Spring:
-                springImage.SetActive(true);
-                summerImage.SetActive(false);
-                autumnImage.SetActive(false);
-                winterImage.SetActive(false);
-                snowline = baseSnowline;
-                break;
-            case Seasons.Summer:
-                springImage.SetActive(false);
-                summerImage.SetActive(true);
-                autumnImage.SetActive(false);
-                winterImage.SetActive(false);
-                snowline = baseSnowline * 2;
-                break;
-            case Seasons.Autumn:
-                springImage.SetActive(false);
-                summerImage.SetActive(false);
-                autumnImage.SetActive(true);
-                winterImage.SetActive(false);
-                snowline = baseSnowline;
-                break;
-            case Seasons.Winter:
-                springImage.SetActive(false);
-                summerImage.SetActive(false);
-                autumnImage.SetActive(false);
-                winterImage.SetActive(true);
-                snowline = baseSnowline / 2;
-                break;
-            default:
-                break;
+        if (season != lastSeason) {
+            switch (season)
+            {
+                case Seasons.Spring:
+                    springImage.SetActive(true);
+                    summerImage.SetActive(false);
+                    autumnImage.SetActive(false);
+                    winterImage.SetActive(false);
+                    snowline = baseSnowline;
+                    EvaluateBaseColours();
+                    break;
+                case Seasons.Summer:
+                    springImage.SetActive(false);
+                    summerImage.SetActive(true);
+                    autumnImage.SetActive(false);
+                    winterImage.SetActive(false);
+                    snowline = baseSnowline * 2;
+                    EvaluateBaseColours();
+                    break;
+                case Seasons.Autumn:
+                    springImage.SetActive(false);
+                    summerImage.SetActive(false);
+                    autumnImage.SetActive(true);
+                    winterImage.SetActive(false);
+                    snowline = baseSnowline;
+                    EvaluateBaseColours();
+                    break;
+                case Seasons.Winter:
+                    springImage.SetActive(false);
+                    summerImage.SetActive(false);
+                    autumnImage.SetActive(false);
+                    winterImage.SetActive(true);
+                    snowline = baseSnowline / 2;
+                    EvaluateBaseColours();
+                    break;
+                default:
+                    EvaluateBaseColours();
+                    break;
+            }
+
         }
+        lastSeason = season;
     }
 
-
+    bool IsNeighbour(Vector2 point1, Vector2 point2) {
+        if (Mathf.Abs(point1.x - point2.x) <= 1 && Mathf.Abs(point1.y - point2.y) <= 1) {
+            if (point1.x == point2.x && point1.y == point2.y) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
 
 
     void UpdateMeshColors()
@@ -307,6 +331,10 @@ public class MenuLandscapeImport : MonoBehaviour
             {
                 if (depths[x, z] < seaPos) {
                     colours[x + (z * widthX)] = seaCol;
+                } else if (x == clickedPoint.x && z == clickedPoint.y) {
+                    colours[x + (z * widthX)] = clickCol;
+                } else if (IsNeighbour(new Vector2(x, z), clickedPoint)) {
+                    colours[x + (z * widthX)] = clickNeighbour;
                 } else if (depths[x, z] - seaPos < coastSize) {
                     colours[x + (z * widthX)] = coastCol;
                 } else {
@@ -388,13 +416,15 @@ public class MenuLandscapeImport : MonoBehaviour
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit)) {
-                Debug.Log ("CLICKED " + hit.collider.name + " at " + hit.point + " of depth " + depths[(int) hit.point.x, (int) hit.point.z]);
-            } else {
-                Debug.Log("Missed");
+                if (depths[(int) hit.point.x, (int) hit.point.z] > seaPos) {
+                    clickedPoint.x = hit.point.x;
+                    clickedPoint.y = hit.point.z;
+                }
             }
         }
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             seaPos = -96.0f;
+            baseSnowline = 100.0f;
             arrow1.SetActive(true);
             arrow2.SetActive(false);
             arrow3.SetActive(false);
@@ -407,6 +437,7 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
             seaPos = -94.0f;
+            baseSnowline = 125.0f;
             arrow1.SetActive(false);
             arrow2.SetActive(true);
             arrow3.SetActive(false);
@@ -419,6 +450,7 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha3)) {
             seaPos = -85.0f;
+            baseSnowline = 150.0f;
             arrow1.SetActive(false);
             arrow2.SetActive(false);
             arrow3.SetActive(true);
@@ -431,6 +463,7 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha4)) {
             seaPos = -55.0f;
+            baseSnowline = 300.0f;
             arrow1.SetActive(false);
             arrow2.SetActive(false);
             arrow3.SetActive(false);
@@ -443,6 +476,7 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha5)) {
             seaPos = -33.0f;
+            baseSnowline = 400.0f;
             arrow1.SetActive(false);
             arrow2.SetActive(false);
             arrow3.SetActive(false);
@@ -455,6 +489,7 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha6)) {
             seaPos = -14.0f;
+            baseSnowline = 450.0f;
             arrow1.SetActive(false);
             arrow2.SetActive(false);
             arrow3.SetActive(false);
@@ -467,6 +502,7 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha7)) {
             seaPos = -5.0f;
+            baseSnowline = 500.0f;
             arrow1.SetActive(false);
             arrow2.SetActive(false);
             arrow3.SetActive(false);

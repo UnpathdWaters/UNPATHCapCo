@@ -1632,7 +1632,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.788, g: -0.5, b: 0.003030303, a: 1}
-    - _DetailWindDirection: {r: 0.036420427, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.015299999, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
@@ -1643,7 +1643,7 @@ Material:
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
-    - _WindDirection: {r: 0.036420427, g: 0, b: 0, a: 0}
+    - _WindDirection: {r: 0.015299999, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!1 &546690808
 GameObject:
@@ -3257,7 +3257,7 @@ MonoBehaviour:
   winterImage: {fileID: 163663712}
   sea: {fileID: 106031702}
   coastSize: 2
-  baseSnowline: 300
+  baseSnowline: 100
   cam: {fileID: 465708542}
   arrow1: {fileID: 1989908917}
   arrow2: {fileID: 2110929201}
