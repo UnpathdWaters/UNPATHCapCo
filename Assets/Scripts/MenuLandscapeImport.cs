@@ -64,7 +64,11 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField]
     GameObject arrow7;
     [SerializeField]
-    GameObject glaciers1;
+    GameObject glaciers20k;
+    [SerializeField]
+    GameObject glaciers17k;
+    [SerializeField]
+    GameObject glaciers15k;
 
     float seaPos;
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
@@ -432,7 +436,9 @@ public class MenuLandscapeImport : MonoBehaviour
             arrow5.SetActive(false);
             arrow6.SetActive(false);
             arrow7.SetActive(false);
-            glaciers1.SetActive(true);
+            glaciers20k.SetActive(true);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
             EvaluateBaseColours();
         }
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
@@ -445,7 +451,9 @@ public class MenuLandscapeImport : MonoBehaviour
             arrow5.SetActive(false);
             arrow6.SetActive(false);
             arrow7.SetActive(false);
-            glaciers1.SetActive(false);
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(true);
+            glaciers15k.SetActive(false);
             EvaluateBaseColours();
         }
         if (Input.GetKeyDown(KeyCode.Alpha3)) {
@@ -458,7 +466,9 @@ public class MenuLandscapeImport : MonoBehaviour
             arrow5.SetActive(false);
             arrow6.SetActive(false);
             arrow7.SetActive(false);
-            glaciers1.SetActive(false);
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(true);
             EvaluateBaseColours();
         }
         if (Input.GetKeyDown(KeyCode.Alpha4)) {
@@ -471,7 +481,9 @@ public class MenuLandscapeImport : MonoBehaviour
             arrow5.SetActive(false);
             arrow6.SetActive(false);
             arrow7.SetActive(false);
-            glaciers1.SetActive(false);
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
             EvaluateBaseColours();
         }
         if (Input.GetKeyDown(KeyCode.Alpha5)) {
@@ -484,7 +496,9 @@ public class MenuLandscapeImport : MonoBehaviour
             arrow5.SetActive(true);
             arrow6.SetActive(false);
             arrow7.SetActive(false);
-            glaciers1.SetActive(false);
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
             EvaluateBaseColours();
         }
         if (Input.GetKeyDown(KeyCode.Alpha6)) {
@@ -497,7 +511,9 @@ public class MenuLandscapeImport : MonoBehaviour
             arrow5.SetActive(false);
             arrow6.SetActive(true);
             arrow7.SetActive(false);
-            glaciers1.SetActive(false);
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
             EvaluateBaseColours();
         }
         if (Input.GetKeyDown(KeyCode.Alpha7)) {
@@ -510,7 +526,9 @@ public class MenuLandscapeImport : MonoBehaviour
             arrow5.SetActive(false);
             arrow6.SetActive(false);
             arrow7.SetActive(true);
-            glaciers1.SetActive(false);
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
             EvaluateBaseColours();
 
         }
