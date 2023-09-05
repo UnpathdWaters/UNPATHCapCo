@@ -75,7 +75,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Assets/localsurface600.asc");
+        surfaceFile = new FileInfo ("Assets/Terrain/localsurface600.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
