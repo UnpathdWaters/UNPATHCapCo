@@ -55,6 +55,10 @@ public class LocalLandscapeImport : MonoBehaviour
     Seasons season, lastSeason;
     float snowline;
 
+    public Texture2D landuseMap;
+    bool[,] river;
+    bool[,] marsh;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -66,6 +70,7 @@ public class LocalLandscapeImport : MonoBehaviour
         InitTimeManagement();
         CreateMesh();
         UpdateMesh();
+        ProcessMask();
     }
 
     void ImportData()
@@ -125,11 +130,6 @@ public class LocalLandscapeImport : MonoBehaviour
         }
         Debug.Log("Maxval is " + maxVal + " and minval is " + minVal);
 
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 5; y++) {
-                Debug.Log(x + "," + y + "=" + depths[x, y]);
-            }
-        }
     }
 
 
@@ -156,6 +156,34 @@ public class LocalLandscapeImport : MonoBehaviour
                     triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 5] = (x - 1) + ((z - 1) * widthX); 
                 }
 
+            }
+        }
+    }
+
+    void ProcessMask()
+    {
+        river = new bool[widthX, heightZ];
+        marsh = new bool[widthX, heightZ];
+        Color[] maskPixels = landuseMap.GetPixels();
+        Debug.Log("maskPixels size is " + maskPixels.Length);
+        Color thisCol;
+        int useableX, useableY;
+        float xFactor, yFactor;
+        xFactor = (float) landuseMap.width / (float) widthX;
+        yFactor = (float) landuseMap.height / (float) heightZ;
+        Debug.Log("Xfac is " + xFactor + " and yfac is " + yFactor);
+        for (int y = 0; y < landuseMap.height; y++){
+            for (int x = 0; x < landuseMap.width; x++) {
+                thisCol = maskPixels[x + (y * landuseMap.width)];
+                useableX = (int) (x * xFactor);
+                useableY = (int) (y * yFactor);
+                if (thisCol == Color.black) {
+                    river[useableX, useableY] = true;
+                    Debug.Log("Pixel " + useableX + "," + useableY +" is river");
+                } else if (thisCol == Color.white) {
+                    marsh[useableX, useableY] = true;
+                    Debug.Log("Pixel " + useableX + "," + useableY +" is marsh");
+                } 
             }
         }
     }
