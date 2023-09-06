@@ -96,7 +96,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Assets/surface600.csv");
+        surfaceFile = new FileInfo ("Assets/Terrain/surface600.csv");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
