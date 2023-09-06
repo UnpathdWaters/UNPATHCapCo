@@ -59,6 +59,13 @@ public class LocalLandscapeImport : MonoBehaviour
     bool[,] river;
     bool[,] marsh;
 
+    public GameObject moose;
+    public GameObject human;
+    public GameObject tree;
+    Vector2 moosePos = new Vector2(300.0f, 300.0f);
+    Vector2 humanPos = new Vector2(305.0f, 305.0f);
+    Vector2 treePos = new Vector2(295.0f, 305.0f);
+
     // Start is called before the first frame update
     void Start()
     {
@@ -71,6 +78,9 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateMesh();
         UpdateMesh();
         ProcessMask();
+        CreateTrees();
+        CreateHumans();
+        CreateMeese();
     }
 
     void ImportData()
@@ -289,6 +299,23 @@ public class LocalLandscapeImport : MonoBehaviour
         }
     }
 
+    void CreateTrees()
+    {
+        Vector3 treePos3D = new Vector3(treePos.x, depths[(int) treePos.x, (int) treePos.y] * zScale, treePos.y);
+        Instantiate(tree, treePos3D, Quaternion.identity);
+    }
+
+    void CreateHumans()
+    {
+        Vector3 humanPos3D = new Vector3(humanPos.x, depths[(int) humanPos.x, (int) humanPos.y] * zScale, humanPos.y);
+        Instantiate(human, humanPos3D, Quaternion.identity);
+    }
+
+    void CreateMeese()
+    {
+        Vector3 moosePos3D = new Vector3(moosePos.x, depths[(int) moosePos.x, (int) moosePos.y] * zScale, moosePos.y);
+        Instantiate(moose, moosePos3D, Quaternion.identity);
+    }
 
     void UpdateMeshColors()
     {
@@ -352,3 +379,4 @@ public class LocalLandscapeImport : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
     }
 }
+

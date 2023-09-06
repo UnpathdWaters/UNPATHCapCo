@@ -856,6 +856,7 @@ Material:
   m_Name: VolumetricFog2/VolumetricFog2DURP
   m_Shader: {fileID: 4800000, guid: cd79ad756ee3e4d3f8fe6b417ef8c835, type: 3}
   m_ValidKeywords:
+  - VF2_CONSTANT_DENSITY
   - VF2_DISTANCE
   - VF2_RECEIVE_SHADOWS
   - VF2_SHAPE_BOX
@@ -914,18 +915,18 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.788, g: -0.5, b: 0.003030303, a: 1}
-    - _DetailWindDirection: {r: 1.9241563, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.0577438, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarSize: {r: 0, g: 0, b: 0, a: 1}
-    - _LightColor: {r: 1.6, g: 1.5309805, b: 1.3427452, a: 1}
+    - _LightColor: {r: 2, g: 2, b: 2, a: 1}
     - _MaxDistanceData: {r: 10000, g: 1, b: 0, a: 0}
     - _RayMarchSettings: {r: 5, g: 0.01, b: 1, a: 0.25}
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
-    - _SunDir: {r: 0.46885353, g: 0.3474266, b: -0.8120783, a: 0}
-    - _WindDirection: {r: 1.9241563, g: 0, b: 0, a: 0}
+    - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
+    - _WindDirection: {r: 0.0577438, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!1 &705507993
 GameObject:
@@ -1517,6 +1518,9 @@ MonoBehaviour:
   baseSnowline: 300
   cam: {fileID: 465708542}
   landuseMap: {fileID: 2800000, guid: 82295533f5c5ea94fb722251d83a8b2a, type: 3}
+  moose: {fileID: 919132149155446097, guid: db8ee18a17d8d0f47a328a214a9c666c, type: 3}
+  human: {fileID: 4579074936070757511, guid: 2f02f27c17ff28b478db7f83f7d5370c, type: 3}
+  tree: {fileID: 919132149155446097, guid: baaf931961be83b479d52d911795865f, type: 3}
 --- !u!1 &1464166179
 GameObject:
   m_ObjectHideFlags: 0
