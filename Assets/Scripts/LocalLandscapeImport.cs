@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using TMPro;
+using System;
 
 [RequireComponent(typeof(MeshFilter))]
 public class LocalLandscapeImport : MonoBehaviour
@@ -25,6 +26,7 @@ public class LocalLandscapeImport : MonoBehaviour
     Mesh mesh;
     float maxVal = -9999;
     float minVal = 9999;
+    float midVal = 0;
     public float zScale = 0.1f;
     public Gradient gradient;
     int year, day;
@@ -70,6 +72,7 @@ public class LocalLandscapeImport : MonoBehaviour
     Vector2 treePos = new Vector2(295.0f, 305.0f);
 
     public int reedDensity;
+    public int treeDensity;
 
     // Start is called before the first frame update
     void Start()
@@ -87,6 +90,8 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateHumans();
         CreateMeese();
         CreateReeds();
+        UpdateMeshColors();
+        Debug.Log("Maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
 
     void ImportData()
@@ -120,6 +125,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
 
         string[] readArray = new string[totCols];
+        float[] tempArray = new float[widthX * heightZ];
 
         int xCount = 0;
         int zCount = heightZ - 1;
@@ -132,6 +138,7 @@ public class LocalLandscapeImport : MonoBehaviour
             {
                 thisval = float.Parse(readArray[x]);
                 depths[xCount, zCount] = thisval;
+                tempArray[x + (z * widthX)] = thisval;
                 if (thisval > maxVal)
                 {
                     maxVal = thisval;
@@ -144,8 +151,7 @@ public class LocalLandscapeImport : MonoBehaviour
             }
             zCount--;
         }
-        Debug.Log("Maxval is " + maxVal + " and minval is " + minVal);
-
+        midVal = CalculateMedian(tempArray);
     }
 
 
@@ -197,11 +203,9 @@ public class LocalLandscapeImport : MonoBehaviour
                 useableY = (int) (y / yFactor);
                 if (thisCol.g < 0.5f && thisCol.a > 0.2f) {
                     river[useableX, useableY] = true;
-                    Debug.Log("Pixel " + useableX + "," + useableY +" is river");
                     riverPix++;
                 } else if (thisCol.g > 0.5f && thisCol.a > 0.2f) {
                     marsh[useableX, useableY] = true;
-                    Debug.Log("Pixel " + useableX + "," + useableY +" is marsh");
                     marshPix++;
                 } 
             }
@@ -230,9 +234,9 @@ public class LocalLandscapeImport : MonoBehaviour
 
     Color AddNoiseToColor(Color inColor)
     {
-        float rRand = Random.Range(-0.03f, 0.04f);
-        float gRand = Random.Range(-0.03f, 0.04f);
-        float bRand = Random.Range(-0.03f, 0.04f);
+        float rRand = UnityEngine.Random.Range(-0.03f, 0.04f);
+        float gRand = UnityEngine.Random.Range(-0.03f, 0.04f);
+        float bRand = UnityEngine.Random.Range(-0.03f, 0.04f);
         float newR = ColNormal(inColor.r + rRand);
         float newG = ColNormal(inColor.g + gRand);
         float newB = ColNormal(inColor.b + bRand);
@@ -310,10 +314,29 @@ public class LocalLandscapeImport : MonoBehaviour
         }
     }
 
+    Vector3 JigglePosition(Vector3 inVec)
+    {
+        Vector3 adj = new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), 0, UnityEngine.Random.Range(-0.5f, 0.5f));
+        return inVec + adj;
+    }
+
     void CreateTrees()
     {
-        Vector3 treePos3D = new Vector3(treePos.x, depths[(int) treePos.x, (int) treePos.y] * zScale, treePos.y);
-        Instantiate(tree, treePos3D, Quaternion.identity);
+        for (int y = 0; y < landuseMap.height; y++){
+            for (int x = 0; x < landuseMap.width; x++) {
+                if (depths[x, y] > midVal && !river[x, y] && !marsh[x, y]) {
+                    if (UnityEngine.Random.Range(midVal, maxVal) < depths[x, y]) {
+                        Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
+                        Instantiate(tree, treePos, Quaternion.identity);
+                    }
+                }
+            }
+        }
+    }
+
+    float CalculateMedian(float[] inArray) {
+        Array.Sort(inArray);
+        return inArray[inArray.Length / 2];
     }
 
     void CreateHumans()
@@ -333,9 +356,16 @@ public class LocalLandscapeImport : MonoBehaviour
         for (int y = 0; y < landuseMap.height; y++){
             for (int x = 0; x < landuseMap.width; x++) {
                 if (marsh[x, y]) {
-                    if (Random.Range(0, 100) < reedDensity) {
+                    if (UnityEngine.Random.Range(0, 100) < reedDensity) {
                         Vector3 reedPos = new Vector3(x, depths[x, y] * zScale, y);
-                        Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0)));
+                        Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
+                    }
+                } else {
+                    if (depths[x, y] < midVal) {
+                        if (UnityEngine.Random.Range(midVal, minVal) > depths[x, y]) {
+                            Vector3 reedPos = new Vector3(x, depths[x, y] * zScale, y);
+                            Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
+                        }
                     }
                 }
             }
@@ -374,7 +404,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = marshCol;
                 } else {
                     float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                    colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
+                    colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                 }
             }
         }
@@ -401,9 +431,9 @@ public class LocalLandscapeImport : MonoBehaviour
     void Update()
     {
         if (!pause) {
-            UpdateMeshColors();
+//            UpdateMeshColors();
             IncrementTime();
-            SetSeaPos();
+//            SetSeaPos();
         }
         if (Input.GetKeyDown(KeyCode.P)) TogglePause();
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
