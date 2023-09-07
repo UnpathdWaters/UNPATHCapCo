@@ -66,10 +66,11 @@ public class LocalLandscapeImport : MonoBehaviour
     public GameObject human;
     public GameObject tree;
     public GameObject reeds;
+    public GameObject camp;
 
     Vector2 moosePos = new Vector2(300.0f, 300.0f);
     Vector2 humanPos = new Vector2(305.0f, 305.0f);
-    Vector2 treePos = new Vector2(295.0f, 305.0f);
+    Vector2 campPos = new Vector2(310.0f, 310.0f);
 
     public int reedDensity;
     public int treeDensity;
@@ -90,6 +91,7 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateHumans();
         CreateMeese();
         CreateReeds();
+        CreateCamps();
         UpdateMeshColors();
         Debug.Log("Maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
@@ -373,6 +375,12 @@ public class LocalLandscapeImport : MonoBehaviour
 
     }
 
+    void CreateCamps() {
+        Vector3 campPos3D = new Vector3(campPos.x, depths[(int) campPos.x, (int) campPos.y] * zScale, campPos.y);
+        Instantiate(camp, campPos3D, Quaternion.identity);
+
+    }
+
     void UpdateMeshColors()
     {
         float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
@@ -399,7 +407,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 } else if (depths[x, z] > seaPos + snowline) {
                     colours[x + (z * widthX)] = Color.white;
                 } else if (river[x, z]) {
-                    colours[x + (z * widthX)] = Color.blue;
+                    colours[x + (z * widthX)] = AddNoiseToColor(Color.blue);
                 } else if (marsh[x, z]) {
                     colours[x + (z * widthX)] = marshCol;
                 } else {
