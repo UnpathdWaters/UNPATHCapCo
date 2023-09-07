@@ -11,8 +11,8 @@ public class LocalLandscapeImport : MonoBehaviour
     protected FileInfo surfaceFile = null;
     protected StreamReader surfaceStream = null;
     protected string inputLine = " ";
-    int widthX = 600;
-    int heightZ = 600;
+    int widthX = 512;
+    int heightZ = 512;
     float[,] depths;
     bool pause;
     string[,] headerText;
@@ -48,8 +48,9 @@ public class LocalLandscapeImport : MonoBehaviour
     Camera cam;
 
     float seaPos;
-    Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
-    Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
+    public Color seaCol;
+    public Color coastCol;
+    public Color marshCol;
 
     enum Seasons { Winter, Spring, Summer, Autumn };
     Seasons season, lastSeason;
@@ -62,9 +63,13 @@ public class LocalLandscapeImport : MonoBehaviour
     public GameObject moose;
     public GameObject human;
     public GameObject tree;
+    public GameObject reeds;
+
     Vector2 moosePos = new Vector2(300.0f, 300.0f);
     Vector2 humanPos = new Vector2(305.0f, 305.0f);
     Vector2 treePos = new Vector2(295.0f, 305.0f);
+
+    public int reedDensity;
 
     // Start is called before the first frame update
     void Start()
@@ -81,11 +86,12 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateTrees();
         CreateHumans();
         CreateMeese();
+        CreateReeds();
     }
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Assets/Terrain/localsurface600.asc");
+        surfaceFile = new FileInfo ("Assets/Terrain/localsurface512.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
@@ -172,6 +178,8 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void ProcessMask()
     {
+        int riverPix = 0;
+        int marshPix = 0;
         river = new bool[widthX, heightZ];
         marsh = new bool[widthX, heightZ];
         Color[] maskPixels = landuseMap.GetPixels();
@@ -185,17 +193,20 @@ public class LocalLandscapeImport : MonoBehaviour
         for (int y = 0; y < landuseMap.height; y++){
             for (int x = 0; x < landuseMap.width; x++) {
                 thisCol = maskPixels[x + (y * landuseMap.width)];
-                useableX = (int) (x * xFactor);
-                useableY = (int) (y * yFactor);
-                if (thisCol == Color.black) {
+                useableX = (int) (x / xFactor);
+                useableY = (int) (y / yFactor);
+                if (thisCol.g < 0.5f && thisCol.a > 0.2f) {
                     river[useableX, useableY] = true;
                     Debug.Log("Pixel " + useableX + "," + useableY +" is river");
-                } else if (thisCol == Color.white) {
+                    riverPix++;
+                } else if (thisCol.g > 0.5f && thisCol.a > 0.2f) {
                     marsh[useableX, useableY] = true;
                     Debug.Log("Pixel " + useableX + "," + useableY +" is marsh");
+                    marshPix++;
                 } 
             }
         }
+        Debug.Log(riverPix + " rivers and " + marshPix + " marshes");
     }
 
 
@@ -317,6 +328,21 @@ public class LocalLandscapeImport : MonoBehaviour
         Instantiate(moose, moosePos3D, Quaternion.identity);
     }
 
+    void CreateReeds()
+    {
+        for (int y = 0; y < landuseMap.height; y++){
+            for (int x = 0; x < landuseMap.width; x++) {
+                if (marsh[x, y]) {
+                    if (Random.Range(0, 100) < reedDensity) {
+                        Vector3 reedPos = new Vector3(x, depths[x, y] * zScale, y);
+                        Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0)));
+                    }
+                }
+            }
+        }
+
+    }
+
     void UpdateMeshColors()
     {
         float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
@@ -342,6 +368,10 @@ public class LocalLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = coastCol;
                 } else if (depths[x, z] > seaPos + snowline) {
                     colours[x + (z * widthX)] = Color.white;
+                } else if (river[x, z]) {
+                    colours[x + (z * widthX)] = Color.blue;
+                } else if (marsh[x, z]) {
+                    colours[x + (z * widthX)] = marshCol;
                 } else {
                     float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
                     colours[x + (z * widthX)] = gradient.Evaluate(vertHeight);
