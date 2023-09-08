@@ -12,6 +12,7 @@ public class MooseManager : MonoBehaviour
     float[,] depths;
     bool depthsPop;
     Vector2[] leaderPos;
+    float zScale;
 
     // Start is called before the first frame update
     void Start()
@@ -25,6 +26,7 @@ public class MooseManager : MonoBehaviour
         if (!depthsPop) {
             LocalLandscapeImport land = landscapeManager.GetComponent<LocalLandscapeImport>();
             depths = land.GetDepths();
+            zScale = land.getZScale();
             depthsPop = true;
             leaderPos = new Vector2[herds];
         }
@@ -33,13 +35,20 @@ public class MooseManager : MonoBehaviour
             Vector2 moosePos = new Vector2(moose.transform.position.x, moose.transform.position.z);
             if (thisMoose.getLeader()) {
                 //Move leader
-                leaderPos[thisMoose.getHerdID()] = moosePos;
+                moose.transform.position = randomMove(moose.transform.position);
+                leaderPos[thisMoose.getHerdID()] = new Vector2(moose.transform.position.x, moose.transform.position.z);
             } else {
-                if (Vector2.Distance(leaderPos[thisMoose.getHerdID()], moosePos) > 7.5f) {
+                if (Vector2.Distance(leaderPos[thisMoose.getHerdID()], moosePos) > 8.0f) {
                     //Move towards leader
+                    moose.transform.position = Vector3.MoveTowards(moose.transform.position, new Vector3(leaderPos[thisMoose.getHerdID()].x, depths[(int)leaderPos[thisMoose.getHerdID()].x, (int)leaderPos[thisMoose.getHerdID()].y] * zScale, leaderPos[thisMoose.getHerdID()].y), 1.0f);
                 }
             }
         }
+    }
+
+    Vector3 randomMove(Vector3 pInputVec) {
+        Vector3 randomElement = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
+        return pInputVec + randomElement;
     }
 
     Vector3 randomMooseOrigin(Vector3 pMooseOrig) {
@@ -48,7 +57,6 @@ public class MooseManager : MonoBehaviour
     }
 
     void CreateHerd(int noOfMeese) {
-        herds++;
         Vector3 mooseOrigin = new Vector3(Random.Range(0, 511), 0, Random.Range(0,511));
         for (int x = 0; x < noOfMeese; x++) {
             if (x == 0) {
@@ -65,5 +73,6 @@ public class MooseManager : MonoBehaviour
                 meese.Add(newMoose);
             }
         }
+        herds++;
     }
 }

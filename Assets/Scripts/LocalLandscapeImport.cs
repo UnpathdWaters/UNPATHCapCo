@@ -434,6 +434,10 @@ public class LocalLandscapeImport : MonoBehaviour
         return depths;
     }
 
+    public float getZScale() {
+        return zScale;
+    }
+
     void Update()
     {
         if (!pause) {
