@@ -89,7 +89,6 @@ public class LocalLandscapeImport : MonoBehaviour
         ProcessMask();
         CreateTrees();
         CreateHumans();
-        CreateMeese();
         CreateReeds();
         CreateCamps();
         UpdateMeshColors();
@@ -347,11 +346,6 @@ public class LocalLandscapeImport : MonoBehaviour
         Instantiate(human, humanPos3D, Quaternion.identity);
     }
 
-    void CreateMeese()
-    {
-        Vector3 moosePos3D = new Vector3(moosePos.x, depths[(int) moosePos.x, (int) moosePos.y] * zScale, moosePos.y);
-        Instantiate(moose, moosePos3D, Quaternion.identity);
-    }
 
     void CreateReeds()
     {
@@ -434,6 +428,10 @@ public class LocalLandscapeImport : MonoBehaviour
         } else {
             pause = true;
         }
+    }
+
+    public float[,] GetDepths() {
+        return depths;
     }
 
     void Update()
