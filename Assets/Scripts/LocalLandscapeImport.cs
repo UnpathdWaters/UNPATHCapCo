@@ -426,6 +426,14 @@ public class LocalLandscapeImport : MonoBehaviour
         return depths;
     }
 
+    public bool[,] GetRiver() {
+        return river;
+    }
+
+    public bool[,] GetMarsh() {
+        return marsh;
+    }
+
     public float getZScale() {
         return zScale;
     }

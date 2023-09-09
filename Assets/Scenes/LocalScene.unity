@@ -548,6 +548,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camp: {fileID: 2362617596599077591, guid: 13156c93747be6843b0388a2399c2e44, type: 3}
+  noOfCamps: 3
   landscapeManager: {fileID: 1445257511}
 --- !u!4 &216754121
 Transform:
@@ -1000,7 +1001,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.478, g: -0.5, b: 0.00004392994, a: 1.6}
-    - _DetailWindDirection: {r: 0.28268743, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
@@ -1011,7 +1012,7 @@ Material:
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
-    - _WindDirection: {r: 0.28268743, g: 0, b: 0, a: 0}
+    - _WindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!84 &554150280
 RenderTexture:
@@ -1818,11 +1819,9 @@ MonoBehaviour:
   coastCol: {r: 0.8, g: 0.8, b: 0, a: 1}
   marshCol: {r: 0.13354489, g: 0.16981131, b: 0.06327874, a: 1}
   landuseMap: {fileID: 2800000, guid: 454880cc7d58d364c8e364673c5424da, type: 3}
-  moose: {fileID: 5787922083189030364, guid: 028bd272ca7d7944b80f66c590b43445, type: 3}
   human: {fileID: 4579074936070757511, guid: 2f02f27c17ff28b478db7f83f7d5370c, type: 3}
   tree: {fileID: 919132149155446097, guid: baaf931961be83b479d52d911795865f, type: 3}
   reeds: {fileID: 919132149155446097, guid: 0aab40fcdfb356f49a06c0c042126ddf, type: 3}
-  camp: {fileID: 2362617596599077591, guid: 13156c93747be6843b0388a2399c2e44, type: 3}
   reedDensity: 100
   treeDensity: 100
 --- !u!1 &1464166179
@@ -2117,7 +2116,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.478, g: -0.5, b: 0.00004392994, a: 1.6}
-    - _DetailWindDirection: {r: 0.28268743, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
@@ -2128,5 +2127,5 @@ Material:
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
-    - _WindDirection: {r: 0.28268743, g: 0, b: 0, a: 0}
+    - _WindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
