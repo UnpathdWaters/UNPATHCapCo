@@ -895,7 +895,8 @@ Material:
   m_Name: VolumetricFog2/VolumetricFog2DURP
   m_Shader: {fileID: 4800000, guid: cd79ad756ee3e4d3f8fe6b417ef8c835, type: 3}
   m_ValidKeywords:
-  - VF2_DETAIL_NOISE
+  - VF2_CONSTANT_DENSITY
+  - VF2_DISTANCE
   - VF2_RECEIVE_SHADOWS
   - VF2_SHAPE_BOX
   - VF2_VOIDS
@@ -941,7 +942,7 @@ Material:
     - _LightDiffusionIntensity: 0.4
     - _LightDiffusionPower: 32
     - _NoiseFinalMultiplier: 1
-    - _NoiseScale: 0.000673446
+    - _NoiseScale: 0.005
     - _NoiseStrength: 1
     - _SpecularIntensity: 0
     - _SpecularThreshold: 0.5
@@ -953,18 +954,18 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.478, g: -0.5, b: 0.00004392994, a: 1.6}
-    - _DetailWindDirection: {r: 0.024167052, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.01618139, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarSize: {r: 0, g: 0, b: 0, a: 1}
-    - _LightColor: {r: 1.6, g: 1.5309805, b: 1.3427452, a: 1}
+    - _LightColor: {r: 2, g: 2, b: 2, a: 1}
     - _MaxDistanceData: {r: 10000, g: 1, b: 0, a: 0}
-    - _RayMarchSettings: {r: 5, g: 0.01, b: 1.26, a: 0.25}
+    - _RayMarchSettings: {r: 5, g: 0.01, b: 1, a: 0.25}
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
-    - _SunDir: {r: 0.46885353, g: 0.3474266, b: -0.8120783, a: 0}
-    - _WindDirection: {r: 0.024167052, g: 0, b: 0, a: 0}
+    - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
+    - _WindDirection: {r: 0.01618139, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!84 &554150280
 RenderTexture:
@@ -1395,6 +1396,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moose: {fileID: 5787922083189030364, guid: 028bd272ca7d7944b80f66c590b43445, type: 3}
   landscapeManager: {fileID: 1445257511}
+  mooseSpeed: 1
+  flockingDist: 8
 --- !u!1 &1207107344
 GameObject:
   m_ObjectHideFlags: 0
@@ -2010,7 +2013,8 @@ Material:
   m_Name: VolumetricFog2/VolumetricFog2DURP
   m_Shader: {fileID: 4800000, guid: cd79ad756ee3e4d3f8fe6b417ef8c835, type: 3}
   m_ValidKeywords:
-  - VF2_DETAIL_NOISE
+  - VF2_CONSTANT_DENSITY
+  - VF2_DISTANCE
   - VF2_RECEIVE_SHADOWS
   - VF2_SHAPE_BOX
   m_InvalidKeywords: []
@@ -2055,7 +2059,7 @@ Material:
     - _LightDiffusionIntensity: 0.4
     - _LightDiffusionPower: 32
     - _NoiseFinalMultiplier: 1
-    - _NoiseScale: 0.000673446
+    - _NoiseScale: 0.005
     - _NoiseStrength: 1
     - _SpecularIntensity: 0
     - _SpecularThreshold: 0.5
@@ -2067,16 +2071,16 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.478, g: -0.5, b: 0.00004392994, a: 1.6}
-    - _DetailWindDirection: {r: 0.024167052, g: 0, b: 0, a: 0}
-    - _DistanceData: {r: 0, g: 5, b: 1, a: 1}
+    - _DetailWindDirection: {r: 0.01618139, g: 0, b: 0, a: 0}
+    - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarSize: {r: 0, g: 0, b: 0, a: 1}
-    - _LightColor: {r: 1.6, g: 1.5309805, b: 1.3427452, a: 1}
+    - _LightColor: {r: 2, g: 2, b: 2, a: 1}
     - _MaxDistanceData: {r: 10000, g: 1, b: 0, a: 0}
-    - _RayMarchSettings: {r: 5, g: 0.01, b: 1.26, a: 0.25}
+    - _RayMarchSettings: {r: 5, g: 0.01, b: 1, a: 0.25}
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
-    - _SunDir: {r: 0.46885353, g: 0.3474266, b: -0.8120783, a: 0}
-    - _WindDirection: {r: 0.024167052, g: 0, b: 0, a: 0}
+    - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
+    - _WindDirection: {r: 0.01618139, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
