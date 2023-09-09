@@ -41,7 +41,9 @@ public class MooseManager : MonoBehaviour
             if (thisMoose.getLeader()) {
                 if (thisMoose.getGraze()) {
                     if (Random.Range(0,100) < 10) {
-                        moose.transform.position = randomMove(moose.transform.position);
+                        Vector3 tempDest = randomMove(moose.transform.position);
+                        moose.transform.LookAt(tempDest, Vector3.up);
+                        moose.transform.position = tempDest;
                     }
                 } else {
                     Vector2 thisDest = thisMoose.getDestination();
@@ -49,7 +51,9 @@ public class MooseManager : MonoBehaviour
                         thisMoose.setGraze(true);
                         thisMoose.setDestination(randomMooseDestination());
                     } else {
-                        moose.transform.position = Vector3.MoveTowards(moose.transform.position, new Vector3(thisDest.x, depths[(int)thisDest.x, (int)thisDest.y] * zScale, thisDest.y), mooseSpeed);
+                        Vector3 tempDest = new Vector3(thisDest.x, depths[(int)thisDest.x, (int)thisDest.y] * zScale, thisDest.y);
+                        moose.transform.LookAt(tempDest, Vector3.up);
+                        moose.transform.position = Vector3.MoveTowards(moose.transform.position, tempDest, mooseSpeed);
                     }
                 }
                 leaderPos[thisMoose.getHerdID()] = new Vector2(moose.transform.position.x, moose.transform.position.z);
@@ -57,11 +61,12 @@ public class MooseManager : MonoBehaviour
                 if (Vector2.Distance(leaderPos[thisMoose.getHerdID()], moosePos) > flockingDist) {
                     Vector3 flockPos = new Vector3(leaderPos[thisMoose.getHerdID()].x, depths[(int)leaderPos[thisMoose.getHerdID()].x, (int)leaderPos[thisMoose.getHerdID()].y] * zScale, leaderPos[thisMoose.getHerdID()].y);
                     Vector3 offsetPos = randomMooseOrigin(flockPos);
-                    
-                    //Move towards leader
+                    moose.transform.LookAt(offsetPos, Vector3.up);
                     moose.transform.position = Vector3.MoveTowards(moose.transform.position, offsetPos, mooseSpeed);
                 } else {
-                    moose.transform.position = randomMove(moose.transform.position);
+                    Vector3 tempDest = randomMove(moose.transform.position);
+                    moose.transform.LookAt(tempDest, Vector3.up);
+                    moose.transform.position = tempDest;
                 }
             }
         }

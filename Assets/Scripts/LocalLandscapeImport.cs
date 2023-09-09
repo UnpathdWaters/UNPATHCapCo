@@ -62,11 +62,9 @@ public class LocalLandscapeImport : MonoBehaviour
     bool[,] river;
     bool[,] marsh;
 
-    public GameObject moose;
     public GameObject human;
     public GameObject tree;
     public GameObject reeds;
-    public GameObject camp;
 
     Vector2 moosePos = new Vector2(300.0f, 300.0f);
     Vector2 humanPos = new Vector2(305.0f, 305.0f);
@@ -90,7 +88,6 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateTrees();
         CreateHumans();
         CreateReeds();
-        CreateCamps();
         UpdateMeshColors();
         Debug.Log("Maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
@@ -369,11 +366,6 @@ public class LocalLandscapeImport : MonoBehaviour
 
     }
 
-    void CreateCamps() {
-        Vector3 campPos3D = new Vector3(campPos.x, depths[(int) campPos.x, (int) campPos.y] * zScale, campPos.y);
-        Instantiate(camp, campPos3D, Quaternion.identity);
-
-    }
 
     void UpdateMeshColors()
     {
