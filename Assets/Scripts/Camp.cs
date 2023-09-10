@@ -24,7 +24,7 @@ public class Camp : MonoBehaviour
     {
         campHuman = Instantiate(human, this.transform.position, Quaternion.identity);
         campHuman.SetActive(false);
-        
+        food = 100;
     }
 
     // Update is called once per frame
@@ -58,6 +58,7 @@ public class Camp : MonoBehaviour
         } else {
             campHuman.transform.position = Vector3.MoveTowards(campHuman.transform.position, new Vector3(destination.x, 0.0f, destination.y), humanSpeed);
         }
+        food--;
     }
 
     bool IsHumanAtTarget(Vector2 pTarget)
@@ -84,7 +85,17 @@ public class Camp : MonoBehaviour
 
     public void SetNearestMoose(Vector2 pMoose)
     {
-        Debug.Log("Nearest moose set to " + pMoose);
+//        Debug.Log("Nearest moose set to " + pMoose);
         nearestMoose = pMoose;
+    }
+
+    public int GetFood()
+    {
+        return food;
+    }
+
+    void OnDestroy()
+    {
+        Object.Destroy(campHuman);
     }
 }

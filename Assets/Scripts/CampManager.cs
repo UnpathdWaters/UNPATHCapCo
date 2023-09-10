@@ -38,13 +38,16 @@ public class CampManager : MonoBehaviour
             marsh = land.GetMarsh();
             mooseManager = mooseManagerGO.GetComponent<MooseManager>();
             meese = mooseManager.GetMeese();
-            CreateCamps();
+            for (int x = 0; x < noOfCamps; x++) {
+                CreateCamp();
+            }
             SetupCamps();
             depthsPop = true;
         }
 
         foreach (var aCamp in campList)
         {
+            Camp thisCamp = aCamp.GetComponent<Camp>();
             float nearestdist = 999999.0f;
             Vector3 nearestLoc = new Vector2(0.0f, 0.0f);
             foreach (var aMoose in meese)
@@ -54,9 +57,17 @@ public class CampManager : MonoBehaviour
                     nearestLoc = new Vector2(aMoose.transform.position.x, aMoose.transform.position.z);
                 }
             }
-            Camp thisCamp = camp.GetComponent<Camp>();
             thisCamp.SetNearestMoose(nearestLoc);
+            if (thisCamp.GetFood() < 0) {
+                campList.Remove(aCamp);
+                Object.Destroy(aCamp);
+                Debug.Log("Destroyed a camp");
+            }            
         }
+        if (campList.Count < noOfCamps) {
+            CreateCamp();
+        }
+
     }
 
     Vector2 FindNearestRiver(Vector2 pLoc)
@@ -121,19 +132,16 @@ public class CampManager : MonoBehaviour
         return new Vector2(x, y);
     }
 
-    void CreateCamps() 
+    void CreateCamp() 
     {
         Vector2 campLoc;
-        for (int x = 0; x < noOfCamps; x++) {
+        campLoc = GenerateCampLoc();
+        while (!CheckCampLoc(campLoc)) {
             campLoc = GenerateCampLoc();
-            while (!CheckCampLoc(campLoc)) {
-                campLoc = GenerateCampLoc();
-            }
-            Vector3 campLoc3D = new Vector3(campLoc.x, depths[(int) campLoc.x, (int) campLoc.y] * zScale, campLoc.y);
-            GameObject newCamp = Instantiate(camp, campLoc3D, Quaternion.identity);
-            Debug.Log("New camp created at " + campLoc);
-            campList.Add(newCamp);
-
         }
+        Vector3 campLoc3D = new Vector3(campLoc.x, depths[(int) campLoc.x, (int) campLoc.y] * zScale, campLoc.y);
+        GameObject newCamp = Instantiate(camp, campLoc3D, Quaternion.identity);
+        Debug.Log("New camp created at " + campLoc);
+        campList.Add(newCamp);
     }
 }
