@@ -550,6 +550,7 @@ MonoBehaviour:
   camp: {fileID: 2362617596599077591, guid: 13156c93747be6843b0388a2399c2e44, type: 3}
   noOfCamps: 3
   landscapeManager: {fileID: 1445257511}
+  mooseManagerGO: {fileID: 1182613834}
 --- !u!4 &216754121
 Transform:
   m_ObjectHideFlags: 0
@@ -1001,7 +1002,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.478, g: -0.5, b: 0.00004392994, a: 1.6}
-    - _DetailWindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.06463648, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
@@ -1012,7 +1013,7 @@ Material:
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
-    - _WindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
+    - _WindDirection: {r: 0.06463648, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!84 &554150280
 RenderTexture:
@@ -2116,7 +2117,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DetailColor: {r: 0.5231373, g: 0.5231373, b: 0.5231373, a: 0}
     - _DetailData: {r: 0.478, g: -0.5, b: 0.00004392994, a: 1.6}
-    - _DetailWindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
+    - _DetailWindDirection: {r: 0.06463648, g: 0, b: 0, a: 0}
     - _DistanceData: {r: 0, g: -0.10000026, b: 0.000004, a: 0.000014399996}
     - _FogOfWarCenter: {r: 0, g: 0, b: 0, a: 1}
     - _FogOfWarCenterAdjusted: {r: 0, g: 0, b: 0, a: 1}
@@ -2127,5 +2128,5 @@ Material:
     - _ShadowData: {r: 0.7, g: 0, b: 62500, a: 0}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _SunDir: {r: 0.70710677, g: 0.70710677, b: 0, a: 0}
-    - _WindDirection: {r: 0.121577054, g: 0, b: 0, a: 0}
+    - _WindDirection: {r: 0.06463648, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

@@ -25,6 +25,11 @@ public class MooseManager : MonoBehaviour
         CreateHerd(7);
     }
 
+    public List<GameObject> GetMeese()
+    {
+        return meese;
+    }
+
     // Update is called once per frame
     void Update()
     {
