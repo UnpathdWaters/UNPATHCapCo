@@ -45,33 +45,37 @@ public class MooseManager : MonoBehaviour
             Vector2 moosePos = new Vector2(moose.transform.position.x, moose.transform.position.z);
             if (thisMoose.getLeader()) {
                 if (thisMoose.getGraze()) {
-                    if (Random.Range(0,100) < 10) {
+                    if (Random.Range(0,100) < 3) {
                         Vector3 tempDest = randomMove(moose.transform.position);
                         moose.transform.LookAt(tempDest, Vector3.up);
-                        moose.transform.position = tempDest;
+                        moose.transform.position = Vector3.MoveTowards(moose.transform.position, tempDest, mooseSpeed * Time.deltaTime);
                     }
                 } else {
+//                    Debug.Log("Moose is travelling");
                     Vector2 thisDest = thisMoose.getDestination();
                     if (IsMooseThereYet(moose, thisDest)) {
+//                        Debug.Log("...but moose is there");
                         thisMoose.setGraze(true);
                         thisMoose.setDestination(randomMooseDestination());
                     } else {
+//                        Debug.Log("On his way from" + moose.transform.position + " to " + thisMoose.getDestination());
                         Vector3 tempDest = new Vector3(thisDest.x, depths[(int)thisDest.x, (int)thisDest.y] * zScale, thisDest.y);
                         moose.transform.LookAt(tempDest, Vector3.up);
-                        moose.transform.position = Vector3.MoveTowards(moose.transform.position, tempDest, mooseSpeed);
+                        moose.transform.position = Vector3.MoveTowards(moose.transform.position, tempDest, mooseSpeed * Time.deltaTime);
                     }
                 }
                 leaderPos[thisMoose.getHerdID()] = new Vector2(moose.transform.position.x, moose.transform.position.z);
             } else {
-                if (Vector2.Distance(leaderPos[thisMoose.getHerdID()], moosePos) > flockingDist) {
-                    Vector3 flockPos = new Vector3(leaderPos[thisMoose.getHerdID()].x, depths[(int)leaderPos[thisMoose.getHerdID()].x, (int)leaderPos[thisMoose.getHerdID()].y] * zScale, leaderPos[thisMoose.getHerdID()].y);
-                    Vector3 offsetPos = randomMooseOrigin(flockPos);
+                if (Vector2.Distance(thisMoose.getPrecederLoc2(), moosePos) > flockingDist) {
+                    Vector3 flockPos = thisMoose.getPrecederLoc3();
+//                    Vector3 offsetPos = randomMooseOrigin(flockPos);
+                    Vector3 offsetPos = flockPos;
                     moose.transform.LookAt(offsetPos, Vector3.up);
-                    moose.transform.position = Vector3.MoveTowards(moose.transform.position, offsetPos, mooseSpeed);
-                } else {
-                    Vector3 tempDest = randomMove(moose.transform.position);
+                    moose.transform.position = Vector3.MoveTowards(moose.transform.position, offsetPos, mooseSpeed * Time.deltaTime);
+                } else if (Random.Range(0,100) < 10) {
+                    Vector3 tempDest = randomMove(new Vector3(leaderPos[thisMoose.getHerdID()].x, depths[(int)leaderPos[thisMoose.getHerdID()].x, (int)leaderPos[thisMoose.getHerdID()].y] * zScale, leaderPos[thisMoose.getHerdID()].y));
                     moose.transform.LookAt(tempDest, Vector3.up);
-                    moose.transform.position = tempDest;
+                    moose.transform.position = Vector3.MoveTowards(moose.transform.position, tempDest, mooseSpeed * Time.deltaTime);
                 }
             }
         }
@@ -87,7 +91,7 @@ public class MooseManager : MonoBehaviour
     }
 
     Vector3 randomMove(Vector3 pInputVec) {
-        Vector3 randomElement = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
+        Vector3 randomElement = new Vector3(Random.Range(-5.0f, 5.0f), 0, Random.Range(-5.0f, 5.0f));
         return pInputVec + randomElement;
     }
 
@@ -105,6 +109,7 @@ public class MooseManager : MonoBehaviour
 
     void CreateHerd(int noOfMeese) {
         Vector3 mooseOrigin = new Vector3(Random.Range(0, 511), 0, Random.Range(0,511));
+        GameObject prevGO = null;
         for (int x = 0; x < noOfMeese; x++) {
             if (x == 0) {
                 GameObject newMoose = Instantiate(moose, mooseOrigin, Quaternion.identity);
@@ -113,12 +118,15 @@ public class MooseManager : MonoBehaviour
                 thisMoose.setHerdID(herds);
                 thisMoose.setDestination(randomMooseDestination());
                 meese.Add(newMoose);
+                prevGO = newMoose;
             } else {
                 GameObject newMoose = Instantiate(moose, randomMooseOrigin(mooseOrigin), Quaternion.identity);
                 Moose thisMoose = newMoose.GetComponent<Moose>();
                 thisMoose.setLeader(false);
                 thisMoose.setHerdID(herds);
+                thisMoose.setPreceder(prevGO);
                 meese.Add(newMoose);
+                prevGO = newMoose;
             }
         }
         herds++;

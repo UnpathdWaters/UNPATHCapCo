@@ -74,4 +74,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95602c106b0cf8a439ff25c03b56cdda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grazeChance: 0.01
+  grazeChance: 0.0001

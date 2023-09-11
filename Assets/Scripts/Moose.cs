@@ -8,6 +8,7 @@ public class Moose : MonoBehaviour
     int herdID;
     public float grazeChance;
     Vector2 destination;
+    GameObject preceder;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,8 +21,8 @@ public class Moose : MonoBehaviour
         if (Random.Range(0.0f, 1.0f) < grazeChance) {
             if (graze) {
                 graze = false;
-            } else {
-                graze = true;
+//            } else {
+//                graze = true;
             }
         }
     }
@@ -52,6 +53,14 @@ public class Moose : MonoBehaviour
         return graze;
     }
 
+    public Vector2 getPrecederLoc2() {
+        return new Vector2(preceder.transform.position.x, preceder.transform.position.z);
+    }
+
+    public Vector3 getPrecederLoc3() {
+        return preceder.transform.position;
+    }
+
     public void setGraze(bool pGraze) {
         graze = pGraze;
     }
@@ -62,5 +71,9 @@ public class Moose : MonoBehaviour
 
     public void setDestination(Vector2 pDest) {
         destination = pDest;
+    }
+
+    public void setPreceder(GameObject pPrec) {
+        preceder = pPrec;
     }
 }
