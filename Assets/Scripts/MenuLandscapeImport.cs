@@ -80,6 +80,7 @@ public class MenuLandscapeImport : MonoBehaviour
     enum Seasons { Winter, Spring, Summer, Autumn };
     Seasons season, lastSeason;
     float snowline;
+    int timePeriod;
 
     // Start is called before the first frame update
     void Start()
@@ -88,6 +89,7 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
+        timePeriod = 0;
         ImportData();
         InitTimeManagement();
         CreateMesh();
@@ -426,111 +428,131 @@ public class MenuLandscapeImport : MonoBehaviour
                 }
             }
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            seaPos = -96.0f;
-            baseSnowline = 100.0f;
-            arrow1.SetActive(true);
-            arrow2.SetActive(false);
-            arrow3.SetActive(false);
-            arrow4.SetActive(false);
-            arrow5.SetActive(false);
-            arrow6.SetActive(false);
-            arrow7.SetActive(false);
-            glaciers20k.SetActive(true);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-            EvaluateBaseColours();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            seaPos = -94.0f;
-            baseSnowline = 125.0f;
-            arrow1.SetActive(false);
-            arrow2.SetActive(true);
-            arrow3.SetActive(false);
-            arrow4.SetActive(false);
-            arrow5.SetActive(false);
-            arrow6.SetActive(false);
-            arrow7.SetActive(false);
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(true);
-            glaciers15k.SetActive(false);
-            EvaluateBaseColours();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            seaPos = -85.0f;
-            baseSnowline = 150.0f;
-            arrow1.SetActive(false);
-            arrow2.SetActive(false);
-            arrow3.SetActive(true);
-            arrow4.SetActive(false);
-            arrow5.SetActive(false);
-            arrow6.SetActive(false);
-            arrow7.SetActive(false);
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(true);
-            EvaluateBaseColours();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            seaPos = -55.0f;
-            baseSnowline = 300.0f;
-            arrow1.SetActive(false);
-            arrow2.SetActive(false);
-            arrow3.SetActive(false);
-            arrow4.SetActive(true);
-            arrow5.SetActive(false);
-            arrow6.SetActive(false);
-            arrow7.SetActive(false);
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-            EvaluateBaseColours();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5)) {
-            seaPos = -33.0f;
-            baseSnowline = 400.0f;
-            arrow1.SetActive(false);
-            arrow2.SetActive(false);
-            arrow3.SetActive(false);
-            arrow4.SetActive(false);
-            arrow5.SetActive(true);
-            arrow6.SetActive(false);
-            arrow7.SetActive(false);
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-            EvaluateBaseColours();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha6)) {
-            seaPos = -14.0f;
-            baseSnowline = 450.0f;
-            arrow1.SetActive(false);
-            arrow2.SetActive(false);
-            arrow3.SetActive(false);
-            arrow4.SetActive(false);
-            arrow5.SetActive(false);
-            arrow6.SetActive(true);
-            arrow7.SetActive(false);
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-            EvaluateBaseColours();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha7)) {
-            seaPos = -5.0f;
-            baseSnowline = 500.0f;
-            arrow1.SetActive(false);
-            arrow2.SetActive(false);
-            arrow3.SetActive(false);
-            arrow4.SetActive(false);
-            arrow5.SetActive(false);
-            arrow6.SetActive(false);
-            arrow7.SetActive(true);
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-            EvaluateBaseColours();
 
+        switch (timePeriod)
+        {
+            case 0:
+                seaPos = -96.0f;
+                baseSnowline = 100.0f;
+                arrow1.SetActive(true);
+                arrow2.SetActive(false);
+                arrow3.SetActive(false);
+                arrow4.SetActive(false);
+                arrow5.SetActive(false);
+                arrow6.SetActive(false);
+                arrow7.SetActive(false);
+                glaciers20k.SetActive(true);
+                glaciers17k.SetActive(false);
+                glaciers15k.SetActive(false);
+                EvaluateBaseColours();
+                break;
+            case 1:
+                seaPos = -94.0f;
+                baseSnowline = 125.0f;
+                arrow1.SetActive(false);
+                arrow2.SetActive(true);
+                arrow3.SetActive(false);
+                arrow4.SetActive(false);
+                arrow5.SetActive(false);
+                arrow6.SetActive(false);
+                arrow7.SetActive(false);
+                glaciers20k.SetActive(false);
+                glaciers17k.SetActive(true);
+                glaciers15k.SetActive(false);
+                EvaluateBaseColours();
+                break;
+            case 2:
+                seaPos = -85.0f;
+                baseSnowline = 150.0f;
+                arrow1.SetActive(false);
+                arrow2.SetActive(false);
+                arrow3.SetActive(true);
+                arrow4.SetActive(false);
+                arrow5.SetActive(false);
+                arrow6.SetActive(false);
+                arrow7.SetActive(false);
+                glaciers20k.SetActive(false);
+                glaciers17k.SetActive(false);
+                glaciers15k.SetActive(true);
+                EvaluateBaseColours();
+                break;
+            case 3:
+                seaPos = -55.0f;
+                baseSnowline = 300.0f;
+                arrow1.SetActive(false);
+                arrow2.SetActive(false);
+                arrow3.SetActive(false);
+                arrow4.SetActive(true);
+                arrow5.SetActive(false);
+                arrow6.SetActive(false);
+                arrow7.SetActive(false);
+                glaciers20k.SetActive(false);
+                glaciers17k.SetActive(false);
+                glaciers15k.SetActive(false);
+                EvaluateBaseColours();
+                break;
+            case 4:
+                seaPos = -33.0f;
+                baseSnowline = 400.0f;
+                arrow1.SetActive(false);
+                arrow2.SetActive(false);
+                arrow3.SetActive(false);
+                arrow4.SetActive(false);
+                arrow5.SetActive(true);
+                arrow6.SetActive(false);
+                arrow7.SetActive(false);
+                glaciers20k.SetActive(false);
+                glaciers17k.SetActive(false);
+                glaciers15k.SetActive(false);
+                EvaluateBaseColours();
+                break;
+            case 5:
+                seaPos = -14.0f;
+                baseSnowline = 450.0f;
+                arrow1.SetActive(false);
+                arrow2.SetActive(false);
+                arrow3.SetActive(false);
+                arrow4.SetActive(false);
+                arrow5.SetActive(false);
+                arrow6.SetActive(true);
+                arrow7.SetActive(false);
+                glaciers20k.SetActive(false);
+                glaciers17k.SetActive(false);
+                glaciers15k.SetActive(false);
+                EvaluateBaseColours();
+                break;
+            case 6:
+                seaPos = -5.0f;
+                baseSnowline = 500.0f;
+                arrow1.SetActive(false);
+                arrow2.SetActive(false);
+                arrow3.SetActive(false);
+                arrow4.SetActive(false);
+                arrow5.SetActive(false);
+                arrow6.SetActive(false);
+                arrow7.SetActive(true);
+                glaciers20k.SetActive(false);
+                glaciers17k.SetActive(false);
+                glaciers15k.SetActive(false);
+                EvaluateBaseColours();
+                break;
+            default:
+                break;
         }
+
+        if (Input.GetButtonDown("Fire1")) {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
+        }
+        if (Input.GetButtonDown("Fire3")) {
+            if (timePeriod > 0) {
+                timePeriod--;
+            }
+        }
+        if (Input.GetButtonDown("Fire2")) {
+            if (timePeriod < 6) {
+                timePeriod++;
+            }
+        }
+
     }
 }

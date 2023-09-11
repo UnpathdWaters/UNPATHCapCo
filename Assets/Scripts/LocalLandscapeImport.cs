@@ -433,7 +433,7 @@ public class LocalLandscapeImport : MonoBehaviour
 //            SetSeaPos();
         }
         if (Input.GetKeyDown(KeyCode.P)) TogglePause();
-        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetButtonDown("Fire1")) UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
     }
 }
 
