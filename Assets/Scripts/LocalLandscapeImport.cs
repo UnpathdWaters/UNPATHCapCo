@@ -62,13 +62,8 @@ public class LocalLandscapeImport : MonoBehaviour
     bool[,] river;
     bool[,] marsh;
 
-    public GameObject human;
     public GameObject tree;
     public GameObject reeds;
-
-    Vector2 moosePos = new Vector2(300.0f, 300.0f);
-    Vector2 humanPos = new Vector2(305.0f, 305.0f);
-    Vector2 campPos = new Vector2(310.0f, 310.0f);
 
     public int reedDensity;
     public int treeDensity;
@@ -86,7 +81,6 @@ public class LocalLandscapeImport : MonoBehaviour
         UpdateMesh();
         ProcessMask();
         CreateTrees();
-        CreateHumans();
         CreateReeds();
         UpdateMeshColors();
         Debug.Log("Maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
@@ -320,8 +314,8 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void CreateTrees()
     {
-        for (int y = 0; y < landuseMap.height; y++){
-            for (int x = 0; x < landuseMap.width; x++) {
+        for (int y = 2; y < landuseMap.height - 2; y++){
+            for (int x = 2; x < landuseMap.width - 2; x++) {
                 if (depths[x, y] > midVal && !river[x, y] && !marsh[x, y]) {
                     if (UnityEngine.Random.Range(midVal, maxVal) < depths[x, y]) {
                         Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
@@ -337,17 +331,10 @@ public class LocalLandscapeImport : MonoBehaviour
         return inArray[inArray.Length / 2];
     }
 
-    void CreateHumans()
-    {
-        Vector3 humanPos3D = new Vector3(humanPos.x, depths[(int) humanPos.x, (int) humanPos.y] * zScale, humanPos.y);
-        Instantiate(human, humanPos3D, Quaternion.identity);
-    }
-
-
     void CreateReeds()
     {
-        for (int y = 0; y < landuseMap.height; y++){
-            for (int x = 0; x < landuseMap.width; x++) {
+        for (int y = 2; y < landuseMap.height - 2; y++){
+            for (int x = 2; x < landuseMap.width - 2; x++) {
                 if (marsh[x, y]) {
                     if (UnityEngine.Random.Range(0, 100) < reedDensity) {
                         Vector3 reedPos = new Vector3(x, depths[x, y] * zScale, y);

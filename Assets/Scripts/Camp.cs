@@ -18,13 +18,17 @@ public class Camp : MonoBehaviour
     Material fishMaterial;
     [SerializeField]
     Material marshMaterial;
+    [SerializeField]
+    int startFood;
+    [SerializeField]
+    int foodPerTrip;
 
     // Start is called before the first frame update
     void Start()
     {
         campHuman = Instantiate(human, this.transform.position, Quaternion.identity);
         campHuman.SetActive(false);
-        food = 100;
+        food = startFood;
     }
 
     // Update is called once per frame
@@ -52,6 +56,7 @@ public class Camp : MonoBehaviour
         if (IsHumanAtTarget(destination)) {
             if (destination == thisLoc) {
                 campHuman.SetActive(false);
+                food = food + foodPerTrip;
             } else {
                 destination = thisLoc;
             }
