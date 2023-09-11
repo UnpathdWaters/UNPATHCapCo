@@ -4905,12 +4905,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   human: {fileID: 4579074936070757511, guid: 2f02f27c17ff28b478db7f83f7d5370c, type: 3}
-  humanSpeed: 0.1
+  humanSpeed: 10
   mooseMaterial: {fileID: 2100000, guid: deb29dfe498c0e548a9b8f172e782824, type: 2}
   fishMaterial: {fileID: 2100000, guid: 93006227518602f488f3462852d4340f, type: 2}
-  marshMaterial: {fileID: 2100000, guid: 7303e7b831e8a8b4da17a8fe69bbad49, type: 2}
+  marshMaterial: {fileID: 2100000, guid: 21a23cab7a70d864aa53dc6c5d73cbf1, type: 2}
+  forageMaterial: {fileID: 2100000, guid: 7303e7b831e8a8b4da17a8fe69bbad49, type: 2}
   startFood: 1000
-  foodPerTrip: 200
+  foodPerTrip: 500
 --- !u!4 &3135178805007634541 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6fe9bee13f95392479f4f999a01cf174, type: 3}

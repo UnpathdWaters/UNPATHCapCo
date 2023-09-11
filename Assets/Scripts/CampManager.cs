@@ -117,12 +117,20 @@ public class CampManager : MonoBehaviour
 
     bool CheckCampLoc(Vector2 pCampLoc)
     {
-        if (!river[(int) pCampLoc.x, (int) pCampLoc.y] && !marsh[(int) pCampLoc.x, (int) pCampLoc.y]) {
-            return true;
-        } else {
-            return false;
-        }
+        for (int j = (int) pCampLoc.x - 2; j <= (int) pCampLoc.x + 2; j++)
+        {
+            for (int k = (int) pCampLoc.y -2; k <= (int) pCampLoc.y + 2; k++)
+            {
+                if (j >= 0 && j < depths.GetLength(0) && k >= 0 && k < depths.GetLength(1))
+                {
+                    if (river[j, k] || marsh[j, k]) {
+                        return false;
+                    }
+                }
 
+            }
+        }
+        return true;
     }
 
     Vector2 GenerateCampLoc()
