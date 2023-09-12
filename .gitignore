@@ -71,7 +71,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-/[Aa]ssets/VolumetricFog2/*
+/[Aa]ssets/VolumetricFog2/Demo/*
+/[Aa]ssets/VolumetricFog2/Documentation/*
+/[Aa]ssets/VolumetricFog2/Editor/*
 /[Aa]ssets/VolumetricFogBundle/*
 /[Aa]ssets/TextMesh Pro/*
 
