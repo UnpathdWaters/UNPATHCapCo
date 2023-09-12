@@ -274,7 +274,7 @@ public class MenuLandscapeImport : MonoBehaviour
     void IncrementTime()
     {
         day++;
-        if (day > 20) {
+        if (day > 20 && !quittable) {
             quittable = true;
         }
         if (day > 365) {
@@ -440,6 +440,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void Update()
     {
+        bool timePeriodChanged = false;
         if (!pause) {
             UpdateMeshColors();
             IncrementTime();
@@ -462,26 +463,18 @@ public class MenuLandscapeImport : MonoBehaviour
             Debug.Log("Time period up!");
             if (timePeriod < 6) {
                 timePeriod++;
+                timePeriodChanged = true;
             }
         }
         if (timePeriodDown) {
             Debug.Log("Time period down!");
             if (timePeriod > 0) {
                 timePeriod--;
+                timePeriodChanged = true;
             }
         }
 
-/*        if (Input.GetMouseButtonDown(0)) {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit)) {
-                if (depths[(int) hit.point.x, (int) hit.point.z] > seaPos) {
-                    clickedPoint.x = hit.point.x;
-                    clickedPoint.y = hit.point.z;
-                }
-            }
-        }*/
-
+        if (timePeriodChanged) {
         switch (timePeriod)
         {
             case 0:
@@ -591,6 +584,8 @@ public class MenuLandscapeImport : MonoBehaviour
                 break;
             default:
                 break;
+        }
+
         }
 
 
