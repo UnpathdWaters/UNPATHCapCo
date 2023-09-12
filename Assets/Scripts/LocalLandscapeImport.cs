@@ -442,7 +442,7 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         if (!pause) {
 //            UpdateMeshColors();
-            IncrementTime();
+//            IncrementTime();
 //            SetSeaPos();
         }
 //        if (Input.GetKeyDown(KeyCode.P)) TogglePause();

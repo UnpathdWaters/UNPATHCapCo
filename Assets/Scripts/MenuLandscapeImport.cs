@@ -90,6 +90,7 @@ public class MenuLandscapeImport : MonoBehaviour
     Seasons season, lastSeason;
     float snowline;
     int timePeriod;
+    bool quittable;
 
     // Start is called before the first frame update
     void Start()
@@ -273,6 +274,9 @@ public class MenuLandscapeImport : MonoBehaviour
     void IncrementTime()
     {
         day++;
+        if (day > 20) {
+            quittable = true;
+        }
         if (day > 365) {
             year--;
             day = 1;
@@ -442,12 +446,12 @@ public class MenuLandscapeImport : MonoBehaviour
             SetSeaPos();
         }
 
-        quit = quitBtn.WasPressedThisFrame();
-        loadScene = loadSceneBtn.WasPressedThisFrame();
+        quit = quitBtn.WasReleasedThisFrame();
+        loadScene = loadSceneBtn.WasReleasedThisFrame();
         timePeriodUp = timePeriodUpBtn.WasReleasedThisFrame();
         timePeriodDown = timePeriodDownBtn.WasReleasedThisFrame();
         
-        if (quit) {
+        if (quit && quittable) {
             Application.Quit();
         }
         if (loadScene) {
