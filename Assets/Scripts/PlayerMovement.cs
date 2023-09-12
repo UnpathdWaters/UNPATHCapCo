@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -8,38 +9,32 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed;
 
-    public float drag;
+    public InputAction playerControls;
 
-    public Transform orientation;
-
-    float horizontalInput;
-    float verticalInput;
-
-    Vector3 moveDirection;
-
+    Vector2 moveDirection;
     Rigidbody rb;
 
     private void Start() {
         rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
     }
 
+    private void OnEnable()
+    {
+        playerControls.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls.Disable();
+    }
+
+
     private void Update() {
-        MyInput();
-        rb.drag = drag;
+        moveDirection = playerControls.ReadValue<Vector2>();
     }
 
     private void FixedUpdate() {
-        MovePlayer();
-    }
+        rb.velocity = new Vector3(moveDirection.x * moveSpeed, 0, moveDirection.y * moveSpeed);
+        }
 
-    private void MyInput() {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
-    }
-
-    private void MovePlayer() {
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-    }
 }

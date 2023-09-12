@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.IO;
 using TMPro;
 using System;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(MeshFilter))]
 public class LocalLandscapeImport : MonoBehaviour
@@ -68,6 +69,8 @@ public class LocalLandscapeImport : MonoBehaviour
     public int reedDensity;
     public int treeDensity;
 
+    public InputAction quitBtn;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -84,6 +87,16 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateReeds();
         UpdateMeshColors();
         Debug.Log("Maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
+    }
+
+    void OnEnable()
+    {
+        quitBtn.Enable();
+    }
+
+    void OnDisable()
+    {
+        quitBtn.Disable();
     }
 
     void ImportData()
@@ -432,8 +445,8 @@ public class LocalLandscapeImport : MonoBehaviour
             IncrementTime();
 //            SetSeaPos();
         }
-        if (Input.GetKeyDown(KeyCode.P)) TogglePause();
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetButtonDown("Fire1")) UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
+//        if (Input.GetKeyDown(KeyCode.P)) TogglePause();
+        if (quitBtn.WasPressedThisFrame()) UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
     }
 }
 

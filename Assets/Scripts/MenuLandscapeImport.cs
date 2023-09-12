@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using TMPro;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(MeshFilter))]
 public class MenuLandscapeImport : MonoBehaviour
@@ -70,6 +71,14 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField]
     GameObject glaciers15k;
 
+    public InputAction quitBtn;
+    public InputAction loadSceneBtn;
+    public InputAction timePeriodUpBtn;
+    public InputAction timePeriodDownBtn;
+    bool quit;
+    bool loadScene;
+    bool timePeriodUp, timePeriodDown;
+
     float seaPos;
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
     Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
@@ -94,6 +103,22 @@ public class MenuLandscapeImport : MonoBehaviour
         InitTimeManagement();
         CreateMesh();
         UpdateMesh();
+    }
+
+    void OnEnable()
+    {
+        quitBtn.Enable();
+        loadSceneBtn.Enable();
+        timePeriodUpBtn.Enable();
+        timePeriodDownBtn.Enable();
+    }
+
+    void OnDisable()
+    {
+        quitBtn.Disable();
+        loadSceneBtn.Disable();
+        timePeriodUpBtn.Disable();
+        timePeriodDownBtn.Disable();
     }
 
     void ImportData()
@@ -416,9 +441,33 @@ public class MenuLandscapeImport : MonoBehaviour
             IncrementTime();
             SetSeaPos();
         }
-        if (Input.GetKeyDown(KeyCode.P)) TogglePause();
-        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
-        if (Input.GetMouseButtonDown(0)) {
+
+        quit = quitBtn.WasPressedThisFrame();
+        loadScene = loadSceneBtn.WasPressedThisFrame();
+        timePeriodUp = timePeriodUpBtn.WasReleasedThisFrame();
+        timePeriodDown = timePeriodDownBtn.WasReleasedThisFrame();
+        
+        if (quit) {
+            Application.Quit();
+        }
+        if (loadScene) {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
+        }
+        if (timePeriodUp)
+        {
+            Debug.Log("Time period up!");
+            if (timePeriod < 6) {
+                timePeriod++;
+            }
+        }
+        if (timePeriodDown) {
+            Debug.Log("Time period down!");
+            if (timePeriod > 0) {
+                timePeriod--;
+            }
+        }
+
+/*        if (Input.GetMouseButtonDown(0)) {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit)) {
@@ -427,7 +476,7 @@ public class MenuLandscapeImport : MonoBehaviour
                     clickedPoint.y = hit.point.z;
                 }
             }
-        }
+        }*/
 
         switch (timePeriod)
         {
@@ -540,19 +589,7 @@ public class MenuLandscapeImport : MonoBehaviour
                 break;
         }
 
-        if (Input.GetButtonDown("Fire1")) {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
-        }
-        if (Input.GetButtonDown("Fire3")) {
-            if (timePeriod > 0) {
-                timePeriod--;
-            }
-        }
-        if (Input.GetButtonDown("Fire2")) {
-            if (timePeriod < 6) {
-                timePeriod++;
-            }
-        }
 
     }
+
 }
