@@ -447,6 +447,15 @@ public class MenuLandscapeImport : MonoBehaviour
             SetSeaPos();
         }
 
+        //Insert Raycast hit to select clicked point
+//      Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(cam.transform.position, cam.transform.TransformDirection(Vector3.forward), out hit)) {
+            clickedPoint.x = hit.point.x;
+            clickedPoint.y = hit.point.z;
+        }
+
+
         quit = quitBtn.WasReleasedThisFrame();
         loadScene = loadSceneBtn.WasReleasedThisFrame();
         timePeriodUp = timePeriodUpBtn.WasReleasedThisFrame();

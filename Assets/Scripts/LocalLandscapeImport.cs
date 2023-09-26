@@ -302,7 +302,6 @@ public class LocalLandscapeImport : MonoBehaviour
                 default:
                     break;
             }
-
         }
         lastSeason = season;
     }
