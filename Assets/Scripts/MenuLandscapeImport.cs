@@ -465,6 +465,8 @@ public class MenuLandscapeImport : MonoBehaviour
             Application.Quit();
         }
         if (loadScene) {
+            DataStore.selectedLocation = clickedPoint;
+            DataStore.selectedYear = year;
             UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
         }
         if (timePeriodUp)

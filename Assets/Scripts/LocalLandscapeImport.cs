@@ -74,6 +74,9 @@ public class LocalLandscapeImport : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Location is " + DataStore.selectedLocation);
+        Debug.Log("Year is " + DataStore.selectedYear);
+
         snowline = baseSnowline;
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
