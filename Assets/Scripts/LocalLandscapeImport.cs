@@ -81,11 +81,15 @@ public class LocalLandscapeImport : MonoBehaviour
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
-        ImportData();
+        river = new bool[widthX, heightZ];
+        marsh = new bool[widthX, heightZ];
+
+        ImportLocalSection();
+//        ImportData();
         InitTimeManagement();
         CreateMesh();
         UpdateMesh();
-        ProcessMask();
+//        ProcessMask();
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
@@ -100,6 +104,97 @@ public class LocalLandscapeImport : MonoBehaviour
     void OnDisable()
     {
         quitBtn.Disable();
+    }
+
+    void ImportLocalSection()
+    {
+        surfaceFile = new FileInfo ("D:/QGISdata/SquareSelectableArea18764.asc");
+        surfaceStream = surfaceFile.OpenText();
+        string[] hdrArray;
+        depths = new float[widthX, heightZ];
+        headerText = new string[2,6];
+        float thisval = 0.0f;
+        char[] separators = new char[] { ' ', '\t', ',' };
+
+        //Read ESRI ASCII header
+        for (int headline = 0; headline < 6; headline++)
+        {
+            inputLine = surfaceStream.ReadLine();
+            hdrArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+            headerText[0,headline] = hdrArray[0];
+            headerText[1,headline] = hdrArray[1];
+        }
+
+
+        totCols = int.Parse(headerText[1,0]);
+        totRows = int.Parse(headerText[1,1]);
+        noData = float.Parse(headerText[1,5]);
+
+        Debug.Log("Input file Cols = " + totCols);
+        Debug.Log("Input file Rows = " + totRows);
+        Debug.Log("Input noData val is " + noData);
+
+        int selectedCol = (int) (DataStore.selectedLocation.x * totCols);
+        int selectedRow = (int) (DataStore.selectedLocation.y * totRows);
+        int startX = selectedCol - (widthX / 2);
+        int endX = selectedCol + (widthX / 2);
+        int startY = selectedRow - (heightZ / 2);
+        int endY = selectedRow + (heightZ / 2);
+
+        Debug.Log("selectedCol is " + selectedCol + "and Row is " + selectedRow + "so X goes from " + startX + "-" + endX + "and Y goes from" + startY + "-" + endY);
+
+        if (startX < 0)
+        {
+            startX = 0;
+            endX = widthX - 1;
+        } else if (endX > totCols - 1)
+        {
+            startX = totCols - 1 - widthX;
+            endX = totCols -1;
+        }
+
+        if (startY < 0)
+        {
+            startY = 0;
+            endY = heightZ - 1;
+        } else if (endY > totRows - 1)
+        {
+            startY = totRows - 1 - heightZ;
+            endY = totRows - 1;
+        }
+
+
+        string[] readArray = new string[totCols];
+        float[] tempArray = new float[widthX * heightZ];
+
+        int xCount = 0;
+        int zCount = heightZ - 1;
+        for (int z = 0; z < totRows; z++)
+        {
+            inputLine = surfaceStream.ReadLine();
+            if (z > startY && z < endY)
+            {
+                xCount = 0;
+                readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+                for (int x = startX; x < endX; x++)
+                {
+                    thisval = float.Parse(readArray[x]);
+                    depths[xCount, zCount] = thisval;
+                    tempArray[xCount + (zCount * widthX)] = thisval;
+                    if (thisval > maxVal)
+                    {
+                        maxVal = thisval;
+                    }
+                    if (thisval < minVal)
+                    {
+                        minVal = thisval;
+                    }
+                    xCount++;
+                }
+                zCount--;
+            }
+        }
+        midVal = CalculateMedian(tempArray);
     }
 
     void ImportData()
@@ -194,8 +289,6 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         int riverPix = 0;
         int marshPix = 0;
-        river = new bool[widthX, heightZ];
-        marsh = new bool[widthX, heightZ];
         Color[] maskPixels = landuseMap.GetPixels();
         Debug.Log("maskPixels size is " + maskPixels.Length);
         Color thisCol;
@@ -233,7 +326,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void InitTimeManagement()
     {
-        year = 20000;
+        year = DataStore.selectedYear;
         day = 1;
         season = Seasons.Winter;
         lastSeason = season;
@@ -358,7 +451,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 } else {
                     if (depths[x, y] < midVal) {
                         if (UnityEngine.Random.Range(midVal, minVal) > depths[x, y]) {
-                            Vector3 reedPos = new Vector3(x, depths[x, y] * zScale, y);
+                            Vector3 reedPos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
                             Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
                         }
                     }

@@ -70,6 +70,14 @@ public class MenuLandscapeImport : MonoBehaviour
     GameObject glaciers17k;
     [SerializeField]
     GameObject glaciers15k;
+    [SerializeField]
+    int leftCol;
+    [SerializeField]
+    int rightCol;
+    [SerializeField]
+    int topRow;
+    [SerializeField]
+    int bottomRow;
 
     public InputAction quitBtn;
     public InputAction loadSceneBtn;
@@ -85,6 +93,7 @@ public class MenuLandscapeImport : MonoBehaviour
     Color autumnTrees = new Color(0.9f, 0.2f, 0.0f, 1.0f);
     Color clickCol = new Color(0.9f, 0.0f, 0.9f, 1.0f);
     Color clickNeighbour = new Color(0.9f, 0.3f, 0.9f, 1.0f);
+    Color boxCol = new Color(1.0f, 0.0f, 0.0f, 1.0f);
 
     enum Seasons { Winter, Spring, Summer, Autumn };
     Seasons season, lastSeason;
@@ -338,6 +347,27 @@ public class MenuLandscapeImport : MonoBehaviour
         }
     }
 
+    bool isBox(int x, int y)
+    {
+        if (x == leftCol && y >= topRow && y <= bottomRow)
+        {
+            return true;
+        }
+        if (x == rightCol && y >= topRow && y <= bottomRow)
+        {
+            return true;
+        }
+        if (y == topRow && x >= leftCol && x <= rightCol)
+        {
+            return true;
+        }
+        if (y == bottomRow && x >= leftCol && x <= rightCol)
+        {
+            return true;
+        }
+        return false;
+    }
+
 
     void UpdateMeshColors()
     {
@@ -364,12 +394,14 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                if (depths[x, z] < seaPos) {
-                    colours[x + (z * widthX)] = seaCol;
+                if (isBox(x, z)) {
+                    colours[x + (z * widthX)] = boxCol;
                 } else if (x == clickedPoint.x && z == clickedPoint.y) {
                     colours[x + (z * widthX)] = clickCol;
                 } else if (IsNeighbour(new Vector2(x, z), clickedPoint)) {
                     colours[x + (z * widthX)] = clickNeighbour;
+                } else if (depths[x, z] < seaPos) {
+                    colours[x + (z * widthX)] = seaCol;
                 } else if (depths[x, z] - seaPos < coastSize) {
                     colours[x + (z * widthX)] = coastCol;
                 } else {
@@ -444,15 +476,27 @@ public class MenuLandscapeImport : MonoBehaviour
         if (!pause) {
             UpdateMeshColors();
             IncrementTime();
-            SetSeaPos();
+//            SetSeaPos();
         }
 
         //Insert Raycast hit to select clicked point
-//      Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(cam.transform.position, cam.transform.TransformDirection(Vector3.forward), out hit)) {
             clickedPoint.x = hit.point.x;
             clickedPoint.y = hit.point.z;
+        }
+
+        if (clickedPoint.x < leftCol) {
+            clickedPoint.x = leftCol;
+        }
+        if (clickedPoint.x > rightCol) {
+            clickedPoint.x = rightCol;
+        }
+        if (clickedPoint.y < topRow) {
+            clickedPoint.y = topRow;
+        }
+        if (clickedPoint.y > bottomRow) {
+            clickedPoint.y = bottomRow;
         }
 
 
@@ -465,7 +509,10 @@ public class MenuLandscapeImport : MonoBehaviour
             Application.Quit();
         }
         if (loadScene) {
-            DataStore.selectedLocation = clickedPoint;
+            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
+            float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
+            Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
+            DataStore.selectedLocation = clickedPointAsPercent;
             DataStore.selectedYear = year;
             UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
         }

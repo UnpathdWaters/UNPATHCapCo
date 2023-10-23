@@ -35,7 +35,7 @@ public class Moose : MonoBehaviour
     public void setHerdID(int pID)
     {
         herdID = pID;
-        Debug.Log("A moose from herd " + herdID + " is alive!");
+//        Debug.Log("A moose from herd " + herdID + " is alive!");
     }
 
     public int getHerdID()
