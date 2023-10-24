@@ -43,8 +43,6 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField]
     GameObject winterImage;
     [SerializeField]
-    GameObject sea;
-    [SerializeField]
     float coastSize;
     [SerializeField]
     float baseSnowline;
@@ -52,18 +50,6 @@ public class MenuLandscapeImport : MonoBehaviour
     Camera cam;
     [SerializeField]
     GameObject arrow1;
-    [SerializeField]
-    GameObject arrow2;
-    [SerializeField]
-    GameObject arrow3;
-    [SerializeField]
-    GameObject arrow4;
-    [SerializeField]
-    GameObject arrow5;
-    [SerializeField]
-    GameObject arrow6;
-    [SerializeField]
-    GameObject arrow7;
     [SerializeField]
     GameObject glaciers20k;
     [SerializeField]
@@ -83,9 +69,7 @@ public class MenuLandscapeImport : MonoBehaviour
     public InputAction loadSceneBtn;
     public InputAction timePeriodUpBtn;
     public InputAction timePeriodDownBtn;
-    bool quit;
-    bool loadScene;
-    bool timePeriodUp, timePeriodDown;
+    int timeAcceleration;
 
     float seaPos;
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
@@ -98,8 +82,11 @@ public class MenuLandscapeImport : MonoBehaviour
     enum Seasons { Winter, Spring, Summer, Autumn };
     Seasons season, lastSeason;
     float snowline;
-    int timePeriod;
     bool quittable;
+    Vector3 yearAdj = new Vector3(0.048f, 0.0f, 0.0f);
+
+    static readonly float[] SLC = new float[21]{ 0.6f, 0.8f, 1.1f, 1.5f, 1.7f, 2.4f, 3.3f, 7.8f, 8.8f, 8.1f, 13.3f, 5.6f, 4.7f, 14.4f, 14.2f, 3.2f, 4.0f, 3.6f, 1.2f, 0.6f, 0.0f };
+
 
     // Start is called before the first frame update
     void Start()
@@ -108,7 +95,6 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
-        timePeriod = 0;
         ImportData();
         InitTimeManagement();
         CreateMesh();
@@ -193,6 +179,7 @@ public class MenuLandscapeImport : MonoBehaviour
     }
 
 
+
     void CreateMesh()
     {
         vertices = new Vector3[widthX * heightZ];
@@ -254,7 +241,8 @@ public class MenuLandscapeImport : MonoBehaviour
         day = 1;
         season = Seasons.Winter;
         lastSeason = season;
-        seaPos = -96.0f;
+        timeAcceleration = 100;
+        seaPos = GetGIAWaterHeight();
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -288,6 +276,8 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (day > 365) {
             year--;
+            arrow1.transform.position = arrow1.transform.position + yearAdj;
+            seaPos = GetGIAWaterHeight();
             day = 1;
         }
         season = (Seasons) (day / SEASONLENGTH);
@@ -367,7 +357,6 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         return false;
     }
-
 
     void UpdateMeshColors()
     {
@@ -453,21 +442,15 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh.colors = colours;
     }
 
-    void SetSeaPos()
+    float GetGIAWaterHeight()
     {
-        float xPos = sea.transform.position.x;
-        float zPos = sea.transform.position.z;
-        Vector3 newPos = new Vector3(xPos, seaPos * zScale, zPos);
-        sea.transform.position = newPos;
-    }
-
-    void TogglePause()
-    {
-        if (pause) {
-            pause = false;
-        } else {
-            pause = true;
+        float giaWaterHeight = 0;
+        for (int x = 0; x < (year / 1000); x++)
+        {
+            giaWaterHeight = giaWaterHeight - (SLC[x]);
         }
+        giaWaterHeight = giaWaterHeight - ((year % 1000) * (SLC[year / 1000] / 1000));
+        return giaWaterHeight;
     }
 
     void Update()
@@ -476,7 +459,6 @@ public class MenuLandscapeImport : MonoBehaviour
         if (!pause) {
             UpdateMeshColors();
             IncrementTime();
-//            SetSeaPos();
         }
 
         //Insert Raycast hit to select clicked point
@@ -499,16 +481,42 @@ public class MenuLandscapeImport : MonoBehaviour
             clickedPoint.y = bottomRow;
         }
 
-
-        quit = quitBtn.WasReleasedThisFrame();
-        loadScene = loadSceneBtn.WasReleasedThisFrame();
-        timePeriodUp = timePeriodUpBtn.WasReleasedThisFrame();
-        timePeriodDown = timePeriodDownBtn.WasReleasedThisFrame();
+        if (timePeriodDownBtn.WasPressedThisFrame())
+        {
+//            timeAcceleration++;
+            int oldYear = year;
+            year = year + timeAcceleration;
+            if (year > 20000) 
+            {
+                year = 20000;
+            }
+            arrow1.transform.position = arrow1.transform.position - (yearAdj * (year - oldYear));
+            Debug.Log("Year is now " + year);
+            timePeriodChanged = true;
+        } 
         
-        if (quit && quittable) {
+        if (timePeriodUpBtn.WasPressedThisFrame())
+        {
+//            timeAcceleration++;
+            int oldYear = year;
+            year = year - timeAcceleration;
+            if (year < 5000) {
+                year = 5000;
+            }
+            arrow1.transform.position = arrow1.transform.position + (yearAdj * (oldYear - year));
+            Debug.Log("Year is now " + year);
+            timePeriodChanged = true;
+        }
+        if (timePeriodUpBtn.WasReleasedThisFrame() || timePeriodDownBtn.WasReleasedThisFrame())
+        {
+//            timeAcceleration = 1;
+            timePeriodChanged = false;
+        }
+        
+        if (quitBtn.WasReleasedThisFrame() && quittable) {
             Application.Quit();
         }
-        if (loadScene) {
+        if (loadSceneBtn.WasReleasedThisFrame()) {
             float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
             float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
             Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
@@ -516,137 +524,38 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.selectedYear = year;
             UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
         }
-        if (timePeriodUp)
-        {
-            Debug.Log("Time period up!");
-            if (timePeriod < 6) {
-                timePeriod++;
-                timePeriodChanged = true;
-            }
-        }
-        if (timePeriodDown) {
-            Debug.Log("Time period down!");
-            if (timePeriod > 0) {
-                timePeriod--;
-                timePeriodChanged = true;
-            }
-        }
 
         if (timePeriodChanged) {
-        switch (timePeriod)
-        {
-            case 0:
-                seaPos = -96.0f;
-                baseSnowline = 100.0f;
-                arrow1.SetActive(true);
-                arrow2.SetActive(false);
-                arrow3.SetActive(false);
-                arrow4.SetActive(false);
-                arrow5.SetActive(false);
-                arrow6.SetActive(false);
-                arrow7.SetActive(false);
+            seaPos = GetGIAWaterHeight();
+            if (year == 20000) {
                 glaciers20k.SetActive(true);
                 glaciers17k.SetActive(false);
                 glaciers15k.SetActive(false);
-                EvaluateBaseColours();
-                break;
-            case 1:
-                seaPos = -94.0f;
-                baseSnowline = 125.0f;
-                arrow1.SetActive(false);
-                arrow2.SetActive(true);
-                arrow3.SetActive(false);
-                arrow4.SetActive(false);
-                arrow5.SetActive(false);
-                arrow6.SetActive(false);
-                arrow7.SetActive(false);
+            } else if (year > 17500) {
                 glaciers20k.SetActive(false);
                 glaciers17k.SetActive(true);
                 glaciers15k.SetActive(false);
-                EvaluateBaseColours();
-                break;
-            case 2:
-                seaPos = -85.0f;
-                baseSnowline = 150.0f;
-                arrow1.SetActive(false);
-                arrow2.SetActive(false);
-                arrow3.SetActive(true);
-                arrow4.SetActive(false);
-                arrow5.SetActive(false);
-                arrow6.SetActive(false);
-                arrow7.SetActive(false);
+            } else if (year > 15000) {
                 glaciers20k.SetActive(false);
                 glaciers17k.SetActive(false);
                 glaciers15k.SetActive(true);
-                EvaluateBaseColours();
-                break;
-            case 3:
-                seaPos = -55.0f;
-                baseSnowline = 300.0f;
-                arrow1.SetActive(false);
-                arrow2.SetActive(false);
-                arrow3.SetActive(false);
-                arrow4.SetActive(true);
-                arrow5.SetActive(false);
-                arrow6.SetActive(false);
-                arrow7.SetActive(false);
+            } else if (year > 12500) {
                 glaciers20k.SetActive(false);
                 glaciers17k.SetActive(false);
                 glaciers15k.SetActive(false);
-                EvaluateBaseColours();
-                break;
-            case 4:
-                seaPos = -33.0f;
-                baseSnowline = 400.0f;
-                arrow1.SetActive(false);
-                arrow2.SetActive(false);
-                arrow3.SetActive(false);
-                arrow4.SetActive(false);
-                arrow5.SetActive(true);
-                arrow6.SetActive(false);
-                arrow7.SetActive(false);
+            } else if (year > 10000) {
                 glaciers20k.SetActive(false);
                 glaciers17k.SetActive(false);
                 glaciers15k.SetActive(false);
-                EvaluateBaseColours();
-                break;
-            case 5:
-                seaPos = -14.0f;
-                baseSnowline = 450.0f;
-                arrow1.SetActive(false);
-                arrow2.SetActive(false);
-                arrow3.SetActive(false);
-                arrow4.SetActive(false);
-                arrow5.SetActive(false);
-                arrow6.SetActive(true);
-                arrow7.SetActive(false);
+            } else if (year > 7500) {
                 glaciers20k.SetActive(false);
                 glaciers17k.SetActive(false);
                 glaciers15k.SetActive(false);
-                EvaluateBaseColours();
-                break;
-            case 6:
-                seaPos = -5.0f;
-                baseSnowline = 500.0f;
-                arrow1.SetActive(false);
-                arrow2.SetActive(false);
-                arrow3.SetActive(false);
-                arrow4.SetActive(false);
-                arrow5.SetActive(false);
-                arrow6.SetActive(false);
-                arrow7.SetActive(true);
+            } else {
                 glaciers20k.SetActive(false);
                 glaciers17k.SetActive(false);
                 glaciers15k.SetActive(false);
-                EvaluateBaseColours();
-                break;
-            default:
-                break;
+            }
         }
-
-        }
-
-
     }
-
 }

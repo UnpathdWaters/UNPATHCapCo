@@ -71,6 +71,9 @@ public class LocalLandscapeImport : MonoBehaviour
 
     public InputAction quitBtn;
 
+    static readonly float[] SLC = new float[21]{ 0.6f, 0.8f, 1.1f, 1.5f, 1.7f, 2.4f, 3.3f, 7.8f, 8.8f, 8.1f, 13.3f, 5.6f, 4.7f, 14.4f, 14.2f, 3.2f, 4.0f, 3.6f, 1.2f, 0.6f, 0.0f };
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -85,11 +88,9 @@ public class LocalLandscapeImport : MonoBehaviour
         marsh = new bool[widthX, heightZ];
 
         ImportLocalSection();
-//        ImportData();
         InitTimeManagement();
         CreateMesh();
         UpdateMesh();
-//        ProcessMask();
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
@@ -197,67 +198,6 @@ public class LocalLandscapeImport : MonoBehaviour
         midVal = CalculateMedian(tempArray);
     }
 
-    void ImportData()
-    {
-        surfaceFile = new FileInfo ("Assets/Terrain/localsurface512.asc");
-        surfaceStream = surfaceFile.OpenText();
-        string[] hdrArray;
-        depths = new float[widthX, heightZ];
-        headerText = new string[2,6];
-        float thisval = 0.0f;
-        char[] separators = new char[] { ' ', '\t', ',' };
-
-        //Read ESRI ASCII header
-        for (int headline = 0; headline < 6; headline++)
-        {
-            inputLine = surfaceStream.ReadLine();
-            hdrArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
-            headerText[0,headline] = hdrArray[0];
-            headerText[1,headline] = hdrArray[1];
-        }
-
-
-        totCols = int.Parse(headerText[1,0]);
-        totRows = int.Parse(headerText[1,1]);
-        noData = float.Parse(headerText[1,5]);
-
-        Debug.Log("Input file Cols = " + totCols);
-        Debug.Log("Input file Rows = " + totRows);
-        Debug.Log("Input noData val is " + noData);
-
-
-
-        string[] readArray = new string[totCols];
-        float[] tempArray = new float[widthX * heightZ];
-
-        int xCount = 0;
-        int zCount = heightZ - 1;
-        for (int z = 0; z < totRows; z++)
-        {
-            inputLine = surfaceStream.ReadLine();
-            xCount = 0;
-            readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
-            for (int x = 0; x < totCols; x++)
-            {
-                thisval = float.Parse(readArray[x]);
-                depths[xCount, zCount] = thisval;
-                tempArray[x + (z * widthX)] = thisval;
-                if (thisval > maxVal)
-                {
-                    maxVal = thisval;
-                }
-                if (thisval < minVal)
-                {
-                    minVal = thisval;
-                }
-                xCount++;
-            }
-            zCount--;
-        }
-        midVal = CalculateMedian(tempArray);
-    }
-
-
     void CreateMesh()
     {
         vertices = new Vector3[widthX * heightZ];
@@ -285,36 +225,6 @@ public class LocalLandscapeImport : MonoBehaviour
         }
     }
 
-    void ProcessMask()
-    {
-        int riverPix = 0;
-        int marshPix = 0;
-        Color[] maskPixels = landuseMap.GetPixels();
-        Debug.Log("maskPixels size is " + maskPixels.Length);
-        Color thisCol;
-        int useableX, useableY;
-        float xFactor, yFactor;
-        xFactor = (float) landuseMap.width / (float) widthX;
-        yFactor = (float) landuseMap.height / (float) heightZ;
-        Debug.Log("Xfac is " + xFactor + " and yfac is " + yFactor);
-        for (int y = 0; y < landuseMap.height; y++){
-            for (int x = 0; x < landuseMap.width; x++) {
-                thisCol = maskPixels[x + (y * landuseMap.width)];
-                useableX = (int) (x / xFactor);
-                useableY = (int) (y / yFactor);
-                if (thisCol.g < 0.5f && thisCol.a > 0.2f) {
-                    river[useableX, useableY] = true;
-                    riverPix++;
-                } else if (thisCol.g > 0.5f && thisCol.a > 0.2f) {
-                    marsh[useableX, useableY] = true;
-                    marshPix++;
-                } 
-            }
-        }
-        Debug.Log(riverPix + " rivers and " + marshPix + " marshes");
-    }
-
-
     void UpdateMesh()
     {
         mesh.Clear();
@@ -330,7 +240,7 @@ public class LocalLandscapeImport : MonoBehaviour
         day = 1;
         season = Seasons.Winter;
         lastSeason = season;
-        seaPos = -96.0f;
+        seaPos = GetGIAWaterHeight();
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -461,6 +371,16 @@ public class LocalLandscapeImport : MonoBehaviour
 
     }
 
+    float GetGIAWaterHeight()
+    {
+        float giaWaterHeight = 0;
+        for (int x = 0; x < (year / 1000); x++)
+        {
+            giaWaterHeight = giaWaterHeight - (SLC[x]);
+        }
+        giaWaterHeight = giaWaterHeight - ((year % 1000) * (SLC[year / 1000] / 1000));
+        return giaWaterHeight;
+    }
 
     void UpdateMeshColors()
     {
@@ -498,14 +418,6 @@ public class LocalLandscapeImport : MonoBehaviour
             }
         }
         mesh.colors = colours;
-    }
-
-    void SetSeaPos()
-    {
-        float xPos = sea.transform.position.x;
-        float zPos = sea.transform.position.z;
-        Vector3 newPos = new Vector3(xPos, seaPos * zScale, zPos);
-        sea.transform.position = newPos;
     }
 
     void TogglePause()
