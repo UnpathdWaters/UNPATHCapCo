@@ -64,12 +64,13 @@ public class MenuLandscapeImport : MonoBehaviour
     int topRow;
     [SerializeField]
     int bottomRow;
+    [SerializeField]
+    SeaLevelServer sls;
 
     public InputAction quitBtn;
     public InputAction loadSceneBtn;
-    public InputAction timePeriodUpBtn;
-    public InputAction timePeriodDownBtn;
-    int timeAcceleration;
+    public InputAction timeControl;
+    public float timeSpeed;
 
     float seaPos;
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
@@ -84,8 +85,8 @@ public class MenuLandscapeImport : MonoBehaviour
     float snowline;
     bool quittable;
     Vector3 yearAdj = new Vector3(0.048f, 0.0f, 0.0f);
+    float timeChangeAmount;
 
-    static readonly float[] SLC = new float[21]{ 0.6f, 0.8f, 1.1f, 1.5f, 1.7f, 2.4f, 3.3f, 7.8f, 8.8f, 8.1f, 13.3f, 5.6f, 4.7f, 14.4f, 14.2f, 3.2f, 4.0f, 3.6f, 1.2f, 0.6f, 0.0f };
 
 
     // Start is called before the first frame update
@@ -105,16 +106,14 @@ public class MenuLandscapeImport : MonoBehaviour
     {
         quitBtn.Enable();
         loadSceneBtn.Enable();
-        timePeriodUpBtn.Enable();
-        timePeriodDownBtn.Enable();
+        timeControl.Enable();
     }
 
     void OnDisable()
     {
         quitBtn.Disable();
         loadSceneBtn.Disable();
-        timePeriodUpBtn.Disable();
-        timePeriodDownBtn.Disable();
+        timeControl.Disable();
     }
 
     void ImportData()
@@ -237,12 +236,17 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void InitTimeManagement()
     {
-        year = 20000;
+        year = DataStore.selectedYear;
+        if (year > 20000 || year < 5000) {
+            year = 20000;
+            DataStore.selectedYear = year;
+        }
         day = 1;
         season = Seasons.Winter;
         lastSeason = season;
-        timeAcceleration = 100;
-        seaPos = GetGIAWaterHeight();
+        seaPos = sls.GetGIAWaterHeight(year);
+        arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
+
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -277,7 +281,7 @@ public class MenuLandscapeImport : MonoBehaviour
         if (day > 365) {
             year--;
             arrow1.transform.position = arrow1.transform.position + yearAdj;
-            seaPos = GetGIAWaterHeight();
+            seaPos = sls.GetGIAWaterHeight(year);
             day = 1;
         }
         season = (Seasons) (day / SEASONLENGTH);
@@ -442,20 +446,11 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh.colors = colours;
     }
 
-    float GetGIAWaterHeight()
-    {
-        float giaWaterHeight = 0;
-        for (int x = 0; x < (year / 1000); x++)
-        {
-            giaWaterHeight = giaWaterHeight - (SLC[x]);
-        }
-        giaWaterHeight = giaWaterHeight - ((year % 1000) * (SLC[year / 1000] / 1000));
-        return giaWaterHeight;
-    }
-
     void Update()
     {
         bool timePeriodChanged = false;
+        timeChangeAmount = timeControl.ReadValue<float>();
+
         if (!pause) {
             UpdateMeshColors();
             IncrementTime();
@@ -481,37 +476,20 @@ public class MenuLandscapeImport : MonoBehaviour
             clickedPoint.y = bottomRow;
         }
 
-        if (timePeriodDownBtn.WasPressedThisFrame())
-        {
-//            timeAcceleration++;
-            int oldYear = year;
-            year = year + timeAcceleration;
+        int oldYear = year;
+        year += (int) (timeChangeAmount * timeSpeed);
+        if (year != oldYear) {
+            timePeriodChanged = true;
             if (year > 20000) 
             {
                 year = 20000;
-            }
-            arrow1.transform.position = arrow1.transform.position - (yearAdj * (year - oldYear));
-            Debug.Log("Year is now " + year);
-            timePeriodChanged = true;
-        } 
-        
-        if (timePeriodUpBtn.WasPressedThisFrame())
-        {
-//            timeAcceleration++;
-            int oldYear = year;
-            year = year - timeAcceleration;
-            if (year < 5000) {
+            } else if (year < 5000) {
                 year = 5000;
             }
-            arrow1.transform.position = arrow1.transform.position + (yearAdj * (oldYear - year));
-            Debug.Log("Year is now " + year);
-            timePeriodChanged = true;
-        }
-        if (timePeriodUpBtn.WasReleasedThisFrame() || timePeriodDownBtn.WasReleasedThisFrame())
-        {
-//            timeAcceleration = 1;
+        } else {
             timePeriodChanged = false;
         }
+
         
         if (quitBtn.WasReleasedThisFrame() && quittable) {
             Application.Quit();
@@ -526,7 +504,9 @@ public class MenuLandscapeImport : MonoBehaviour
         }
 
         if (timePeriodChanged) {
-            seaPos = GetGIAWaterHeight();
+            Debug.Log("Year is now " + year);
+            arrow1.transform.position = arrow1.transform.position + (yearAdj * (oldYear - year));
+            seaPos = sls.GetGIAWaterHeight(year);
             if (year == 20000) {
                 glaciers20k.SetActive(true);
                 glaciers17k.SetActive(false);

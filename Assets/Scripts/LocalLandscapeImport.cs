@@ -71,8 +71,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     public InputAction quitBtn;
 
-    static readonly float[] SLC = new float[21]{ 0.6f, 0.8f, 1.1f, 1.5f, 1.7f, 2.4f, 3.3f, 7.8f, 8.8f, 8.1f, 13.3f, 5.6f, 4.7f, 14.4f, 14.2f, 3.2f, 4.0f, 3.6f, 1.2f, 0.6f, 0.0f };
-
+    SeaLevelServer sls;
 
     // Start is called before the first frame update
     void Start()
@@ -86,6 +85,7 @@ public class LocalLandscapeImport : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
         river = new bool[widthX, heightZ];
         marsh = new bool[widthX, heightZ];
+        sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
 
         ImportLocalSection();
         InitTimeManagement();
@@ -180,7 +180,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 for (int x = startX; x < endX; x++)
                 {
                     thisval = float.Parse(readArray[x]);
-                    depths[xCount, zCount] = thisval;
+                    depths[xCount, zCount] = AddNoiseToDepths(thisval);
                     tempArray[xCount + (zCount * widthX)] = thisval;
                     if (thisval > maxVal)
                     {
@@ -196,6 +196,11 @@ public class LocalLandscapeImport : MonoBehaviour
             }
         }
         midVal = CalculateMedian(tempArray);
+    }
+
+    float AddNoiseToDepths(float depth)
+    {
+        return depth + UnityEngine.Random.Range(-0.5f, 0.5f);
     }
 
     void CreateMesh()
@@ -240,7 +245,7 @@ public class LocalLandscapeImport : MonoBehaviour
         day = 1;
         season = Seasons.Winter;
         lastSeason = season;
-        seaPos = GetGIAWaterHeight();
+        seaPos = sls.GetGIAWaterHeight(year);
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -371,17 +376,6 @@ public class LocalLandscapeImport : MonoBehaviour
 
     }
 
-    float GetGIAWaterHeight()
-    {
-        float giaWaterHeight = 0;
-        for (int x = 0; x < (year / 1000); x++)
-        {
-            giaWaterHeight = giaWaterHeight - (SLC[x]);
-        }
-        giaWaterHeight = giaWaterHeight - ((year % 1000) * (SLC[year / 1000] / 1000));
-        return giaWaterHeight;
-    }
-
     void UpdateMeshColors()
     {
         float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
@@ -450,7 +444,7 @@ public class LocalLandscapeImport : MonoBehaviour
         if (!pause) {
 //            UpdateMeshColors();
 //            IncrementTime();
-//            SetSeaPos();
+            seaPos = sls.GetGIAWaterHeight(year);
         }
 //        if (Input.GetKeyDown(KeyCode.P)) TogglePause();
         if (quitBtn.WasPressedThisFrame()) UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
