@@ -62,6 +62,7 @@ public class LocalLandscapeImport : MonoBehaviour
     public Texture2D landuseMap;
     bool[,] river;
     bool[,] marsh;
+    bool seasonChange;
 
     public GameObject tree;
     public GameObject reeds;
@@ -70,6 +71,7 @@ public class LocalLandscapeImport : MonoBehaviour
     public int treeDensity;
 
     public InputAction quitBtn;
+    public InputAction pauseBtn;
 
     SeaLevelServer sls;
 
@@ -100,11 +102,13 @@ public class LocalLandscapeImport : MonoBehaviour
     void OnEnable()
     {
         quitBtn.Enable();
+        pauseBtn.Enable();
     }
 
     void OnDisable()
     {
         quitBtn.Disable();
+        pauseBtn.Disable();
     }
 
     void ImportLocalSection()
@@ -246,6 +250,7 @@ public class LocalLandscapeImport : MonoBehaviour
         season = Seasons.Winter;
         lastSeason = season;
         seaPos = sls.GetGIAWaterHeight(year);
+        seasonChange = true;
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -273,6 +278,9 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void IncrementTime()
     {
+        if (seasonChange) {
+            seasonChange = false;
+        }
         day++;
         if (day > 365) {
             year--;
@@ -280,6 +288,7 @@ public class LocalLandscapeImport : MonoBehaviour
         }
         season = (Seasons) (day / SEASONLENGTH);
         if (season != lastSeason) {
+            seasonChange = true;
             switch (season)
             {
                 case Seasons.Spring:
@@ -308,7 +317,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     summerImage.SetActive(false);
                     autumnImage.SetActive(false);
                     winterImage.SetActive(true);
-                    snowline = baseSnowline / 2;
+                    snowline = seaPos + (coastSize * 2);
                     break;
                 default:
                     break;
@@ -376,29 +385,28 @@ public class LocalLandscapeImport : MonoBehaviour
 
     }
 
+    Color CreateSands(Color inColor, float seaDist)
+    {
+        float rAdj, gAdj, bAdj;
+        float ripple = ColNormal((float) (((seaDist % 0.5f) - 0.25f) / 10.0f));
+//        Debug.Log(ripple);
+        rAdj = inColor.r + ripple;
+        gAdj = inColor.g;
+        bAdj = inColor.b;
+        return new Color(rAdj, gAdj, bAdj, 1);
+    }
+
     void UpdateMeshColors()
     {
-        float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
-        if (timeThroughSeason > 0.5f) {
-            timeThroughSeason = 0.5f - (timeThroughSeason - 0.5f);
-        }
-
-        float timeThroughYear = (float) day / (float) 365;
-        if (timeThroughYear > 0.5f) {
-            timeThroughYear = 0.5f - (timeThroughYear - 0.5f);
-        }
-
-
-
         // Assign colours to vertices
         for (int z = 0; z < heightZ; z++)
         {
             for (int x = 0; x < widthX; x++)
             {
                 if (depths[x, z] < seaPos) {
-                    colours[x + (z * widthX)] = seaCol;
+                    colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
                 } else if (depths[x, z] - seaPos < coastSize) {
-                    colours[x + (z * widthX)] = coastCol;
+                    colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - seaPos);
                 } else if (depths[x, z] > seaPos + snowline) {
                     colours[x + (z * widthX)] = Color.white;
                 } else if (river[x, z]) {
@@ -407,7 +415,9 @@ public class LocalLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = marshCol;
                 } else {
                     float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                    colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
+                    if (seasonChange) {
+                        colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
+                    } 
                 }
             }
         }
@@ -442,11 +452,11 @@ public class LocalLandscapeImport : MonoBehaviour
     void Update()
     {
         if (!pause) {
-//            UpdateMeshColors();
-//            IncrementTime();
             seaPos = sls.GetGIAWaterHeight(year);
+            IncrementTime();
+            UpdateMeshColors();
         }
-//        if (Input.GetKeyDown(KeyCode.P)) TogglePause();
+        if (pauseBtn.WasPressedThisFrame()) TogglePause();
         if (quitBtn.WasPressedThisFrame()) UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
     }
 }

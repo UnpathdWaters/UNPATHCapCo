@@ -66,10 +66,14 @@ public class MenuLandscapeImport : MonoBehaviour
     int bottomRow;
     [SerializeField]
     SeaLevelServer sls;
+    [SerializeField]
+    int timeJumpAmt;
 
     public InputAction quitBtn;
     public InputAction loadSceneBtn;
     public InputAction timeControl;
+    public InputAction timeJumpPlus;
+    public InputAction timeJumpMinus;
     public float timeSpeed;
 
     float seaPos;
@@ -107,6 +111,8 @@ public class MenuLandscapeImport : MonoBehaviour
         quitBtn.Enable();
         loadSceneBtn.Enable();
         timeControl.Enable();
+        timeJumpPlus.Enable();
+        timeJumpMinus.Enable();
     }
 
     void OnDisable()
@@ -114,11 +120,13 @@ public class MenuLandscapeImport : MonoBehaviour
         quitBtn.Disable();
         loadSceneBtn.Disable();
         timeControl.Disable();
+        timeJumpPlus.Disable();
+        timeJumpMinus.Disable();
     }
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Assets/Terrain/surface600.csv");
+        surfaceFile = new FileInfo ("d:/QGISdata/surface600.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
@@ -126,8 +134,13 @@ public class MenuLandscapeImport : MonoBehaviour
         treeSet = false;
         headerText = new string[2,6];
         float thisval = 0.0f;
-        char[] separators = new char[] { ' ', '.', '\t', ',' };
+        char[] separators = new char[] { ' ', '\t', ',' };
         clickedPoint = new Vector2(0, 0);
+        if (DataStore.subsequentRun)
+        {
+            cam.transform.position = DataStore.cameraPosition;
+            cam.transform.rotation = DataStore.cameraRotation;
+        }
 
         //Read ESRI ASCII header
         for (int headline = 0; headline < 6; headline++)
@@ -236,17 +249,18 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void InitTimeManagement()
     {
-        year = DataStore.selectedYear;
-        if (year > 20000 || year < 5000) {
+        if (DataStore.subsequentRun && DataStore.selectedYear <= 20000 && DataStore.selectedYear >= 5000)
+        {
+            year = DataStore.selectedYear;
+        } else {
             year = 20000;
-            DataStore.selectedYear = year;
         }
         day = 1;
         season = Seasons.Winter;
         lastSeason = season;
         seaPos = sls.GetGIAWaterHeight(year);
         arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
-
+        SetGlacierVisibility();
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -362,6 +376,40 @@ public class MenuLandscapeImport : MonoBehaviour
         return false;
     }
 
+    void SetGlacierVisibility()
+    {
+        if (year == 20000) {
+            glaciers20k.SetActive(true);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
+        } else if (year > 17500) {
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(true);
+            glaciers15k.SetActive(false);
+        } else if (year > 15000) {
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(true);
+        } else if (year > 12500) {
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
+        } else if (year > 10000) {
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
+        } else if (year > 7500) {
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
+        } else {
+            glaciers20k.SetActive(false);
+            glaciers17k.SetActive(false);
+            glaciers15k.SetActive(false);
+        }
+
+    }
+
     void UpdateMeshColors()
     {
         float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
@@ -436,10 +484,10 @@ public class MenuLandscapeImport : MonoBehaviour
                         default:
                             break;
                     }
-                    if (depths[x, z] < (snowline + seaPos))
-                    {
-                        colours[x + (z * widthX)] = Color.Lerp(colours[x + (z * widthX)], Color.green, (timeThroughYear / 4.0f));
-                    }
+//                    if (depths[x, z] < (snowline + seaPos))
+//                    {
+//                        colours[x + (z * widthX)] = Color.Lerp(colours[x + (z * widthX)], Color.green, (timeThroughYear / 4.0f));
+//                    }
                 }
             }
         }
@@ -500,42 +548,33 @@ public class MenuLandscapeImport : MonoBehaviour
             Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
             DataStore.selectedLocation = clickedPointAsPercent;
             DataStore.selectedYear = year;
+            DataStore.cameraPosition = cam.transform.position;
+            DataStore.cameraRotation = cam.transform.rotation;
+            DataStore.subsequentRun = true;
             UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
+        }
+        if (timeJumpPlus.WasReleasedThisFrame()) {
+            if (year <= 20000 - timeJumpAmt) {
+                year = year + timeJumpAmt;
+            } else {
+                year = 20000;
+            }
+            timePeriodChanged = true;
+        }
+        if (timeJumpMinus.WasReleasedThisFrame()) {
+            if (year >= 5000 + timeJumpAmt) {
+                year = year - timeJumpAmt;
+            } else {
+                year = 5000;
+            }
+            timePeriodChanged = true;
         }
 
         if (timePeriodChanged) {
             Debug.Log("Year is now " + year);
             arrow1.transform.position = arrow1.transform.position + (yearAdj * (oldYear - year));
             seaPos = sls.GetGIAWaterHeight(year);
-            if (year == 20000) {
-                glaciers20k.SetActive(true);
-                glaciers17k.SetActive(false);
-                glaciers15k.SetActive(false);
-            } else if (year > 17500) {
-                glaciers20k.SetActive(false);
-                glaciers17k.SetActive(true);
-                glaciers15k.SetActive(false);
-            } else if (year > 15000) {
-                glaciers20k.SetActive(false);
-                glaciers17k.SetActive(false);
-                glaciers15k.SetActive(true);
-            } else if (year > 12500) {
-                glaciers20k.SetActive(false);
-                glaciers17k.SetActive(false);
-                glaciers15k.SetActive(false);
-            } else if (year > 10000) {
-                glaciers20k.SetActive(false);
-                glaciers17k.SetActive(false);
-                glaciers15k.SetActive(false);
-            } else if (year > 7500) {
-                glaciers20k.SetActive(false);
-                glaciers17k.SetActive(false);
-                glaciers15k.SetActive(false);
-            } else {
-                glaciers20k.SetActive(false);
-                glaciers17k.SetActive(false);
-                glaciers15k.SetActive(false);
-            }
+            SetGlacierVisibility();
         }
     }
 }
