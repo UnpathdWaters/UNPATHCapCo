@@ -31,7 +31,6 @@ public class MenuLandscapeImport : MonoBehaviour
     float maxVal = -9999;
     float minVal = 9999;
     public float zScale = 0.1f;
-    int year, day;
     Vector2 clickedPoint;
     private int SEASONLENGTH = 91;
     [SerializeField]
@@ -68,6 +67,8 @@ public class MenuLandscapeImport : MonoBehaviour
     SeaLevelServer sls;
     [SerializeField]
     int timeJumpAmt;
+    [SerializeField]
+    TimeServer time;
 
     public InputAction quitBtn;
     public InputAction loadSceneBtn;
@@ -84,8 +85,6 @@ public class MenuLandscapeImport : MonoBehaviour
     Color clickNeighbour = new Color(0.9f, 0.3f, 0.9f, 1.0f);
     Color boxCol = new Color(1.0f, 0.0f, 0.0f, 1.0f);
 
-    enum Seasons { Winter, Spring, Summer, Autumn };
-    Seasons season, lastSeason;
     float snowline;
     bool quittable;
     Vector3 yearAdj = new Vector3(0.048f, 0.0f, 0.0f);
@@ -249,17 +248,8 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void InitTimeManagement()
     {
-        if (DataStore.subsequentRun && DataStore.selectedYear <= 20000 && DataStore.selectedYear >= 5000)
-        {
-            year = DataStore.selectedYear;
-        } else {
-            year = 20000;
-        }
-        day = 1;
-        season = Seasons.Winter;
-        lastSeason = season;
-        seaPos = sls.GetGIAWaterHeight(year);
-        arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
+        seaPos = sls.GetGIAWaterHeight(time.GetYear());
+        arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - time.GetYear()));
         SetGlacierVisibility();
     }
 
@@ -286,62 +276,6 @@ public class MenuLandscapeImport : MonoBehaviour
         }
     }
 
-    void IncrementTime()
-    {
-        day++;
-        if (day > 20 && !quittable) {
-            quittable = true;
-        }
-        if (day > 365) {
-            year--;
-            arrow1.transform.position = arrow1.transform.position + yearAdj;
-            seaPos = sls.GetGIAWaterHeight(year);
-            day = 1;
-        }
-        season = (Seasons) (day / SEASONLENGTH);
-        if (season != lastSeason) {
-            switch (season)
-            {
-                case Seasons.Spring:
-                    springImage.SetActive(true);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(false);
-                    snowline = baseSnowline;
-                    EvaluateBaseColours();
-                    break;
-                case Seasons.Summer:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(true);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(false);
-                    snowline = baseSnowline * 2;
-                    EvaluateBaseColours();
-                    break;
-                case Seasons.Autumn:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(true);
-                    winterImage.SetActive(false);
-                    snowline = baseSnowline;
-                    EvaluateBaseColours();
-                    break;
-                case Seasons.Winter:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(true);
-                    snowline = baseSnowline / 2;
-                    EvaluateBaseColours();
-                    break;
-                default:
-                    EvaluateBaseColours();
-                    break;
-            }
-
-        }
-        lastSeason = season;
-    }
 
     bool IsNeighbour(Vector2 point1, Vector2 point2) {
         if (Mathf.Abs(point1.x - point2.x) <= 1 && Mathf.Abs(point1.y - point2.y) <= 1) {
@@ -501,7 +435,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (!pause) {
             UpdateMeshColors();
-            IncrementTime();
+            time.IncrementDay();
         }
 
         //Insert Raycast hit to select clicked point
@@ -547,7 +481,6 @@ public class MenuLandscapeImport : MonoBehaviour
             float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
             Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
             DataStore.selectedLocation = clickedPointAsPercent;
-            DataStore.selectedYear = year;
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;

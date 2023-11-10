@@ -20,18 +20,20 @@ public class CampManager : MonoBehaviour
     MooseManager mooseManager;
     List<GameObject> meese;
     
+    SeaLevelServer sls;
+    LocalLandscapeImport land;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
+        land = landscapeManager.GetComponent<LocalLandscapeImport>();
     }
 
     // Update is called once per frame
     void Update()
     {
         if (!depthsPop) {
-            LocalLandscapeImport land = landscapeManager.GetComponent<LocalLandscapeImport>();
             depths = land.GetDepths();
             zScale = land.getZScale();
             river = land.GetRiver();
@@ -123,7 +125,7 @@ public class CampManager : MonoBehaviour
             {
                 if (j >= 0 && j < depths.GetLength(0) && k >= 0 && k < depths.GetLength(1))
                 {
-                    if (river[j, k] || marsh[j, k]) {
+                    if (river[j, k] || marsh[j, k] || depths[j, k] < sls.GetGIAWaterHeight(land.GetYear()) + land.GetCoastSize()) {
                         return false;
                     }
                 }

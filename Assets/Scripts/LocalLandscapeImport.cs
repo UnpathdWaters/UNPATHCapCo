@@ -348,7 +348,7 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         for (int y = 2; y < landuseMap.height - 2; y++){
             for (int x = 2; x < landuseMap.width - 2; x++) {
-                if (depths[x, y] > midVal && !river[x, y] && !marsh[x, y]) {
+                if (depths[x, y] > midVal && depths[x, y] > seaPos + coastSize) {
                     if (UnityEngine.Random.Range(midVal, maxVal) < depths[x, y]) {
                         Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
                         Instantiate(tree, treePos, Quaternion.identity);
@@ -447,6 +447,14 @@ public class LocalLandscapeImport : MonoBehaviour
 
     public float getZScale() {
         return zScale;
+    }
+
+    public float GetCoastSize() {
+        return coastSize;
+    }
+
+    public int GetYear() {
+        return year;
     }
 
     void Update()
