@@ -53,11 +53,9 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField]
     int bottomRow;
     [SerializeField]
-    SeaLevelServer sls;
-    [SerializeField]
     int timeJumpAmt;
-    [SerializeField]
     TimeServer time;
+    SeaLevelServer sls;
 
     public InputAction quitBtn;
     public InputAction loadSceneBtn;
@@ -74,16 +72,16 @@ public class MenuLandscapeImport : MonoBehaviour
     Color clickNeighbour = new Color(0.9f, 0.3f, 0.9f, 1.0f);
     Color boxCol = new Color(1.0f, 0.0f, 0.0f, 1.0f);
 
-    float snowline;
     bool quittable;
-    float timeChangeAmount;
+    int timeChangeAmount;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
-        snowline = baseSnowline;
+        sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
+        time = GameObject.Find("TimeServer").GetComponent<TimeServer>();
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
@@ -216,7 +214,7 @@ public class MenuLandscapeImport : MonoBehaviour
             for (int x = 0; x < widthX; x++)
             {
 //                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                float vertHeight = Mathf.InverseLerp(seaPos, seaPos + snowline, depths[x, z]);
+                float vertHeight = Mathf.InverseLerp(seaPos, seaPos + time.GetSnowline(), depths[x, z]);
                 colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                 basecol[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
 
@@ -236,8 +234,10 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void InitTimeManagement()
     {
+        Debug.Log("Year at Init is " + time.GetYear());
         seaPos = sls.GetGIAWaterHeight(time.GetYear());
         SetGlacierVisibility();
+        time.RefreshIcons();
     }
 
     Color AddNoiseToColor(Color inColor)
@@ -361,13 +361,13 @@ public class MenuLandscapeImport : MonoBehaviour
                     if (time.IsSpring()) {
                         colours[x + (z * widthX)] = basecol[x + (z * widthX)];
                     } else if (time.IsSummer()) {
-                        if (depths[x, z] < (snowline + seaPos))
+                        if (depths[x, z] < (time.GetSnowline() + seaPos))
                         {
                             colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, (time.GetTimeThroughSeason() / 4.0f));
                         }
                     } else if (time.IsAutumn()) {
                         if (!treeSet) {
-                            if (depths[x, z] < (snowline + seaPos) && depths[x, z] > (seaPos + (coastSize * 5))) {
+                            if (depths[x, z] < (time.GetSnowline() + seaPos) && depths[x, z] > (seaPos + (coastSize * 5))) {
                                 if (Random.Range(0, 100) < 15) {
                                     trees[x, z] = true;
                                 } else {
@@ -385,7 +385,7 @@ public class MenuLandscapeImport : MonoBehaviour
                             colours[x + (z * widthX)] = basecol[x + (z * widthX)];
                         }
                     } else {
-                        float heightFac = (depths[x, z] - seaPos) / (snowline - seaPos);
+                        float heightFac = (depths[x, z] - seaPos) / (time.GetSnowline() - seaPos);
                         colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, (time.GetTimeThroughSeason() + (heightFac / 2.0f)) / 1.5f);
                     }
 
@@ -402,7 +402,12 @@ public class MenuLandscapeImport : MonoBehaviour
     void Update()
     {
         bool timePeriodChanged = false;
-        timeChangeAmount = timeControl.ReadValue<float>();
+        timeChangeAmount = (int) (timeControl.ReadValue<float>() * timeSpeed);
+
+        if (timeChangeAmount != 0) {
+            time.AdjustYear(timeChangeAmount);
+            timePeriodChanged = true;
+        }
 
         if (!pause) {
             UpdateMeshColors();

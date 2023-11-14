@@ -32,8 +32,6 @@ public class LocalLandscapeImport : MonoBehaviour
     public Gradient gradient;
     Vector2 clickedPoint;
     [SerializeField]
-    GameObject sea;
-    [SerializeField]
     float coastSize;
     [SerializeField]
     float baseSnowline;
@@ -45,9 +43,6 @@ public class LocalLandscapeImport : MonoBehaviour
     public Color coastCol;
     public Color marshCol;
 
-    enum Seasons { Winter, Spring, Summer, Autumn };
-    Seasons season, lastSeason;
-    float snowline;
 
     public Texture2D landuseMap;
     bool[,] river;
@@ -69,7 +64,6 @@ public class LocalLandscapeImport : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        snowline = baseSnowline;
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
@@ -339,7 +333,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
                 } else if (depths[x, z] - seaPos < coastSize) {
                     colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - seaPos);
-                } else if (depths[x, z] > seaPos + snowline) {
+                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
                     colours[x + (z * widthX)] = Color.white;
                 } else if (river[x, z]) {
                     colours[x + (z * widthX)] = AddNoiseToColor(Color.blue);
@@ -389,6 +383,7 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         if (!pause) {
             seaPos = sls.GetGIAWaterHeight(time.GetYear());
+            Debug.Log("Seapos = " + seaPos);
             UpdateMeshColors();
         }
         if (pauseBtn.WasPressedThisFrame()) TogglePause();

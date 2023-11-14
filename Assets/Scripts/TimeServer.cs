@@ -9,17 +9,15 @@ public class TimeServer : MonoBehaviour
     Seasons season, lastSeason;
     int SEASONLENGTH = 91;
     float snowline, baseSnowline;
-    [SerializeField]
     GameObject springImage;
-    [SerializeField]
     GameObject summerImage;
-    [SerializeField]
     GameObject autumnImage;
-    [SerializeField]
     GameObject winterImage;
-    [SerializeField]
     GameObject arrow1;
     Vector3 yearAdj = new Vector3(0.048f, 0.0f, 0.0f);
+    public static TimeServer Instance {get; private set;}
+    int maxYear = 20000;
+    int minYear = 5000;
 
 
 
@@ -28,11 +26,26 @@ public class TimeServer : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
-        year = 20000;
-        day = 1;
-        baseSnowline = 300;
-        arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
+        if (Instance != null && Instance != this) {
+            Destroy(this);
+        } else {
+            Instance = this;            
+            DontDestroyOnLoad(this.gameObject);
+            year = maxYear;
+            day = 1;
+            baseSnowline = 300;
+            Debug.Log("TIME SERVER AWAKES!");
+            RefreshIcons();
+        }
+    }
+
+    public void RefreshIcons() {
+            springImage = GameObject.Find("SpringImage");
+            summerImage = GameObject.Find("SummerImage");
+            autumnImage = GameObject.Find("AutumnImage");
+            winterImage = GameObject.Find("WinterImage");
+            arrow1 = GameObject.Find("BlackArrow");
+            arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
     }
 
     public int GetYear() {
@@ -40,8 +53,8 @@ public class TimeServer : MonoBehaviour
     }
 
     public void SetYear(int pYear) {
-        arrow1.transform.position = arrow1.transform.position + (yearAdj * (year - pYear));
-        year = pYear;
+        arrow1.transform.position = arrow1.transform.position + (yearAdj * (year - ValidYear(pYear)));
+        year = ValidYear(pYear);
     }
 
     public int GetDay() {
@@ -49,17 +62,29 @@ public class TimeServer : MonoBehaviour
     }
 
     public float GetSnowline() {
-        return snowline;
+        switch (season)
+        {
+            case Seasons.Spring:
+                return baseSnowline;
+            case Seasons.Summer:
+                return baseSnowline * 2;
+            case Seasons.Autumn:
+                return baseSnowline;
+            case Seasons.Winter:
+                return baseSnowline / 2;
+            default:
+                return baseSnowline;
+        }
     }
 
     public void IncrementYear() {
-        year--;
+        year = ValidYear(year--);
     }
 
     public void IncrementDay() {
         day++;
         if (day > 365) {
-            year--;
+            year = ValidYear(year--);
             arrow1.transform.position = arrow1.transform.position + yearAdj;
             day = 1;
         }
@@ -72,28 +97,24 @@ public class TimeServer : MonoBehaviour
                     summerImage.SetActive(false);
                     autumnImage.SetActive(false);
                     winterImage.SetActive(false);
-                    snowline = baseSnowline;
                     break;
                 case Seasons.Summer:
                     springImage.SetActive(false);
                     summerImage.SetActive(true);
                     autumnImage.SetActive(false);
                     winterImage.SetActive(false);
-                    snowline = baseSnowline * 2;
                     break;
                 case Seasons.Autumn:
                     springImage.SetActive(false);
                     summerImage.SetActive(false);
                     autumnImage.SetActive(true);
                     winterImage.SetActive(false);
-                    snowline = baseSnowline;
                     break;
                 case Seasons.Winter:
                     springImage.SetActive(false);
                     summerImage.SetActive(false);
                     autumnImage.SetActive(false);
                     winterImage.SetActive(true);
-                    snowline = baseSnowline / 2;
                     break;
                 default:
                     break;
@@ -105,7 +126,7 @@ public class TimeServer : MonoBehaviour
 
     public void AdjustYear(int yearAdjust) {
         arrow1.transform.position = arrow1.transform.position + (yearAdj * (year - yearAdjust));
-        year = year + yearAdjust;
+        year = ValidYear(year + yearAdjust);
     }
 
     public Seasons GetSeason() {
@@ -166,6 +187,16 @@ public class TimeServer : MonoBehaviour
             timeThroughYear = 0.5f - (timeThroughYear - 0.5f);
         }
         return timeThroughYear;
+    }
+
+    public int ValidYear(int pYear) {
+        if (year > maxYear) {
+            return maxYear;
+        } else if (year < minYear) {
+            return minYear;
+        } else {
+            return pYear;
+        }
     }
 
 }

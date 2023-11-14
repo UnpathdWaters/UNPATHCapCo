@@ -300,7 +300,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &107799872
 RectTransform:
   m_ObjectHideFlags: 0
@@ -373,7 +373,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &163663713
 RectTransform:
   m_ObjectHideFlags: 0
@@ -704,7 +704,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &290967235
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3281,9 +3281,7 @@ MonoBehaviour:
   rightCol: 430
   topRow: 150
   bottomRow: 350
-  sls: {fileID: 1603364423}
   timeJumpAmt: 250
-  time: {fileID: 1985316571}
   quitBtn:
     m_Name: Quit Btn
     m_Type: 0
@@ -3440,7 +3438,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1464166180
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4092,11 +4090,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 255cf5fc670b70e43924a40c8cac24c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  springImage: {fileID: 1464166179}
-  summerImage: {fileID: 290967234}
-  autumnImage: {fileID: 107799871}
-  winterImage: {fileID: 163663712}
-  arrow1: {fileID: 1989908917}
 --- !u!4 &1985316572
 Transform:
   m_ObjectHideFlags: 0
