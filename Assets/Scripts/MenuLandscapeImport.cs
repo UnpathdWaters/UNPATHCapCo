@@ -32,23 +32,12 @@ public class MenuLandscapeImport : MonoBehaviour
     float minVal = 9999;
     public float zScale = 0.1f;
     Vector2 clickedPoint;
-    private int SEASONLENGTH = 91;
-    [SerializeField]
-    GameObject springImage;
-    [SerializeField]
-    GameObject summerImage;
-    [SerializeField]
-    GameObject autumnImage;
-    [SerializeField]
-    GameObject winterImage;
     [SerializeField]
     float coastSize;
     [SerializeField]
     float baseSnowline;
     [SerializeField]
     Camera cam;
-    [SerializeField]
-    GameObject arrow1;
     [SerializeField]
     GameObject glaciers20k;
     [SerializeField]
@@ -87,7 +76,6 @@ public class MenuLandscapeImport : MonoBehaviour
 
     float snowline;
     bool quittable;
-    Vector3 yearAdj = new Vector3(0.048f, 0.0f, 0.0f);
     float timeChangeAmount;
 
 
@@ -249,7 +237,6 @@ public class MenuLandscapeImport : MonoBehaviour
     void InitTimeManagement()
     {
         seaPos = sls.GetGIAWaterHeight(time.GetYear());
-        arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - time.GetYear()));
         SetGlacierVisibility();
     }
 
@@ -312,27 +299,27 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void SetGlacierVisibility()
     {
-        if (year == 20000) {
+        if (time.GetYear() == 20000) {
             glaciers20k.SetActive(true);
             glaciers17k.SetActive(false);
             glaciers15k.SetActive(false);
-        } else if (year > 17500) {
+        } else if (time.GetYear() > 17500) {
             glaciers20k.SetActive(false);
             glaciers17k.SetActive(true);
             glaciers15k.SetActive(false);
-        } else if (year > 15000) {
+        } else if (time.GetYear() > 15000) {
             glaciers20k.SetActive(false);
             glaciers17k.SetActive(false);
             glaciers15k.SetActive(true);
-        } else if (year > 12500) {
+        } else if (time.GetYear() > 12500) {
             glaciers20k.SetActive(false);
             glaciers17k.SetActive(false);
             glaciers15k.SetActive(false);
-        } else if (year > 10000) {
+        } else if (time.GetYear() > 10000) {
             glaciers20k.SetActive(false);
             glaciers17k.SetActive(false);
             glaciers15k.SetActive(false);
-        } else if (year > 7500) {
+        } else if (time.GetYear() > 7500) {
             glaciers20k.SetActive(false);
             glaciers17k.SetActive(false);
             glaciers15k.SetActive(false);
@@ -346,17 +333,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void UpdateMeshColors()
     {
-        float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
-        if (timeThroughSeason > 0.5f) {
-            timeThroughSeason = 0.5f - (timeThroughSeason - 0.5f);
-        }
-
-        float timeThroughYear = (float) day / (float) 365;
-        if (timeThroughYear > 0.5f) {
-            timeThroughYear = 0.5f - (timeThroughYear - 0.5f);
-        }
-
-        if (day % SEASONLENGTH == 1 && season == Seasons.Autumn) {
+        if (time.FirstDayOfSeason() && time.IsAutumn()) {
             treeSet = false;
         } else {
             treeSet = true;
@@ -380,44 +357,38 @@ public class MenuLandscapeImport : MonoBehaviour
                 } else if (depths[x, z] - seaPos < coastSize) {
                     colours[x + (z * widthX)] = coastCol;
                 } else {
-                    switch (season)
-                    {
-                        case Seasons.Spring:
-                            colours[x + (z * widthX)] = basecol[x + (z * widthX)];
-                            break;
-                        case Seasons.Summer:
-                            if (depths[x, z] < (snowline + seaPos))
-                            {
-                                colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, (timeThroughSeason / 4.0f));
-                            }
-                            break;
-                        case Seasons.Autumn:
-                            if (!treeSet) {
-                                if (depths[x, z] < (snowline + seaPos) && depths[x, z] > (seaPos + (coastSize * 5))) {
-                                    if (Random.Range(0, 100) < 15) {
-                                        trees[x, z] = true;
-                                    } else {
-                                        trees[x, z] = false;
-                                    }
+
+                    if (time.IsSpring()) {
+                        colours[x + (z * widthX)] = basecol[x + (z * widthX)];
+                    } else if (time.IsSummer()) {
+                        if (depths[x, z] < (snowline + seaPos))
+                        {
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, (time.GetTimeThroughSeason() / 4.0f));
+                        }
+                    } else if (time.IsAutumn()) {
+                        if (!treeSet) {
+                            if (depths[x, z] < (snowline + seaPos) && depths[x, z] > (seaPos + (coastSize * 5))) {
+                                if (Random.Range(0, 100) < 15) {
+                                    trees[x, z] = true;
                                 } else {
                                     trees[x, z] = false;
-                                }    
-                            }
-                            if (trees[x, z]) {
-                                colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, timeThroughSeason);
-                            } else if (depths[x, z] > (seaPos + (coastSize * 5))) {
-                                colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, (timeThroughSeason / 4.0f));
+                                }
                             } else {
-                                colours[x + (z * widthX)] = basecol[x + (z * widthX)];
-                            }
-                            break;
-                        case Seasons.Winter:
-                            float heightFac = (depths[x, z] - seaPos) / (snowline - seaPos);
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, (timeThroughSeason + (heightFac / 2.0f)) / 1.5f);
-                            break;
-                        default:
-                            break;
+                                trees[x, z] = false;
+                            }    
+                        }
+                        if (trees[x, z]) {
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, time.GetTimeThroughSeason());
+                        } else if (depths[x, z] > (seaPos + (coastSize * 5))) {
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, (time.GetTimeThroughSeason() / 4.0f));
+                        } else {
+                            colours[x + (z * widthX)] = basecol[x + (z * widthX)];
+                        }
+                    } else {
+                        float heightFac = (depths[x, z] - seaPos) / (snowline - seaPos);
+                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, (time.GetTimeThroughSeason() + (heightFac / 2.0f)) / 1.5f);
                     }
+
 //                    if (depths[x, z] < (snowline + seaPos))
 //                    {
 //                        colours[x + (z * widthX)] = Color.Lerp(colours[x + (z * widthX)], Color.green, (timeThroughYear / 4.0f));
@@ -458,21 +429,6 @@ public class MenuLandscapeImport : MonoBehaviour
             clickedPoint.y = bottomRow;
         }
 
-        int oldYear = year;
-        year += (int) (timeChangeAmount * timeSpeed);
-        if (year != oldYear) {
-            timePeriodChanged = true;
-            if (year > 20000) 
-            {
-                year = 20000;
-            } else if (year < 5000) {
-                year = 5000;
-            }
-        } else {
-            timePeriodChanged = false;
-        }
-
-        
         if (quitBtn.WasReleasedThisFrame() && quittable) {
             Application.Quit();
         }
@@ -486,27 +442,19 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.subsequentRun = true;
             UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
         }
+
         if (timeJumpPlus.WasReleasedThisFrame()) {
-            if (year <= 20000 - timeJumpAmt) {
-                year = year + timeJumpAmt;
-            } else {
-                year = 20000;
-            }
+            time.AdjustYear(timeJumpAmt);
             timePeriodChanged = true;
         }
         if (timeJumpMinus.WasReleasedThisFrame()) {
-            if (year >= 5000 + timeJumpAmt) {
-                year = year - timeJumpAmt;
-            } else {
-                year = 5000;
-            }
+            time.AdjustYear(0 - timeJumpAmt);
             timePeriodChanged = true;
         }
 
         if (timePeriodChanged) {
-            Debug.Log("Year is now " + year);
-            arrow1.transform.position = arrow1.transform.position + (yearAdj * (oldYear - year));
-            seaPos = sls.GetGIAWaterHeight(year);
+            Debug.Log("Year is now " + time.GetYear());
+            seaPos = sls.GetGIAWaterHeight(time.GetYear());
             SetGlacierVisibility();
         }
     }

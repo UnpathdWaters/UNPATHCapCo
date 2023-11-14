@@ -22,11 +22,13 @@ public class CampManager : MonoBehaviour
     
     SeaLevelServer sls;
     LocalLandscapeImport land;
+    TimeServer time;
 
     // Start is called before the first frame update
     void Start()
     {
         sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
+        time = GameObject.Find("TimeServer").GetComponent<TimeServer>();
         land = landscapeManager.GetComponent<LocalLandscapeImport>();
     }
 
@@ -125,7 +127,7 @@ public class CampManager : MonoBehaviour
             {
                 if (j >= 0 && j < depths.GetLength(0) && k >= 0 && k < depths.GetLength(1))
                 {
-                    if (river[j, k] || marsh[j, k] || depths[j, k] < sls.GetGIAWaterHeight(land.GetYear()) + land.GetCoastSize()) {
+                    if (river[j, k] || marsh[j, k] || depths[j, k] < sls.GetGIAWaterHeight(time.GetYear()) + land.GetCoastSize()) {
                         return false;
                     }
                 }

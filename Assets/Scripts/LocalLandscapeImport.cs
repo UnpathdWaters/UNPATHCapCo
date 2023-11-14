@@ -30,17 +30,7 @@ public class LocalLandscapeImport : MonoBehaviour
     float midVal = 0;
     public float zScale = 0.1f;
     public Gradient gradient;
-    int year, day;
     Vector2 clickedPoint;
-    private int SEASONLENGTH = 91;
-    [SerializeField]
-    GameObject springImage;
-    [SerializeField]
-    GameObject summerImage;
-    [SerializeField]
-    GameObject autumnImage;
-    [SerializeField]
-    GameObject winterImage;
     [SerializeField]
     GameObject sea;
     [SerializeField]
@@ -74,13 +64,11 @@ public class LocalLandscapeImport : MonoBehaviour
     public InputAction pauseBtn;
 
     SeaLevelServer sls;
+    TimeServer time;
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Location is " + DataStore.selectedLocation);
-        Debug.Log("Year is " + DataStore.selectedYear);
-
         snowline = baseSnowline;
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
@@ -88,9 +76,12 @@ public class LocalLandscapeImport : MonoBehaviour
         river = new bool[widthX, heightZ];
         marsh = new bool[widthX, heightZ];
         sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
+        time = GameObject.Find("TimeServer").GetComponent<TimeServer>();
+
+        Debug.Log("Location is " + DataStore.selectedLocation);
+        Debug.Log("Year is " + time.GetYear());
 
         ImportLocalSection();
-        InitTimeManagement();
         CreateMesh();
         UpdateMesh();
         CreateTrees();
@@ -243,16 +234,6 @@ public class LocalLandscapeImport : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    void InitTimeManagement()
-    {
-        year = DataStore.selectedYear;
-        day = 1;
-        season = Seasons.Winter;
-        lastSeason = season;
-        seaPos = sls.GetGIAWaterHeight(year);
-        seasonChange = true;
-    }
-
     Color AddNoiseToColor(Color inColor)
     {
         float rRand = UnityEngine.Random.Range(-0.03f, 0.04f);
@@ -276,55 +257,6 @@ public class LocalLandscapeImport : MonoBehaviour
         }
     }
 
-    void IncrementTime()
-    {
-        if (seasonChange) {
-            seasonChange = false;
-        }
-        day++;
-        if (day > 365) {
-            year--;
-            day = 1;
-        }
-        season = (Seasons) (day / SEASONLENGTH);
-        if (season != lastSeason) {
-            seasonChange = true;
-            switch (season)
-            {
-                case Seasons.Spring:
-                    springImage.SetActive(true);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(false);
-                    snowline = baseSnowline;
-                    break;
-                case Seasons.Summer:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(true);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(false);
-                    snowline = baseSnowline * 2;
-                    break;
-                case Seasons.Autumn:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(true);
-                    winterImage.SetActive(false);
-                    snowline = baseSnowline;
-                    break;
-                case Seasons.Winter:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(true);
-                    snowline = seaPos + (coastSize * 2);
-                    break;
-                default:
-                    break;
-            }
-        }
-        lastSeason = season;
-    }
 
     bool IsNeighbour(Vector2 point1, Vector2 point2) {
         if (Mathf.Abs(point1.x - point2.x) <= 1 && Mathf.Abs(point1.y - point2.y) <= 1) {
@@ -453,15 +385,10 @@ public class LocalLandscapeImport : MonoBehaviour
         return coastSize;
     }
 
-    public int GetYear() {
-        return year;
-    }
-
     void Update()
     {
         if (!pause) {
-            seaPos = sls.GetGIAWaterHeight(year);
-            IncrementTime();
+            seaPos = sls.GetGIAWaterHeight(time.GetYear());
             UpdateMeshColors();
         }
         if (pauseBtn.WasPressedThisFrame()) TogglePause();
