@@ -38,7 +38,6 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField]
     Camera cam;
 
-    float seaPos;
     public Color seaCol;
     public Color coastCol;
     public Color marshCol;
@@ -47,7 +46,7 @@ public class LocalLandscapeImport : MonoBehaviour
     public Texture2D landuseMap;
     bool[,] river;
     bool[,] marsh;
-    bool seasonChange;
+
 
     public GameObject tree;
     public GameObject reeds;
@@ -81,7 +80,7 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
-        Debug.Log("Maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
+        Debug.Log("Local maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
 
     void OnEnable()
@@ -170,6 +169,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 {
                     thisval = float.Parse(readArray[x]);
                     depths[xCount, zCount] = AddNoiseToDepths(thisval);
+//                    Debug.Log(x + "," + z + "-" + thisval);
                     tempArray[xCount + (zCount * widthX)] = thisval;
                     if (thisval > maxVal)
                     {
@@ -204,6 +204,8 @@ public class LocalLandscapeImport : MonoBehaviour
             for (int x = 0; x < widthX; x++)
             {
                 vertices[x + (z * widthX)] = new Vector3(x, depths[x , z] * zScale, z);
+                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
+                colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
 
                 if (x > 0 && z > 0)
                 {
@@ -274,7 +276,7 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         for (int y = 2; y < landuseMap.height - 2; y++){
             for (int x = 2; x < landuseMap.width - 2; x++) {
-                if (depths[x, y] > midVal && depths[x, y] > seaPos + coastSize) {
+                if (depths[x, y] > midVal && depths[x, y] > sls.GetGIAWaterHeight() + coastSize) {
                     if (UnityEngine.Random.Range(midVal, maxVal) < depths[x, y]) {
                         Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
                         Instantiate(tree, treePos, Quaternion.identity);
@@ -329,11 +331,11 @@ public class LocalLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                if (depths[x, z] < seaPos) {
+                if (depths[x, z] < sls.GetGIAWaterHeight()) {
                     colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
-                } else if (depths[x, z] - seaPos < coastSize) {
-                    colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - seaPos);
-                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
+                } else if (depths[x, z] - sls.GetGIAWaterHeight() < coastSize) {
+                    colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - sls.GetGIAWaterHeight());
+                } else if (depths[x, z] > sls.GetGIAWaterHeight() + time.GetSnowline()) {
                     colours[x + (z * widthX)] = Color.white;
                 } else if (river[x, z]) {
                     colours[x + (z * widthX)] = AddNoiseToColor(Color.blue);
@@ -341,7 +343,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = marshCol;
                 } else {
                     float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                    if (seasonChange) {
+                    if (time.FirstDayOfSeason()) {
                         colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                     } 
                 }
@@ -382,9 +384,8 @@ public class LocalLandscapeImport : MonoBehaviour
     void Update()
     {
         if (!pause) {
-            seaPos = sls.GetGIAWaterHeight(time.GetYear());
-            Debug.Log("Seapos = " + seaPos);
             UpdateMeshColors();
+            time.IncrementDay();
         }
         if (pauseBtn.WasPressedThisFrame()) TogglePause();
         if (quitBtn.WasPressedThisFrame()) UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");

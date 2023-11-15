@@ -235,7 +235,7 @@ public class MenuLandscapeImport : MonoBehaviour
     void InitTimeManagement()
     {
         Debug.Log("Year at Init is " + time.GetYear());
-        seaPos = sls.GetGIAWaterHeight(time.GetYear());
+        seaPos = sls.GetGIAWaterHeight();
         SetGlacierVisibility();
         time.RefreshIcons();
     }
@@ -459,7 +459,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (timePeriodChanged) {
             Debug.Log("Year is now " + time.GetYear());
-            seaPos = sls.GetGIAWaterHeight(time.GetYear());
+            seaPos = sls.GetGIAWaterHeight();
             SetGlacierVisibility();
         }
     }
