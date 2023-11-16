@@ -28,7 +28,8 @@ public class LocalLandscapeImport : MonoBehaviour
     float maxVal = -9999;
     float minVal = 9999;
     float midVal = 0;
-    public float zScale = 0.1f;
+    float seaPos;
+    public float zScale;
     public Gradient gradient;
     Vector2 clickedPoint;
     [SerializeField]
@@ -56,6 +57,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     public InputAction quitBtn;
     public InputAction pauseBtn;
+    public int updateFrequency;
 
     SeaLevelServer sls;
     TimeServer time;
@@ -70,10 +72,14 @@ public class LocalLandscapeImport : MonoBehaviour
         marsh = new bool[widthX, heightZ];
         sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
         time = GameObject.Find("TimeServer").GetComponent<TimeServer>();
+        time.SetLocalMode(true);
 
         Debug.Log("Location is " + DataStore.selectedLocation);
         Debug.Log("Year is " + time.GetYear());
 
+        seaPos = sls.GetGIAWaterHeight();
+        time.RefreshSeasonIcons();
+        time.SetSeasonIcons();
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();
@@ -331,19 +337,19 @@ public class LocalLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                if (depths[x, z] < sls.GetGIAWaterHeight()) {
+                if (depths[x, z] < seaPos) {
                     colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
-                } else if (depths[x, z] - sls.GetGIAWaterHeight() < coastSize) {
-                    colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - sls.GetGIAWaterHeight());
-                } else if (depths[x, z] > sls.GetGIAWaterHeight() + time.GetSnowline()) {
+                } else if (depths[x, z] - seaPos < coastSize) {
+                    colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - seaPos);
+                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
                     colours[x + (z * widthX)] = Color.white;
                 } else if (river[x, z]) {
                     colours[x + (z * widthX)] = AddNoiseToColor(Color.blue);
                 } else if (marsh[x, z]) {
                     colours[x + (z * widthX)] = marshCol;
                 } else {
-                    float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
                     if (time.FirstDayOfSeason()) {
+                        float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
                         colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                     } 
                 }
@@ -383,12 +389,19 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void Update()
     {
+        seaPos = sls.GetGIAWaterHeight();
         if (!pause) {
-            UpdateMeshColors();
+            if (time.GetDay() % updateFrequency == 0) {
+                UpdateMeshColors();
+            }
             time.IncrementDay();
         }
-        if (pauseBtn.WasPressedThisFrame()) TogglePause();
-        if (quitBtn.WasPressedThisFrame()) UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
+        if (pauseBtn.WasPressedThisFrame()) {
+            TogglePause();
+        }
+        if (quitBtn.WasPressedThisFrame()) {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
+        }
     }
 }
 

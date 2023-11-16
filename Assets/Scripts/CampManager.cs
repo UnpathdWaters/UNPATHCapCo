@@ -63,9 +63,14 @@ public class CampManager : MonoBehaviour
             }
             thisCamp.SetNearestMoose(nearestLoc);
             if (thisCamp.GetFood() < 0) {
-                campList.Remove(aCamp);
-                Object.Destroy(aCamp);
-                Debug.Log("Destroyed a camp");
+                Vector2 campLoc;
+                campLoc = GenerateCampLoc();
+                while (!CheckCampLoc(campLoc)) {
+                    campLoc = GenerateCampLoc();
+                }
+                Vector3 campLoc3D = new Vector3(campLoc.x, depths[(int) campLoc.x, (int) campLoc.y] * zScale, campLoc.y);
+                aCamp.transform.position = campLoc3D;
+                Debug.Log("Moved a camp");
             }            
         }
         if (campList.Count < noOfCamps) {

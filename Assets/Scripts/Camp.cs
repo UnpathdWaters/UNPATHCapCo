@@ -48,8 +48,8 @@ public class Camp : MonoBehaviour
             Human thisHuman = thisHumanGO.GetComponent<Human>();
             if (IsHumanAtTarget(thisHumanGO, thisHuman.GetDestination())) {
                 if (thisHuman.GetDestination() == thisLoc) {
-                    campHumans.Remove(thisHumanGO);
-                    Object.Destroy(thisHumanGO);
+//                    campHumans.Remove(thisHumanGO);
+//                    Object.Destroy(thisHumanGO);
                     food = food + foodPerTrip;
                     lastHuman = food;
                 } else {

@@ -18,6 +18,8 @@ public class TimeServer : MonoBehaviour
     public static TimeServer Instance {get; private set;}
     int maxYear = 20000;
     int minYear = 5000;
+    bool localMode;
+    Vector3 arrowPos;
 
 
 
@@ -35,17 +37,28 @@ public class TimeServer : MonoBehaviour
             day = 1;
             baseSnowline = 300;
             Debug.Log("TIME SERVER AWAKES!");
-            RefreshIcons();
+            RefreshSeasonIcons();
+            RefreshArrowIcon();
         }
     }
 
-    public void RefreshIcons() {
-            springImage = GameObject.Find("SpringImage");
-            summerImage = GameObject.Find("SummerImage");
-            autumnImage = GameObject.Find("AutumnImage");
-            winterImage = GameObject.Find("WinterImage");
-            arrow1 = GameObject.Find("BlackArrow");
-            arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
+    public void RefreshSeasonIcons() {
+        springImage = GameObject.Find("SpringImage");
+        summerImage = GameObject.Find("SummerImage");
+        autumnImage = GameObject.Find("AutumnImage");
+        winterImage = GameObject.Find("WinterImage");
+    }
+
+    public void RefreshArrowIcon() {
+        arrow1 = GameObject.Find("BlackArrow");
+        arrowPos = arrow1.transform.position;
+//        arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
+    }
+
+    public void SetArrowPosition() {
+        if (!localMode) {
+            arrow1.transform.position = arrowPos + (yearAdj * (maxYear - year));
+        }
     }
 
     public int GetYear() {
@@ -53,12 +66,16 @@ public class TimeServer : MonoBehaviour
     }
 
     public void SetYear(int pYear) {
-        arrow1.transform.position = arrow1.transform.position + (yearAdj * (year - ValidYear(pYear)));
         year = ValidYear(pYear);
+        SetArrowPosition();
     }
 
     public int GetDay() {
         return day;
+    }
+
+    public void SetLocalMode(bool pLocal) {
+        localMode = pLocal;
     }
 
     public float GetSnowline() {
@@ -85,48 +102,51 @@ public class TimeServer : MonoBehaviour
         day++;
         if (day > 365) {
             year = ValidYear(year--);
-            arrow1.transform.position = arrow1.transform.position + yearAdj;
+            SetArrowPosition();
             day = 1;
         }
         season = (Seasons) (day / SEASONLENGTH);
         if (season != lastSeason) {
-            switch (season)
-            {
-                case Seasons.Spring:
-                    springImage.SetActive(true);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(false);
-                    break;
-                case Seasons.Summer:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(true);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(false);
-                    break;
-                case Seasons.Autumn:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(true);
-                    winterImage.SetActive(false);
-                    break;
-                case Seasons.Winter:
-                    springImage.SetActive(false);
-                    summerImage.SetActive(false);
-                    autumnImage.SetActive(false);
-                    winterImage.SetActive(true);
-                    break;
-                default:
-                    break;
-            }
-
+            SetSeasonIcons();
         }
         lastSeason = season;
     }
 
+    public void SetSeasonIcons() {
+        switch (season)
+        {
+            case Seasons.Spring:
+                springImage.SetActive(true);
+                summerImage.SetActive(false);
+                autumnImage.SetActive(false);
+                winterImage.SetActive(false);
+                break;
+            case Seasons.Summer:
+                springImage.SetActive(false);
+                summerImage.SetActive(true);
+                autumnImage.SetActive(false);
+                winterImage.SetActive(false);
+                break;
+            case Seasons.Autumn:
+                springImage.SetActive(false);
+                summerImage.SetActive(false);
+                autumnImage.SetActive(true);
+                winterImage.SetActive(false);
+                break;
+            case Seasons.Winter:
+                springImage.SetActive(false);
+                summerImage.SetActive(false);
+                autumnImage.SetActive(false);
+                winterImage.SetActive(true);
+                break;
+            default:
+                break;
+        }
+    }
+
     public void AdjustYear(int yearAdjust) {
-        arrow1.transform.position = arrow1.transform.position + (yearAdj * (year - yearAdjust));
         year = ValidYear(year + yearAdjust);
+        SetArrowPosition();
     }
 
     public Seasons GetSeason() {
@@ -190,9 +210,9 @@ public class TimeServer : MonoBehaviour
     }
 
     public int ValidYear(int pYear) {
-        if (year > maxYear) {
+        if (pYear > maxYear) {
             return maxYear;
-        } else if (year < minYear) {
+        } else if (pYear < minYear) {
             return minYear;
         } else {
             return pYear;

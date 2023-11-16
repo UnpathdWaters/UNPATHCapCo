@@ -2354,7 +2354,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 4eb88a84551592c4d8bb9bf5a6b6e15a, type: 2}
     - target: {fileID: 919132149155446097, guid: d43142dd7645c454d88d25c2a61782a1, type: 3}
       propertyPath: m_Name
-      value: glaciers001
+      value: glaciers20k
       objectReference: {fileID: 0}
     - target: {fileID: 8905292771346140400, guid: d43142dd7645c454d88d25c2a61782a1, type: 3}
       propertyPath: m_Materials.Array.data[0]
