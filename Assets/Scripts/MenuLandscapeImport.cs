@@ -63,6 +63,7 @@ public class MenuLandscapeImport : MonoBehaviour
     public InputAction timeJumpPlus;
     public InputAction timeJumpMinus;
     public float timeSpeed;
+    public GameObject loadingScreen;
 
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
     Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
@@ -438,12 +439,21 @@ public class MenuLandscapeImport : MonoBehaviour
         }
 
         if (quitBtn.WasReleasedThisFrame() && quittable) {
-            Application.Quit();
+            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
+            float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
+            Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
+            loadingScreen.SetActive(true);
+            DataStore.selectedLocation = clickedPointAsPercent;
+            DataStore.cameraPosition = cam.transform.position;
+            DataStore.cameraRotation = cam.transform.rotation;
+            DataStore.subsequentRun = true;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("IntroScene");
         }
         if (loadSceneBtn.WasReleasedThisFrame()) {
             float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
             float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
             Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
+            loadingScreen.SetActive(true);
             DataStore.selectedLocation = clickedPointAsPercent;
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;

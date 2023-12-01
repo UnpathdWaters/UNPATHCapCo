@@ -6,22 +6,31 @@ using UnityEngine.UI;
 
 public class TabController : MonoBehaviour
 {
-    public GameObject InfoTab;
-    public GameObject ControlTab;
-    public GameObject SettingTab;
-    public GameObject InfoBody;
-    public GameObject ControlBody;
-    public GameObject SettingBody;
+    public GameObject infoTab;
+    public GameObject controlTab;
+    public GameObject settingTab;
+    public GameObject infoBody;
+    public GameObject controlBody;
+    public GameObject settingBody;
     public InputAction tabRight;
     public InputAction tabLeft;
     public InputAction proceed;
+    public InputAction quitBtn;
+    public GameObject loadingScreen;
 
     int tabSelected;
+    TabButtonController infoTabBtn;
+    TabButtonController controlTabBtn;
+    TabButtonController settingTabBtn;
 
     // Start is called before the first frame update
     void Start()
     {
-        tabSelected = 0;    
+        tabSelected = 0;
+        infoTabBtn = infoTab.GetComponent<TabButtonController>();
+        controlTabBtn = controlTab.GetComponent<TabButtonController>();
+        settingTabBtn = settingTab.GetComponent<TabButtonController>();
+
     }
 
     void OnEnable()
@@ -29,6 +38,7 @@ public class TabController : MonoBehaviour
         tabRight.Enable();
         tabLeft.Enable();
         proceed.Enable();
+        quitBtn.Enable();
     }
 
     void OnDisable()
@@ -36,6 +46,7 @@ public class TabController : MonoBehaviour
         tabRight.Disable();
         tabLeft.Disable();
         proceed.Disable();
+        quitBtn.Disable();
     }
 
     // Update is called once per frame
@@ -44,37 +55,46 @@ public class TabController : MonoBehaviour
         bool change = false;
         Debug.Log("Working");
         if (proceed.WasReleasedThisFrame()) {
+            loadingScreen.SetActive(true);
             UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
         }
         if (tabRight.WasReleasedThisFrame()) {
-            Debug.Log("Tabright!");
             if (tabSelected < 2) {
                 tabSelected++;
                 change = true;
-                Debug.Log("Worked!");
             }
         }
         if (tabLeft.WasReleasedThisFrame()) {
-            Debug.Log("Tableft!");
             if (tabSelected > 0) {
                 tabSelected--;
                 change = true;
-                Debug.Log("Worked!");
             }
+        }
+        if (quitBtn.WasReleasedThisFrame()) {
+            Application.Quit();
         }
         if (change) {
             if (tabSelected == 0) {
-                InfoBody.SetActive(true);
-                ControlBody.SetActive(false);
-                SettingBody.SetActive(false);
+                infoBody.SetActive(false);
+                controlBody.SetActive(true);
+                settingBody.SetActive(false);
+                infoTabBtn.UnselectTab();
+                controlTabBtn.SelectTab();
+                settingTabBtn.UnselectTab();
             } else if (tabSelected == 1) {
-                InfoBody.SetActive(false);
-                ControlBody.SetActive(true);
-                SettingBody.SetActive(false);
+                infoBody.SetActive(true);
+                controlBody.SetActive(false);
+                settingBody.SetActive(false);
+                infoTabBtn.SelectTab();
+                controlTabBtn.UnselectTab();
+                settingTabBtn.UnselectTab();
             } else if (tabSelected == 2) {
-                InfoBody.SetActive(false);
-                ControlBody.SetActive(false);
-                SettingBody.SetActive(true);
+                infoBody.SetActive(false);
+                controlBody.SetActive(false);
+                settingBody.SetActive(true);
+                infoTabBtn.UnselectTab();
+                controlTabBtn.UnselectTab();
+                settingTabBtn.SelectTab();
             }
         }
     }
