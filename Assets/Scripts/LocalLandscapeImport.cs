@@ -57,6 +57,10 @@ public class LocalLandscapeImport : MonoBehaviour
 
     public InputAction quitBtn;
     public InputAction pauseBtn;
+    public InputAction controlsBtn;
+    public GameObject controlScreen;
+
+
     public int updateFrequency;
 
     SeaLevelServer sls;
@@ -93,12 +97,14 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         quitBtn.Enable();
         pauseBtn.Enable();
+        controlsBtn.Enable();
     }
 
     void OnDisable()
     {
         quitBtn.Disable();
         pauseBtn.Disable();
+        controlsBtn.Disable();
     }
 
     void ImportLocalSection()
@@ -402,6 +408,12 @@ public class LocalLandscapeImport : MonoBehaviour
         if (quitBtn.WasPressedThisFrame()) {
             UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
         }
+        if (controlsBtn.IsPressed()) {
+            controlScreen.SetActive(true);
+        } else {
+            controlScreen.SetActive(false);
+        }
+
     }
 }
 

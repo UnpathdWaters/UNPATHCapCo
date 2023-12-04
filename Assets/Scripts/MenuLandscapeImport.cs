@@ -62,8 +62,10 @@ public class MenuLandscapeImport : MonoBehaviour
     public InputAction timeControl;
     public InputAction timeJumpPlus;
     public InputAction timeJumpMinus;
+    public InputAction controlsBtn;
     public float timeSpeed;
     public GameObject loadingScreen;
+    public GameObject controlScreen;
 
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
     Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
@@ -99,6 +101,7 @@ public class MenuLandscapeImport : MonoBehaviour
         timeControl.Enable();
         timeJumpPlus.Enable();
         timeJumpMinus.Enable();
+        controlsBtn.Enable();
     }
 
     void OnDisable()
@@ -108,6 +111,7 @@ public class MenuLandscapeImport : MonoBehaviour
         timeControl.Disable();
         timeJumpPlus.Disable();
         timeJumpMinus.Disable();
+        controlsBtn.Disable();
     }
 
     void ImportData()
@@ -468,6 +472,11 @@ public class MenuLandscapeImport : MonoBehaviour
         if (timeJumpMinus.WasReleasedThisFrame()) {
             time.AdjustYear(0 - timeJumpAmt);
             timePeriodChanged = true;
+        }
+        if (controlsBtn.IsPressed()) {
+            controlScreen.SetActive(true);
+        } else {
+            controlScreen.SetActive(false);
         }
 
         if (timePeriodChanged) {
