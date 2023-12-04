@@ -12,10 +12,12 @@ public class TabController : MonoBehaviour
     public GameObject infoBody;
     public GameObject controlBody;
     public GameObject settingBody;
+    public GameObject infoScreen;
     public InputAction tabRight;
     public InputAction tabLeft;
     public InputAction proceed;
     public InputAction quitBtn;
+    public InputAction infoBtn;
     public GameObject loadingScreen;
 
     int tabSelected;
@@ -39,6 +41,7 @@ public class TabController : MonoBehaviour
         tabLeft.Enable();
         proceed.Enable();
         quitBtn.Enable();
+        infoBtn.Enable();
     }
 
     void OnDisable()
@@ -47,6 +50,7 @@ public class TabController : MonoBehaviour
         tabLeft.Disable();
         proceed.Disable();
         quitBtn.Disable();
+        infoBtn.Disable();
     }
 
     // Update is called once per frame
@@ -72,6 +76,11 @@ public class TabController : MonoBehaviour
         }
         if (quitBtn.WasReleasedThisFrame()) {
             Application.Quit();
+        }
+        if (infoBtn.IsPressed()) {
+            infoScreen.SetActive(true);
+        } else {
+            infoScreen.SetActive(false);
         }
         if (change) {
             if (tabSelected == 0) {
