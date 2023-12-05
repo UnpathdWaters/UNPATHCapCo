@@ -57,7 +57,7 @@ public class TabController : MonoBehaviour
     void Update()
     {
         bool change = false;
-        Debug.Log("Working");
+//        Debug.Log("Working");
         if (proceed.WasReleasedThisFrame()) {
             loadingScreen.SetActive(true);
             UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
