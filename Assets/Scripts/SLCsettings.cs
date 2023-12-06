@@ -28,6 +28,10 @@ public class SLCsettings : MonoBehaviour
         GameObject seaLevelServer;
         SeaLevelServer SLS;
 
+        GameObject[] dots = new GameObject[16];
+        [SerializeField] float dotOffset;
+        [SerializeField] float dotMultiplier;
+
 
     void Awake()
     {
@@ -72,9 +76,42 @@ public class SLCsettings : MonoBehaviour
         _18k.text = oldSLC[13].ToString();
         _19k.text = oldSLC[14].ToString();
         _20k.text = oldSLC[15].ToString();
+        dots[0] = GameObject.Find("5kdot");
+        dots[1] = GameObject.Find("6kdot");
+        dots[2] = GameObject.Find("7kdot");
+        dots[3] = GameObject.Find("8kdot");
+        dots[4] = GameObject.Find("9kdot");
+        dots[5] = GameObject.Find("10kdot");
+        dots[6] = GameObject.Find("11kdot");
+        dots[7] = GameObject.Find("12kdot");
+        dots[8] = GameObject.Find("13kdot");
+        dots[9] = GameObject.Find("14kdot");
+        dots[10] = GameObject.Find("15kdot");
+        dots[11] = GameObject.Find("16kdot");
+        dots[12] = GameObject.Find("17kdot");
+        dots[13] = GameObject.Find("18kdot");
+        dots[14] = GameObject.Find("19kdot");
+        dots[15] = GameObject.Find("20kdot");
     }
 
     void OnDestroy()
+    {
+        ParseValues();
+        SLS.SetSLC(newSLC);
+        Debug.Log("Data written!");
+    }
+
+    void OnEnable()
+    {
+        for (int x = 0; x < dots.Length; x++)
+        {
+            Vector3 thisPos = dots[x].transform.position;
+            thisPos = new Vector3(thisPos.x, dotOffset + (newSLC[x] * dotMultiplier), thisPos.z);
+            dots[x].transform.position = thisPos; 
+        }
+    }
+
+    void ParseValues()
     {
         newSLC[0] = float.Parse(_5k.text);
         newSLC[1] = float.Parse(_6k.text);
@@ -92,7 +129,10 @@ public class SLCsettings : MonoBehaviour
         newSLC[13] = float.Parse(_18k.text);
         newSLC[14] = float.Parse(_19k.text);
         newSLC[15] = float.Parse(_20k.text);
-        SLS.SetSLC(newSLC);
-        Debug.Log("Data written!");
+    }
+
+    void Update()
+    {
+        ParseValues();
     }
 }
