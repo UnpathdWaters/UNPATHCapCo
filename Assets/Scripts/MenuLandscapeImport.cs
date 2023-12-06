@@ -116,7 +116,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("d:/QGISdata/surface600.asc");
+        surfaceFile = new FileInfo ("Build/surface600.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
