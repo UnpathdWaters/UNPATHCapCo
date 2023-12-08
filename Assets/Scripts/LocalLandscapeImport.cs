@@ -109,7 +109,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void ImportLocalSection()
     {
-        surfaceFile = new FileInfo ("Build/SquareSelectableArea18764.asc");
+        surfaceFile = new FileInfo (".\\SquareSelectableArea18764.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];

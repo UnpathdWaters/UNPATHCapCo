@@ -35,8 +35,6 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField]
     float coastSize;
     [SerializeField]
-    float baseSnowline;
-    [SerializeField]
     Camera cam;
     [SerializeField]
     GameObject glaciers20k;
@@ -116,7 +114,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo ("Build/surface600.asc");
+        surfaceFile = new FileInfo (".\\surface600.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];

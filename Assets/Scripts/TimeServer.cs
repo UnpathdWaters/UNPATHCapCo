@@ -8,7 +8,6 @@ public class TimeServer : MonoBehaviour
     public enum Seasons { Winter, Spring, Summer, Autumn };
     Seasons season, lastSeason;
     int SEASONLENGTH = 91;
-    float snowline, baseSnowline;
     GameObject springImage;
     GameObject summerImage;
     GameObject autumnImage;
@@ -20,6 +19,8 @@ public class TimeServer : MonoBehaviour
     int minYear = 5000;
     bool localMode;
     Vector3 arrowPos;
+    int[] SAT = new int[16] {10, 10, 10, 9, 8, 8, 7, 6, 4, 4, 3, -1, -1, -2, -2, -2};
+    [SerializeField] int baseSnowline;
 
 
 
@@ -82,13 +83,13 @@ public class TimeServer : MonoBehaviour
         switch (season)
         {
             case Seasons.Spring:
-                return baseSnowline;
+                return baseSnowline * GetTempFactor();
             case Seasons.Summer:
-                return baseSnowline * 2;
+                return baseSnowline * (GetTempFactor() * 2);
             case Seasons.Autumn:
-                return baseSnowline;
+                return baseSnowline * GetTempFactor();
             case Seasons.Winter:
-                return baseSnowline / 2;
+                return baseSnowline * (GetTempFactor() / 2);
             default:
                 return baseSnowline;
         }
@@ -219,4 +220,20 @@ public class TimeServer : MonoBehaviour
         }
     }
 
+    public float GetTempFactor() {
+        int maxval = SAT[0];
+        int minval = SAT[0];
+        for (int x = 0; x < SAT.Length; x++)
+        {
+            if (SAT[x] < minval) {
+                minval = SAT[x];
+            }
+            if (SAT[x] > maxval) {
+                maxval = SAT[x];
+            }
+        }
+        int SATindex = (year - 5000) / 1000;
+        float SATfactor = ((float)SAT[SATindex] - (float)minval) / ((float)maxval - (float)minval);
+        return SATfactor;
+    }
 }
