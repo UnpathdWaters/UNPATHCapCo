@@ -77,3 +77,5 @@ crashlytics-build.properties
 /[Aa]ssets/VolumetricFogBundle/*
 /[Aa]ssets/TextMesh Pro/*
 
+*.asc
+

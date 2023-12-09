@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: a29a74ee216439f4c8b4cf5e6f658135, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -2994,6 +2994,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 255cf5fc670b70e43924a40c8cac24c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseSnowline: 0
 --- !u!4 &502176368
 Transform:
   m_ObjectHideFlags: 0
@@ -12834,6 +12835,7 @@ GameObject:
   - component: {fileID: 2025981064}
   - component: {fileID: 2025981065}
   - component: {fileID: 2025981066}
+  - component: {fileID: 2025981067}
   m_Layer: 5
   m_Name: Frame
   m_TagString: Untagged
@@ -13036,6 +13038,43 @@ MonoBehaviour:
       m_Flags: 0
     m_Flags: 0
   loadingScreen: {fileID: 622418852}
+--- !u!114 &2025981067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025981063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceadd8bced4348442a9e009606392380, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  font1: {fileID: 11400000, guid: e55b3569c97436b4ea5fb3871f86488c, type: 2}
+  font2: {fileID: 11400000, guid: c48887d93b732de43878881cc6b0c129, type: 2}
+  textFields:
+  - {fileID: 68253697}
+  - {fileID: 1229858347}
+  - {fileID: 977840854}
+  - {fileID: 627051025}
+  - {fileID: 2107573829}
+  fontToggle:
+    m_Name: Font Toggle
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: e043f9e2-c9d2-4f2d-a3f4-2c2aeeb00377
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: e0b317d1-76e7-4c9a-913d-fe22487a4160
+      m_Path: <Keyboard>/o
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Font Toggle
+      m_Flags: 0
+    m_Flags: 0
 --- !u!1 &2029555995
 GameObject:
   m_ObjectHideFlags: 0
