@@ -5878,7 +5878,6 @@ GameObject:
   - component: {fileID: 838337371}
   - component: {fileID: 838337373}
   - component: {fileID: 838337372}
-  - component: {fileID: 838337374}
   m_Layer: 5
   m_Name: Settings
   m_TagString: Untagged
@@ -5945,20 +5944,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 838337370}
   m_CullTransparentMesh: 1
---- !u!114 &838337374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 838337370}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ec791d7f547f549afb1c76b8f5d311, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectedColor: {r: 0.04705883, g: 0.14117648, b: 0.3803922, a: 1}
-  unselectedColor: {r: 0.16470589, g: 0.3647059, b: 0.49019608, a: 1}
 --- !u!1 &868602227
 GameObject:
   m_ObjectHideFlags: 0
@@ -6105,7 +6090,6 @@ GameObject:
   - component: {fileID: 917451827}
   - component: {fileID: 917451829}
   - component: {fileID: 917451828}
-  - component: {fileID: 917451830}
   m_Layer: 5
   m_Name: Controls
   m_TagString: Untagged
@@ -6172,20 +6156,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 917451826}
   m_CullTransparentMesh: 1
---- !u!114 &917451830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 917451826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ec791d7f547f549afb1c76b8f5d311, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectedColor: {r: 0.04705883, g: 0.14117648, b: 0.3803922, a: 1}
-  unselectedColor: {r: 0.16470589, g: 0.3647059, b: 0.49019608, a: 1}
 --- !u!1 &922986737
 GameObject:
   m_ObjectHideFlags: 0
@@ -6459,7 +6429,6 @@ GameObject:
   - component: {fileID: 945626764}
   - component: {fileID: 945626766}
   - component: {fileID: 945626765}
-  - component: {fileID: 945626767}
   m_Layer: 5
   m_Name: Info
   m_TagString: Untagged
@@ -6526,20 +6495,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 945626763}
   m_CullTransparentMesh: 1
---- !u!114 &945626767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 945626763}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ec791d7f547f549afb1c76b8f5d311, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectedColor: {r: 0.04705883, g: 0.14117648, b: 0.3803922, a: 1}
-  unselectedColor: {r: 0.16470589, g: 0.3647059, b: 0.49019608, a: 1}
 --- !u!1 &977840854
 GameObject:
   m_ObjectHideFlags: 0
@@ -11831,7 +11786,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 864.48, y: -100}
+  m_AnchoredPosition: {x: 960, y: -100}
   m_SizeDelta: {x: 1920, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1885396570
@@ -11854,7 +11809,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 4fbe8dfaabfd78f41bfc2fde563d95ba, type: 3}
+  m_Texture: {fileID: 2800000, guid: d4288a7375bb40a4da0cd4c6eb852ab2, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -12905,12 +12860,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18918b8da7c0cf247a7e91dd545fbd42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infoTab: {fileID: 945626763}
-  controlTab: {fileID: 917451826}
-  settingTab: {fileID: 838337370}
-  infoBody: {fileID: 1816905969}
-  controlBody: {fileID: 505975036}
-  settingBody: {fileID: 450260692}
+  tabs:
+  - {fileID: 917451826}
+  - {fileID: 945626763}
+  - {fileID: 838337370}
+  tabBody:
+  - {fileID: 505975036}
+  - {fileID: 1816905969}
+  - {fileID: 450260692}
   infoScreen: {fileID: 2007785372}
   tabRight:
     m_Name: Tab Right
@@ -13037,7 +12994,32 @@ MonoBehaviour:
       m_Action: Info Btn
       m_Flags: 0
     m_Flags: 0
+  colourBtn:
+    m_Name: Colour Btn
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 4b043f78-ad20-4420-9b1d-3dd1a922dcdd
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: b34239e2-fcc2-4548-b27d-becde27448c8
+      m_Path: <Keyboard>/p
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Colour Btn
+      m_Flags: 0
+    m_Flags: 0
   loadingScreen: {fileID: 622418852}
+  hcBackground: {fileID: 21300000, guid: b1e6f24d4dc72fb4ab97565f438f066b, type: 3}
+  background: {fileID: 21300000, guid: 77418226ef649884ab4d04fb8cb56d35, type: 3}
+  hcFontCol: {r: 0, g: 0.019607844, b: 0.14901961, a: 1}
+  fontCol: {r: 1, g: 1, b: 1, a: 1}
+  tabSelectCol: {r: 0.04705883, g: 0.14117648, b: 0.3803922, a: 1}
+  tabUnselectCol: {r: 0.16470589, g: 0.3647059, b: 0.49019608, a: 1}
+  tabHCSelectCol: {r: 1, g: 1, b: 1, a: 1}
+  tabHCUnselectCol: {r: 0.98039216, g: 0.827451, b: 0.5647059, a: 1}
 --- !u!114 &2025981067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13050,7 +13032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceadd8bced4348442a9e009606392380, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  font1: {fileID: 11400000, guid: e55b3569c97436b4ea5fb3871f86488c, type: 2}
+  font1: {fileID: 11400000, guid: b6a94d6a0e377f0479eb12ab79dabdaa, type: 2}
   font2: {fileID: 11400000, guid: c48887d93b732de43878881cc6b0c129, type: 2}
   textFields:
   - {fileID: 68253697}
