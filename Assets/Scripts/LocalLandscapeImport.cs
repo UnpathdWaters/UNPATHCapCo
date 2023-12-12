@@ -32,12 +32,8 @@ public class LocalLandscapeImport : MonoBehaviour
     public float zScale;
     public Gradient gradient;
     Vector2 clickedPoint;
-    [SerializeField]
-    float coastSize;
-    [SerializeField]
-    float baseSnowline;
-    [SerializeField]
-    Camera cam;
+    [SerializeField] float coastSize;
+    [SerializeField] Camera cam;
 
     public Color seaCol;
     public Color coastCol;

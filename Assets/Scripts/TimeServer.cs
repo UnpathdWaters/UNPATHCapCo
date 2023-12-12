@@ -5,7 +5,7 @@ using UnityEngine;
 public class TimeServer : MonoBehaviour
 {
     int year, day;
-    public enum Seasons { Winter, Spring, Summer, Autumn };
+    public enum Seasons { Spring, Summer, Autumn, Winter };
     Seasons season, lastSeason;
     int SEASONLENGTH = 91;
     GameObject springImage;
@@ -19,8 +19,11 @@ public class TimeServer : MonoBehaviour
     int minYear = 5000;
     bool localMode;
     Vector3 arrowPos;
-    int[] SAT = new int[16] {10, 10, 10, 9, 8, 8, 7, 6, 4, 4, 3, -1, -1, -2, -2, -2};
-    [SerializeField] int baseSnowline;
+//    int[] SAT = new int[16] {10, 10, 10, 9, 8, 8, 7, 6, 4, 4, 3, -1, -1, -2, -2, -2};
+    float[] SAT = new float[16] {1.0f, 1.0f, 1.0f, 0.916f, 0.833f, 0.833f, 0.75f, 0.666f, 0.5f, 0.5f, 0.417f, 0.0833f, 0.0833f, 0.0f, 0.0f, 0.0f};
+    [SerializeField] float baseSnowline;
+    [SerializeField] float seasonMultiplier;
+    [SerializeField] float tempMultiplier;
 
 
 
@@ -36,7 +39,6 @@ public class TimeServer : MonoBehaviour
             DontDestroyOnLoad(this.gameObject);
             year = maxYear;
             day = 1;
-            baseSnowline = 300;
             Debug.Log("TIME SERVER AWAKES!");
             RefreshSeasonIcons();
             RefreshArrowIcon();
@@ -80,19 +82,8 @@ public class TimeServer : MonoBehaviour
     }
 
     public float GetSnowline() {
-        switch (season)
-        {
-            case Seasons.Spring:
-                return baseSnowline * GetTempFactor();
-            case Seasons.Summer:
-                return baseSnowline * (GetTempFactor() * 2);
-            case Seasons.Autumn:
-                return baseSnowline * GetTempFactor();
-            case Seasons.Winter:
-                return baseSnowline * (GetTempFactor() / 2);
-            default:
-                return baseSnowline;
-        }
+//        Debug.Log("base " + baseSnowline + ",temp " + GetTempFactor() + ",snow " + GetSnowFactor());
+        return baseSnowline + ((GetTempFactor() * tempMultiplier) - (tempMultiplier / 2)) + ((GetSnowFactor() * seasonMultiplier) - (seasonMultiplier / 2));
     }
 
     public void IncrementYear() {
@@ -111,6 +102,7 @@ public class TimeServer : MonoBehaviour
             SetSeasonIcons();
         }
         lastSeason = season;
+//        Debug.Log("Day is " + day + " and snowfactor is " + GetSnowFactor() + " so snowline is " + GetSnowline());
     }
 
     public void SetSeasonIcons() {
@@ -194,6 +186,14 @@ public class TimeServer : MonoBehaviour
         }
     }
 
+    public float GetSnowFactor() {
+        if (day < 183) {
+            return 1.0f - ((183.0f - (float)day) / 183.0f);
+        } else {
+            return 1.0f - (((float)day - 183.0f) / 183.0f);
+        }
+    }
+
     public float GetTimeThroughSeason() {
         float timeThroughSeason = (float) (day % SEASONLENGTH) /  (float) SEASONLENGTH;
         if (timeThroughSeason > 0.5f) {
@@ -221,19 +221,17 @@ public class TimeServer : MonoBehaviour
     }
 
     public float GetTempFactor() {
-        int maxval = SAT[0];
-        int minval = SAT[0];
-        for (int x = 0; x < SAT.Length; x++)
-        {
-            if (SAT[x] < minval) {
-                minval = SAT[x];
-            }
-            if (SAT[x] > maxval) {
-                maxval = SAT[x];
-            }
-        }
         int SATindex = (year - 5000) / 1000;
-        float SATfactor = ((float)SAT[SATindex] - (float)minval) / ((float)maxval - (float)minval);
+        float SATfudge = (float)(year % 1000) / 1000.0f;
+//        Debug.Log("Year is " + year + " so satfudge is " + SATfudge);
+        float SATfactor;
+        if (SATindex > 0)
+        {
+            SATfactor = Mathf.Lerp(SAT[SATindex], SAT[SATindex - 1], SATfudge);
+        } else {
+            SATfactor = SAT[0];
+        }
+//        Debug.Log(SAT[SATindex] + " " + SAT[SATindex - 1] + " " + SATfudge);
         return SATfactor;
     }
 }

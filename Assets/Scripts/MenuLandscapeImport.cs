@@ -64,6 +64,7 @@ public class MenuLandscapeImport : MonoBehaviour
     public float timeSpeed;
     public GameObject loadingScreen;
     public GameObject controlScreen;
+    public float gradientAnchor;
 
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
     Color coastCol = new Color(0.8f, 0.8f, 0.0f, 1.0f);
@@ -217,7 +218,7 @@ public class MenuLandscapeImport : MonoBehaviour
             for (int x = 0; x < widthX; x++)
             {
 //                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                float vertHeight = Mathf.InverseLerp(sls.GetGIAWaterHeight(), sls.GetGIAWaterHeight() + time.GetSnowline(), depths[x, z]);
+                float vertHeight = Mathf.InverseLerp(sls.GetGIAWaterHeight(), sls.GetGIAWaterHeight() + gradientAnchor, depths[x, z]);
                 colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                 basecol[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
 
@@ -337,6 +338,11 @@ public class MenuLandscapeImport : MonoBehaviour
 
     }
 
+    float GetLatitudeFactor(int y)
+    {
+        return ((y / heightZ) / 4) + 0.75f;
+    }
+
     void UpdateMeshColors()
     {
         if (time.FirstDayOfSeason() && time.IsAutumn()) {
@@ -344,9 +350,6 @@ public class MenuLandscapeImport : MonoBehaviour
         } else {
             treeSet = true;
         }
-//        Debug.Log("Time through season is " + timeThroughSeason);
-
-
         // Assign colours to vertices
         for (int z = 0; z < heightZ; z++)
         {
@@ -362,9 +365,31 @@ public class MenuLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = seaCol;
                 } else if (depths[x, z] - sls.GetGIAWaterHeight() < coastSize) {
                     colours[x + (z * widthX)] = coastCol;
+                } else if (depths[x, z] > (time.GetSnowline() + sls.GetGIAWaterHeight())) {
+                    colours[x + (z * widthX)] = Color.white;
                 } else {
 
-                    if (time.IsSpring()) {
+                        if (!treeSet) {
+                            if (depths[x, z] < (time.GetSnowline() + sls.GetGIAWaterHeight()) && depths[x, z] > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
+                                if (Random.Range(0, 100) < 15) {
+                                    trees[x, z] = true;
+                                } else {
+                                    trees[x, z] = false;
+                                }
+                            } else {
+                                trees[x, z] = false;
+                            }    
+                        }
+                        if (trees[x, z]) {
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, time.GetTimeThroughSeason());
+                        } else if (depths[x, z] > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
+                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, (time.GetTimeThroughSeason() / 4.0f));
+                        } else {
+                            colours[x + (z * widthX)] = basecol[x + (z * widthX)];
+                        }
+
+
+/*                    if (time.IsSpring()) {
                         colours[x + (z * widthX)] = basecol[x + (z * widthX)];
                     } else if (time.IsSummer()) {
                         if (depths[x, z] < (time.GetSnowline() + sls.GetGIAWaterHeight()))
@@ -393,12 +418,10 @@ public class MenuLandscapeImport : MonoBehaviour
                     } else {
                         float heightFac = (depths[x, z] - sls.GetGIAWaterHeight()) / (time.GetSnowline() - sls.GetGIAWaterHeight());
                         colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, (time.GetTimeThroughSeason() + (heightFac / 2.0f)) / 1.5f);
-                    }
+                    }*/
 
-//                    if (depths[x, z] < (snowline + seaPos))
-//                    {
-//                        colours[x + (z * widthX)] = Color.Lerp(colours[x + (z * widthX)], Color.green, (timeThroughYear / 4.0f));
-//                    }
+
+
                 }
             }
         }
