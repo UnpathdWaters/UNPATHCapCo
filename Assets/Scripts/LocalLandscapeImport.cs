@@ -16,7 +16,6 @@ public class LocalLandscapeImport : MonoBehaviour
     int widthX = 512;
     int heightZ = 512;
     float[,] depths;
-    bool pause;
     string[,] headerText;
     int totCols;
     int totRows;
@@ -31,9 +30,7 @@ public class LocalLandscapeImport : MonoBehaviour
     float seaPos;
     public float zScale;
     public Gradient gradient;
-    Vector2 clickedPoint;
     [SerializeField] float coastSize;
-    [SerializeField] Camera cam;
 
     public Color seaCol;
     public Color coastCol;
@@ -52,11 +49,8 @@ public class LocalLandscapeImport : MonoBehaviour
     public int treeDensity;
 
     public InputAction quitBtn;
-    public InputAction pauseBtn;
     public InputAction controlsBtn;
     public GameObject controlScreen;
-
-
     public int updateFrequency;
 
     SeaLevelServer sls;
@@ -92,14 +86,12 @@ public class LocalLandscapeImport : MonoBehaviour
     void OnEnable()
     {
         quitBtn.Enable();
-        pauseBtn.Enable();
         controlsBtn.Enable();
     }
 
     void OnDisable()
     {
         quitBtn.Disable();
-        pauseBtn.Disable();
         controlsBtn.Disable();
     }
 
@@ -138,7 +130,7 @@ public class LocalLandscapeImport : MonoBehaviour
         int startY = selectedRow - (heightZ / 2);
         int endY = selectedRow + (heightZ / 2);
 
-        Debug.Log("selectedCol is " + selectedCol + "and Row is " + selectedRow + "so X goes from " + startX + "-" + endX + "and Y goes from" + startY + "-" + endY);
+        Debug.Log("selectedCol is " + selectedCol + " and Row is " + selectedRow + " so X goes from " + startX + "-" + endX + " and Y goes from" + startY + "-" + endY);
 
         if (startX < 0)
         {
@@ -350,7 +342,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 } else if (marsh[x, z]) {
                     colours[x + (z * widthX)] = marshCol;
                 } else {
-                    if (time.FirstDayOfSeason()) {
+                    if (time.FirstDayOfSeason(updateFrequency)) {
                         float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
                         colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                     } 
@@ -358,15 +350,7 @@ public class LocalLandscapeImport : MonoBehaviour
             }
         }
         mesh.colors = colours;
-    }
-
-    void TogglePause()
-    {
-        if (pause) {
-            pause = false;
-        } else {
-            pause = true;
-        }
+//        Debug.Log("Updating mesh colours on day " + time.GetDay() + " of year " + time.GetYear() + " when snowline is " + time.GetSnowline());
     }
 
     public float[,] GetDepths() {
@@ -389,18 +373,17 @@ public class LocalLandscapeImport : MonoBehaviour
         return coastSize;
     }
 
+    public float GetMidVal() {
+        return midVal;
+    }
+
     void Update()
     {
         seaPos = sls.GetGIAWaterHeight();
-        if (!pause) {
-            if (time.GetDay() % updateFrequency == 0) {
-                UpdateMeshColors();
-            }
-            time.IncrementDay();
+        if (time.GetDay() % updateFrequency == 0) {
+            UpdateMeshColors();
         }
-        if (pauseBtn.WasPressedThisFrame()) {
-            TogglePause();
-        }
+        time.IncrementHour();
         if (quitBtn.WasPressedThisFrame()) {
             UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
         }

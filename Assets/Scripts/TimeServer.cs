@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimeServer : MonoBehaviour
 {
-    int year, day;
+    int year, day, hour;
     public enum Seasons { Spring, Summer, Autumn, Winter };
     Seasons season, lastSeason;
     int SEASONLENGTH = 91;
@@ -39,6 +39,7 @@ public class TimeServer : MonoBehaviour
             DontDestroyOnLoad(this.gameObject);
             year = maxYear;
             day = 1;
+            hour = 1;
             Debug.Log("TIME SERVER AWAKES!");
             RefreshSeasonIcons();
             RefreshArrowIcon();
@@ -103,6 +104,14 @@ public class TimeServer : MonoBehaviour
         }
         lastSeason = season;
 //        Debug.Log("Day is " + day + " and snowfactor is " + GetSnowFactor() + " so snowline is " + GetSnowline());
+    }
+
+    public void IncrementHour() {
+        hour++;
+        if (hour > 24) {
+            IncrementDay();
+            hour = 1;
+        }
     }
 
     public void SetSeasonIcons() {
@@ -178,8 +187,8 @@ public class TimeServer : MonoBehaviour
         }
     }
 
-    public bool FirstDayOfSeason() {
-        if (day % SEASONLENGTH == 1) {
+    public bool FirstDayOfSeason(int updateFreq) {
+        if (day % SEASONLENGTH <= updateFreq) {
             return true;
         } else {
             return false;

@@ -32,26 +32,16 @@ public class MenuLandscapeImport : MonoBehaviour
     float minVal = 9999;
     public float zScale = 0.1f;
     Vector2 clickedPoint;
-    [SerializeField]
-    float coastSize;
-    [SerializeField]
-    Camera cam;
-    [SerializeField]
-    GameObject glaciers20k;
-    [SerializeField]
-    GameObject glaciers17k;
-    [SerializeField]
-    GameObject glaciers15k;
-    [SerializeField]
-    int leftCol;
-    [SerializeField]
-    int rightCol;
-    [SerializeField]
-    int topRow;
-    [SerializeField]
-    int bottomRow;
-    [SerializeField]
-    int timeJumpAmt;
+    [SerializeField] float coastSize;
+    [SerializeField] Camera cam;
+    [SerializeField] GameObject glaciers20k;
+    [SerializeField] GameObject glaciers17k;
+    [SerializeField] GameObject glaciers15k;
+    [SerializeField] int leftCol;
+    [SerializeField] int rightCol;
+    [SerializeField] int topRow;
+    [SerializeField] int bottomRow;
+    [SerializeField] int timeJumpAmt;
     TimeServer time;
     SeaLevelServer sls;
 
@@ -345,7 +335,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void UpdateMeshColors()
     {
-        if (time.FirstDayOfSeason() && time.IsAutumn()) {
+        if (time.FirstDayOfSeason(1) && time.IsAutumn()) {
             treeSet = false;
         } else {
             treeSet = true;
