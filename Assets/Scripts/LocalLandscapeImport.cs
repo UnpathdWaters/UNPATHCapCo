@@ -77,6 +77,7 @@ public class LocalLandscapeImport : MonoBehaviour
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();
+//        GenerateRiverAndMarsh();
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
@@ -93,6 +94,39 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         quitBtn.Disable();
         controlsBtn.Disable();
+    }
+
+    void GenerateRiverAndMarsh()
+    {
+        for (int x = 1; x < widthX - 1; x++)
+        {
+            for (int y = 1; y < heightZ - 1; y++)
+            {
+                if (NumberOfLowerNeighbours(x, y) == 1)
+                {
+                    river[x,y] = true;
+                } else if (NumberOfLowerNeighbours(x, y) == 0)
+                {
+                    marsh[x,y] = true;
+                } 
+            }
+        }
+    }
+
+    int NumberOfLowerNeighbours(int pX, int pY)
+    {
+        int lowerNeighbours = 0;
+        for (int x = pX - 1; x <= pX + 1; x++)
+        {
+            for (int y = pY - 1; y <= pY + 1; y++)
+            {
+                if (depths[x,y] < depths[pX, pY])
+                {
+                    lowerNeighbours++;
+                }
+            }
+        }
+        return lowerNeighbours;
     }
 
     void ImportLocalSection()
