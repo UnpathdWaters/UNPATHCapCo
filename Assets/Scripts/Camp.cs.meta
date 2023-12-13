@@ -3,7 +3,12 @@ guid: ab5c0ca44761ea24bafd472cd9a6c25b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - human: {instanceID: 0}
+  - mooseMaterial: {fileID: 2100000, guid: deb29dfe498c0e548a9b8f172e782824, type: 2}
+  - fishMaterial: {fileID: 2100000, guid: 93006227518602f488f3462852d4340f, type: 2}
+  - marshMaterial: {fileID: 2100000, guid: 21a23cab7a70d864aa53dc6c5d73cbf1, type: 2}
+  - forageMaterial: {fileID: 2100000, guid: 7303e7b831e8a8b4da17a8fe69bbad49, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

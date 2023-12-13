@@ -411,6 +411,20 @@ public class LocalLandscapeImport : MonoBehaviour
         return midVal;
     }
 
+    public bool IsSnow(int pX, int pY)
+    {
+        if (depths[pX, pY] > time.GetSnowline() + sls.GetGIAWaterHeight()) {
+            return true;
+        }
+        return false;
+    }
+
+    public float GetLocationDepth(int pX, int pY)
+    {
+        return depths[pX, pY] * zScale;
+    }
+
+
     void Update()
     {
         seaPos = sls.GetGIAWaterHeight();

@@ -11,26 +11,25 @@ public class Camp : MonoBehaviour
     public GameObject human;
     List<GameObject> campHumans = new List<GameObject>();
     public float humanSpeed;
-    [SerializeField]
-    Material mooseMaterial;
-    [SerializeField]
-    Material fishMaterial;
-    [SerializeField]
-    Material marshMaterial;
-    [SerializeField]
-    Material forageMaterial;
-    [SerializeField]
-    int startFood;
-    [SerializeField]
-    int foodPerTrip;
+    [SerializeField] Material mooseMaterial;
+    [SerializeField] Material fishMaterial;
+    [SerializeField] Material marshMaterial;
+    [SerializeField] Material forageMaterial;
+    [SerializeField] int startFood;
+    [SerializeField] int foodPerTrip;
     float mooseDist, riverDist, marshDist;
     Vector2 thisLoc;
     public int humanInterval;
     int lastHuman;
+    LocalLandscapeImport land;
+
+
 
     // Start is called before the first frame update
     void Start()
     {
+        land = GameObject.Find("LocalSceneManager").GetComponent<LocalLandscapeImport>();
+
         thisLoc = new Vector2(this.transform.position.x, this.transform.position.z);
         riverDist = Vector2.Distance(nearestRiver, thisLoc);
         marshDist = Vector2.Distance(nearestMarsh, thisLoc);
@@ -42,25 +41,42 @@ public class Camp : MonoBehaviour
     void Update()
     {
         mooseDist = Vector2.Distance(nearestMoose, thisLoc);
+        List<GameObject> humansToDelete = new List<GameObject>();
+
 
         foreach (var thisHumanGO in campHumans)
         {
             Human thisHuman = thisHumanGO.GetComponent<Human>();
             if (IsHumanAtTarget(thisHumanGO, thisHuman.GetDestination())) {
+                Debug.Log("Human has reached target at " + thisHuman.GetDestination());
                 if (thisHuman.GetDestination() == thisLoc) {
-//                    campHumans.Remove(thisHumanGO);
-//                    Object.Destroy(thisHumanGO);
-                    food = food + foodPerTrip;
+                    Debug.Log("Human back at camp");
+                    if (land.IsSnow((int)thisLoc.x, (int)thisLoc.y)) {
+                        food = food + (foodPerTrip / 2);
+                    } else {
+                        food = food + foodPerTrip;
+                    }
                     lastHuman = food;
+                    humansToDelete.Add(thisHumanGO);
                 } else {
                     thisHuman.SetDestination(thisLoc);
+                    Debug.Log("Human heading back to camp at " + thisLoc);
                 }
             } else {
-                thisHumanGO.transform.position = Vector3.MoveTowards(thisHumanGO.transform.position, new Vector3(thisHuman.GetDestination().x, 0.0f, thisHuman.GetDestination().y), humanSpeed * Time.deltaTime);
+//                Debug.Log("Human premove is at " + thisHumanGO.transform.position);
+                thisHumanGO.transform.position = Vector3.MoveTowards(thisHumanGO.transform.position, new Vector3(thisHuman.GetDestination().x, land.GetLocationDepth((int)thisHuman.GetDestination().x, (int)thisHuman.GetDestination().y), thisHuman.GetDestination().y), humanSpeed * Time.deltaTime);
+//                Debug.Log("Human postmove is at " + thisHumanGO.transform.position);
             }
         }
 
-        if (campHumans.Count == 0) {
+        foreach (var thisHumanDelete in humansToDelete)
+        {
+            campHumans.Remove(thisHumanDelete);
+            Destroy(thisHumanDelete);
+            Debug.Log("Removed a human");
+        }
+
+        if (campHumans.Count < 2 && mooseDist > 1 && mooseDist < 200) {
             GenerateHuman(false);
             lastHuman = food;
         } else if (food < (startFood / 2) && campHumans.Count < 5 && food < (lastHuman - humanInterval)) {
@@ -89,16 +105,20 @@ public class Camp : MonoBehaviour
         if (!pForager) {
             if (mooseDist < riverDist && mooseDist < marshDist) {
                 thisHuman.SetDestination(nearestMoose);
+                Debug.Log("Setting human destination to moose at " + nearestMoose);
                 humanRenderer.material = mooseMaterial;
             } else if (riverDist < mooseDist && riverDist < marshDist) {
                 thisHuman.SetDestination(nearestRiver);
+                Debug.Log("Setting human destination to river at " + nearestRiver);
                 humanRenderer.material = fishMaterial;
             } else {
                 thisHuman.SetDestination(nearestMarsh);
+                Debug.Log("Setting human destination to marsh at " + nearestMarsh);
                 humanRenderer.material = marshMaterial;
             }
         } else {
             thisHuman.SetDestination(GetForagingDestination());
+            Debug.Log("Setting human destination to forage at " + thisHuman.GetDestination());
             humanRenderer.material = forageMaterial;
         }
         campHumans.Add(thisHumanGO);
@@ -125,6 +145,11 @@ public class Camp : MonoBehaviour
     public int GetFood()
     {
         return food;
+    }
+
+    public void ResetFood()
+    {
+        food = startFood;
     }
 
     void OnDestroy()

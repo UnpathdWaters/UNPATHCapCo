@@ -3,7 +3,10 @@ guid: 02490bfe6dec0474dae40dcb73f4a4ca
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - camp: {fileID: 2362617596599077591, guid: 13156c93747be6843b0388a2399c2e44, type: 3}
+  - landscapeManager: {instanceID: 0}
+  - mooseManagerGO: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

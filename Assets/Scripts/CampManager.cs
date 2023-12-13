@@ -8,15 +8,13 @@ public class CampManager : MonoBehaviour
     public GameObject camp;
     public int noOfCamps;
     List<GameObject> campList = new List<GameObject>();
-    [SerializeField]
-    GameObject landscapeManager;
+    [SerializeField] GameObject landscapeManager;
     float[,] depths;
     bool[,] river;
     bool[,] marsh;
     bool depthsPop;
     float zScale;
-    [SerializeField]
-    GameObject mooseManagerGO;
+    [SerializeField] GameObject mooseManagerGO;
     MooseManager mooseManager;
     List<GameObject> meese;
     
@@ -24,7 +22,6 @@ public class CampManager : MonoBehaviour
     LocalLandscapeImport land;
     TimeServer time;
 
-    // Start is called before the first frame update
     void Start()
     {
         sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
@@ -32,7 +29,6 @@ public class CampManager : MonoBehaviour
         land = landscapeManager.GetComponent<LocalLandscapeImport>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!depthsPop) {
@@ -70,6 +66,7 @@ public class CampManager : MonoBehaviour
                 }
                 Vector3 campLoc3D = new Vector3(campLoc.x, depths[(int) campLoc.x, (int) campLoc.y] * zScale, campLoc.y);
                 aCamp.transform.position = campLoc3D;
+                thisCamp.ResetFood();
                 Debug.Log("Moved a camp");
             }            
         }
