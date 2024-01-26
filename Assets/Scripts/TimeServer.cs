@@ -5,13 +5,8 @@ using UnityEngine;
 public class TimeServer : MonoBehaviour
 {
     int year, day, hour;
-    public enum Seasons { Spring, Summer, Autumn, Winter };
-    Seasons season, lastSeason;
+    Seasons season;
     int SEASONLENGTH = 91;
-    GameObject springImage;
-    GameObject summerImage;
-    GameObject autumnImage;
-    GameObject winterImage;
     GameObject arrow1;
     Vector3 yearAdj = new Vector3(0.048f, 0.0f, 0.0f);
     public static TimeServer Instance {get; private set;}
@@ -41,22 +36,14 @@ public class TimeServer : MonoBehaviour
             day = 1;
             hour = 1;
             Debug.Log("TIME SERVER AWAKES!");
-            RefreshSeasonIcons();
             RefreshArrowIcon();
         }
     }
 
-    public void RefreshSeasonIcons() {
-        springImage = GameObject.Find("SpringImage");
-        summerImage = GameObject.Find("SummerImage");
-        autumnImage = GameObject.Find("AutumnImage");
-        winterImage = GameObject.Find("WinterImage");
-    }
 
     public void RefreshArrowIcon() {
         arrow1 = GameObject.Find("BlackArrow");
         arrowPos = arrow1.transform.position;
-//        arrow1.transform.position = arrow1.transform.position + (yearAdj * (20000 - year));
     }
 
     public void SetArrowPosition() {
@@ -99,10 +86,6 @@ public class TimeServer : MonoBehaviour
             day = 1;
         }
         season = (Seasons) (day / SEASONLENGTH);
-        if (season != lastSeason) {
-            SetSeasonIcons();
-        }
-        lastSeason = season;
 //        Debug.Log("Day is " + day + " and snowfactor is " + GetSnowFactor() + " so snowline is " + GetSnowline());
     }
 
@@ -114,37 +97,6 @@ public class TimeServer : MonoBehaviour
         }
     }
 
-    public void SetSeasonIcons() {
-        switch (season)
-        {
-            case Seasons.Spring:
-                springImage.SetActive(true);
-                summerImage.SetActive(false);
-                autumnImage.SetActive(false);
-                winterImage.SetActive(false);
-                break;
-            case Seasons.Summer:
-                springImage.SetActive(false);
-                summerImage.SetActive(true);
-                autumnImage.SetActive(false);
-                winterImage.SetActive(false);
-                break;
-            case Seasons.Autumn:
-                springImage.SetActive(false);
-                summerImage.SetActive(false);
-                autumnImage.SetActive(true);
-                winterImage.SetActive(false);
-                break;
-            case Seasons.Winter:
-                springImage.SetActive(false);
-                summerImage.SetActive(false);
-                autumnImage.SetActive(false);
-                winterImage.SetActive(true);
-                break;
-            default:
-                break;
-        }
-    }
 
     public void AdjustYear(int yearAdjust) {
         year = ValidYear(year + yearAdjust);
@@ -244,3 +196,6 @@ public class TimeServer : MonoBehaviour
         return SATfactor;
     }
 }
+
+public enum Seasons { Spring, Summer, Autumn, Winter }
+

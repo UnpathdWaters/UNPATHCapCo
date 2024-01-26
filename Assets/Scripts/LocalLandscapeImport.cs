@@ -72,8 +72,6 @@ public class LocalLandscapeImport : MonoBehaviour
         Debug.Log("Year is " + time.GetYear());
 
         seaPos = sls.GetGIAWaterHeight();
-        time.RefreshSeasonIcons();
-        time.SetSeasonIcons();
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();

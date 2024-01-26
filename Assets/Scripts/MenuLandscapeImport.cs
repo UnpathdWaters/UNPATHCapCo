@@ -231,10 +231,8 @@ public class MenuLandscapeImport : MonoBehaviour
         Debug.Log("Year at Init is " + time.GetYear());
         time.SetLocalMode(false);
         SetGlacierVisibility();
-        time.RefreshSeasonIcons();
         time.RefreshArrowIcon();
         time.SetArrowPosition();
-        time.SetSeasonIcons();
     }
 
     Color AddNoiseToColor(Color inColor)

@@ -864,6 +864,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c7544d3578f8f546af3f65acc5ba13a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interpolationModeBtn:
+    m_Name: Interpolation Mode Btn
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: e56c27d3-86de-4d51-bd61-a557c6a7ebc7
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 4b6ba587-da55-47bf-bf83-3b7b393d96bc
+      m_Path: <Keyboard>/m
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Interpolation Mode Btn
+      m_Flags: 0
+    m_Flags: 0
   slcLinearInt:
     serializedVersion: 2
     m_Curve:
