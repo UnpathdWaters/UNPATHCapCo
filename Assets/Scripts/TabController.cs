@@ -119,7 +119,7 @@ public class TabController : MonoBehaviour
 //        Debug.Log("Working");
         if (proceed.WasReleasedThisFrame()) {
             loadingScreen.SetActive(true);
-            UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("02MenuScene");
         }
         if (tabRight.WasReleasedThisFrame()) {
             if (tabSelected < 2) {

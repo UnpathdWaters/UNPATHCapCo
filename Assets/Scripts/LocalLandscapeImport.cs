@@ -431,7 +431,7 @@ public class LocalLandscapeImport : MonoBehaviour
         }
         time.IncrementHour();
         if (quitBtn.WasPressedThisFrame()) {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("MenuScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("02MenuScene");
         }
         if (controlsBtn.IsPressed()) {
             controlScreen.SetActive(true);

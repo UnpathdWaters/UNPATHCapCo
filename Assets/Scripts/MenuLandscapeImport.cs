@@ -460,7 +460,7 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("IntroScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
         }
         if (loadSceneBtn.WasReleasedThisFrame()) {
             float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
@@ -471,7 +471,7 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("LocalScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");
         }
 
         if (timeJumpPlus.WasReleasedThisFrame()) {

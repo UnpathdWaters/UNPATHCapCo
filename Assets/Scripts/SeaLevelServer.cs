@@ -18,6 +18,8 @@ public class SeaLevelServer : MonoBehaviour
     AnimationCurve[] interpolationModes;
     string[] interpolationModeNames;
     int interpolationMode;
+    int seaLevelAdjust;
+    public InputAction seaLevelPlus, seaLevelMinus;
 
     void Awake()
     {
@@ -30,39 +32,35 @@ public class SeaLevelServer : MonoBehaviour
             interpolationModes  = new AnimationCurve[3] { slcLinearInt, slcSteppedInt, slcWigglyInt };
             interpolationModeNames = new string[3] { "Linear", "Stepped", "Inundation/Regression" };
             interpolationMode = 0;
+            seaLevelAdjust = 0;
         }
     }
 
     void OnEnable()
     {
         interpolationModeBtn.Enable();
+        seaLevelPlus.Enable();
+        seaLevelMinus.Enable();
     }
 
     void OnDisable()
     {
         interpolationModeBtn.Disable();
+        seaLevelPlus.Disable();
+        seaLevelMinus.Disable();
     }
 
     public float GetGIAWaterHeight()
     {
         if (time.GetYear() == 20000) {
-            return SLC[SLC.Length - 1];
+            return SLC[SLC.Length - 1] + seaLevelAdjust;
         } else {
 
             float timeThroughCentury = time.GetYear() % 1000;
             int SLCindex = (time.GetYear() - 5000) / 1000;
             float giaWaterHeight = Mathf.Lerp(SLC[SLCindex], SLC[SLCindex + 1], interpolationModes[interpolationMode].Evaluate(timeThroughCentury / 1000.0f));
 
-
-
-/*            int SLCindex = (time.GetYear() - 5000) / 1000;
-            float giaWaterHeight = SLC[SLCindex];
-            giaWaterHeight = giaWaterHeight - (((SLC[SLCindex] - SLC[SLCindex + 1]) / 1000) * (time.GetYear() % 1000));*/
-
-
-
-
-            return giaWaterHeight;
+            return giaWaterHeight + seaLevelAdjust;
         }
     }
 
@@ -78,6 +76,11 @@ public class SeaLevelServer : MonoBehaviour
     public float[] GetSLC()
     {
         return SLC;
+    }
+
+    public int GetSeaLevelAdjust()
+    {
+        return seaLevelAdjust;
     }
 
     public string GetInterpolationModeName()
@@ -100,6 +103,14 @@ public class SeaLevelServer : MonoBehaviour
         {
             CycleInterpolationMode();
             Debug.Log("Interpolation mode is " + interpolationMode);
+        }
+        if (seaLevelPlus.WasPressedThisFrame())
+        {
+            seaLevelAdjust++;
+        }
+        if (seaLevelMinus.WasPressedThisFrame())
+        {
+            seaLevelAdjust--;
         }
     }
 }

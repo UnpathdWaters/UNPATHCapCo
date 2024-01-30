@@ -11,6 +11,7 @@ public class InfoPanel : MonoBehaviour
     [SerializeField] GameObject autumnImage;
     [SerializeField] GameObject winterImage;
     [SerializeField] TMP_Text interpolationModeTMP;
+    [SerializeField] TMP_Text seaLevelAdjustTMP;
     TimeServer time;
     SeaLevelServer sls;
 
@@ -68,6 +69,7 @@ public class InfoPanel : MonoBehaviour
             SetSeasonIcons();
         }
         interpolationModeText = sls.GetInterpolationModeName();
-        interpolationModeTMP.text = "Interpolation mode - " + interpolationModeText;
+        interpolationModeTMP.text = "Interpolation mode: " + interpolationModeText;
+        seaLevelAdjustTMP.text = "Sea Level Adjust: " + sls.GetSeaLevelAdjust() + "m";
     }
 }

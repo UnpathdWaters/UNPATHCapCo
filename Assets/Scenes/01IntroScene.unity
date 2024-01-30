@@ -1007,6 +1007,40 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  seaLevelPlus:
+    m_Name: Sea Level Plus
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 09997413-d0ed-4f42-b17e-db17a93a2cad
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: c0565d1f-8fda-4063-b069-ee13c897c7c0
+      m_Path: <Keyboard>/numpad6
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Sea Level Plus
+      m_Flags: 0
+    m_Flags: 0
+  seaLevelMinus:
+    m_Name: Sea Level Minus
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 1d64d712-0c16-414f-95be-8132cb47dbb9
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 2fd1ff77-1366-49f8-95b2-90d04518f536
+      m_Path: <Keyboard>/numpad4
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Sea Level Minus
+      m_Flags: 0
+    m_Flags: 0
 --- !u!4 &160958956
 Transform:
   m_ObjectHideFlags: 0
