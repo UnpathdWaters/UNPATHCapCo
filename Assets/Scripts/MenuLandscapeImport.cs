@@ -14,6 +14,7 @@ public class MenuLandscapeImport : MonoBehaviour
     int widthX = 600;
     int heightZ = 600;
     float[,] depths;
+    GameObject[,] cubes;
     bool pause;
     string[,] headerText;
     int totCols;
@@ -21,7 +22,7 @@ public class MenuLandscapeImport : MonoBehaviour
     float noData;
     float maxVal = -9999;
     float minVal = 9999;
-    public float zScale = 0.1f;
+    float yScale = 0.1f;
     [SerializeField] GameObject terrainCube;
     [SerializeField] Camera cam;
     [SerializeField] GameObject glaciers20k;
@@ -62,6 +63,7 @@ public class MenuLandscapeImport : MonoBehaviour
         CreateTerrainCubes();
         InitTimeManagement();
         quittable = false;
+        terrainController.SetYScale(yScale);
     }
 
     void OnEnable()
@@ -90,6 +92,7 @@ public class MenuLandscapeImport : MonoBehaviour
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
+        cubes = new GameObject[widthX, heightZ];
         headerText = new string[2,6];
         float thisval = 0.0f;
         char[] separators = new char[] { ' ', '\t', ',' };
@@ -154,8 +157,9 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < totCols; x++)
             {
-                Vector3 cubeLoc = new Vector3(x, depths[x, z] * zScale, z);
-                Instantiate(terrainCube, cubeLoc, Quaternion.identity);
+                Vector3 cubeLoc = new Vector3(x, depths[x, z] * yScale, z);
+                GameObject thisObj = Instantiate(terrainCube, cubeLoc, Quaternion.identity);
+                cubes[x, z] = thisObj;
             }
         }
     }
@@ -203,6 +207,17 @@ public class MenuLandscapeImport : MonoBehaviour
         }
     }
 
+    void UpdateTerrain()
+    {
+        for (int z = 0; z < totRows; z++)
+        {
+            for (int x = 0; x < totCols; x++)
+            {
+                cubes[x, z].SendMessage("ColourUpdate");
+            }
+        }
+
+    }
 
     void Update()
     {
@@ -242,6 +257,7 @@ public class MenuLandscapeImport : MonoBehaviour
         if (timePeriodChanged) {
             Debug.Log("Year is now " + time.GetYear());
             SetGlacierVisibility();
+            UpdateTerrain();
         }
         quittable = true;
     }

@@ -12,6 +12,7 @@ public class InfoPanel : MonoBehaviour
     [SerializeField] GameObject winterImage;
     [SerializeField] TMP_Text interpolationModeTMP;
     [SerializeField] TMP_Text seaLevelAdjustTMP;
+    [SerializeField] TMP_Text fpsTMP;
     TimeServer time;
     SeaLevelServer sls;
 
@@ -71,5 +72,6 @@ public class InfoPanel : MonoBehaviour
         interpolationModeText = sls.GetInterpolationModeName();
         interpolationModeTMP.text = "Interpolation mode: " + interpolationModeText;
         seaLevelAdjustTMP.text = "Sea Level Adjust: " + sls.GetSeaLevelAdjust() + "m";
+        fpsTMP.text = "FPS: " + (int)(1f / Time.unscaledDeltaTime);
     }
 }
