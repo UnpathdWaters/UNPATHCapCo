@@ -52,7 +52,7 @@ public class SeaLevelServer : MonoBehaviour
 
     public float GetGIAWaterHeight()
     {
-        if (time.GetYear() == 20000) {
+/*        if (time.GetYear() == 20000) {
             return SLC[SLC.Length - 1] + seaLevelAdjust;
         } else {
 
@@ -61,7 +61,8 @@ public class SeaLevelServer : MonoBehaviour
             float giaWaterHeight = Mathf.Lerp(SLC[SLCindex], SLC[SLCindex + 1], interpolationModes[interpolationMode].Evaluate(timeThroughCentury / 1000.0f));
 
             return giaWaterHeight + seaLevelAdjust;
-        }
+        }*/
+        return 0.0f + seaLevelAdjust;
     }
 
     public void SetSLC(float[] newSLC)

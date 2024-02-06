@@ -12,9 +12,9 @@ public class MenuLandscapeImport : MonoBehaviour
     protected FileInfo surfaceFile = null;
     protected StreamReader surfaceStream = null;
     protected string inputLine = " ";
-    int widthX = 600;
-    int heightZ = 600;
-    float[,] depths;
+    int widthX = 512;
+    int heightZ = 512;
+    float[,,] depths;
     bool [,] trees;
     bool treeSet;
     bool pause;
@@ -28,8 +28,8 @@ public class MenuLandscapeImport : MonoBehaviour
     Color[] basecol;
     Mesh mesh;
     public Gradient gradient;
-    float maxVal = -9999;
-    float minVal = 9999;
+    float maxVal;
+    float minVal;
     public float zScale = 0.1f;
     Vector2 clickedPoint;
     [SerializeField] float coastSize;
@@ -76,6 +76,7 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
+//        DebugDepth();
         ImportData();
         InitTimeManagement();
         CreateMesh();
@@ -105,68 +106,98 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void ImportData()
     {
-        surfaceFile = new FileInfo (".\\surface600.asc");
-        surfaceStream = surfaceFile.OpenText();
-        string[] hdrArray;
-        depths = new float[widthX, heightZ];
+        string fileString;
+        int fileCount = 0;
+        depths = new float[16, widthX, heightZ];
+        for (int t = 20; t > 4; t--)
+        {
+            maxVal = -9999.0f;
+            minVal = 9999.0f;
+            fileString = ".\\Proc" + t + ".asc";
+            surfaceFile = new FileInfo (fileString);
+            surfaceStream = surfaceFile.OpenText();
+            string[] hdrArray;
+            headerText = new string[2,6];
+            float thisval = 0.0f;
+            char[] separators = new char[] { ' ', '\t', ',' };
+
+            //Read ESRI ASCII header
+            for (int headline = 0; headline < 6; headline++)
+            {
+                inputLine = surfaceStream.ReadLine();
+                hdrArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+                headerText[0,headline] = hdrArray[0];
+                headerText[1,headline] = hdrArray[1];
+            }
+
+
+            totCols = int.Parse(headerText[1,0]);
+            totRows = int.Parse(headerText[1,1]);
+            noData = float.Parse(headerText[1,5]);
+
+            Debug.Log("Input file Cols = " + totCols);
+            Debug.Log("Input file Rows = " + totRows);
+            Debug.Log("Input noData val is " + noData);
+
+            string[] readArray = new string[totCols];
+
+            int xCount = 0;
+            int zCount = heightZ - 1;
+            for (int z = 0; z < totRows; z++)
+            {
+                inputLine = surfaceStream.ReadLine();
+                xCount = 0;
+                readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+                for (int x = 0; x < totCols; x++)
+                {
+                    thisval = float.Parse(readArray[x]);
+//                    if (thisval == noData) {
+//                        thisval = 0.0f;
+//                    }
+                    depths[fileCount, xCount, zCount] = thisval;
+                    if (thisval > maxVal)
+                    {
+                        maxVal = thisval;
+                    }
+                    if (thisval < minVal)
+                    {
+                        minVal = thisval;
+                    }
+                    xCount++;
+                }
+                zCount--;
+            }
+            Debug.Log(fileString + " maxval is " + maxVal + " and minval is " + minVal);
+            fileCount++;
+        }
+
+
         trees = new bool[widthX, heightZ];
         treeSet = false;
-        headerText = new string[2,6];
-        float thisval = 0.0f;
-        char[] separators = new char[] { ' ', '\t', ',' };
         clickedPoint = new Vector2(0, 0);
         if (DataStore.subsequentRun)
         {
             cam.transform.position = DataStore.cameraPosition;
             cam.transform.rotation = DataStore.cameraRotation;
         }
+    }
 
-        //Read ESRI ASCII header
-        for (int headline = 0; headline < 6; headline++)
+    void DebugDepth()
+    {
+        int x = Random.Range(0, 511);
+        int y = Random.Range(0, 511);
+        int sheet = Random.Range(0, 15);
+        Debug.Log(x + "," + y + " on sheet " + sheet + " is " + depths[sheet, x, y] + " and GVD is " + GetVertexDepth(x, y));
+    }
+
+    float GetVertexDepth(int pX, int pY)
+    {
+        int lowerbound = 20 - (time.GetYear() / 1000);
+        if (lowerbound == 15)
         {
-            inputLine = surfaceStream.ReadLine();
-            hdrArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
-            headerText[0,headline] = hdrArray[0];
-            headerText[1,headline] = hdrArray[1];
+            return depths[15, pX, pY];
         }
-
-
-        totCols = int.Parse(headerText[1,0]);
-        totRows = int.Parse(headerText[1,1]);
-        noData = float.Parse(headerText[1,5]);
-
-        Debug.Log("Input file Cols = " + totCols);
-        Debug.Log("Input file Rows = " + totRows);
-        Debug.Log("Input noData val is " + noData);
-
-
-
-        string[] readArray = new string[totCols];
-
-        int xCount = 0;
-        int zCount = heightZ - 1;
-        for (int z = 0; z < totRows; z++)
-        {
-            inputLine = surfaceStream.ReadLine();
-            xCount = 0;
-            readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
-            for (int x = 0; x < totCols; x++)
-            {
-                thisval = float.Parse(readArray[x]);
-                depths[xCount, zCount] = thisval;
-                if (thisval > maxVal)
-                {
-                    maxVal = thisval;
-                }
-                if (thisval < minVal)
-                {
-                    minVal = thisval;
-                }
-                xCount++;
-            }
-            zCount--;
-        }
-        Debug.Log("Maxval is " + maxVal + " and minval is " + minVal);
+        return Mathf.Lerp(depths[lowerbound, pX, pY], depths[lowerbound + 1, pX, pY], 1000.0f / (float) (time.GetYear() % 1000));
     }
 
 
@@ -183,7 +214,7 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                vertices[x + (z * widthX)] = new Vector3(x, depths[x , z] * zScale, z);
+                vertices[x + (z * widthX)] = new Vector3(x, GetVertexDepth(x, z) * zScale, z);
 
                 if (x > 0 && z > 0)
                 {
@@ -208,7 +239,7 @@ public class MenuLandscapeImport : MonoBehaviour
             for (int x = 0; x < widthX; x++)
             {
 //                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                float vertHeight = Mathf.InverseLerp(sls.GetGIAWaterHeight(), sls.GetGIAWaterHeight() + gradientAnchor, depths[x, z]);
+                float vertHeight = Mathf.InverseLerp(sls.GetGIAWaterHeight(), sls.GetGIAWaterHeight() + gradientAnchor, GetVertexDepth(x, z));
                 colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                 basecol[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
 
@@ -294,7 +325,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     void SetGlacierVisibility()
     {
-        if (time.GetYear() == 20000) {
+/*        if (time.GetYear() == 20000) {
             glaciers20k.SetActive(true);
             glaciers17k.SetActive(false);
             glaciers15k.SetActive(false);
@@ -323,12 +354,7 @@ public class MenuLandscapeImport : MonoBehaviour
             glaciers17k.SetActive(false);
             glaciers15k.SetActive(false);
         }
-
-    }
-
-    float GetLatitudeFactor(int y)
-    {
-        return ((y / heightZ) / 4) + 0.75f;
+*/
     }
 
     void UpdateMeshColors()
@@ -349,16 +375,16 @@ public class MenuLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = clickCol;
                 } else if (IsNeighbour(new Vector2(x, z), clickedPoint)) {
                     colours[x + (z * widthX)] = clickNeighbour;
-                } else if (depths[x, z] < sls.GetGIAWaterHeight()) {
+                } else if (GetVertexDepth(x, z) < sls.GetGIAWaterHeight()) {
                     colours[x + (z * widthX)] = seaCol;
-                } else if (depths[x, z] - sls.GetGIAWaterHeight() < coastSize) {
+                } else if (GetVertexDepth(x, z) - sls.GetGIAWaterHeight() < coastSize) {
                     colours[x + (z * widthX)] = coastCol;
-                } else if (depths[x, z] > (time.GetSnowline() + sls.GetGIAWaterHeight())) {
+                } else if (GetVertexDepth(x, z) > (time.GetSnowline() + sls.GetGIAWaterHeight())) {
                     colours[x + (z * widthX)] = Color.white;
                 } else {
 
                         if (!treeSet) {
-                            if (depths[x, z] < (time.GetSnowline() + sls.GetGIAWaterHeight()) && depths[x, z] > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
+                            if (GetVertexDepth(x, z) < (time.GetSnowline() + sls.GetGIAWaterHeight()) && GetVertexDepth(x, z) > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
                                 if (Random.Range(0, 100) < 15) {
                                     trees[x, z] = true;
                                 } else {
@@ -370,44 +396,11 @@ public class MenuLandscapeImport : MonoBehaviour
                         }
                         if (trees[x, z]) {
                             colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, time.GetTimeThroughSeason());
-                        } else if (depths[x, z] > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
+                        } else if (GetVertexDepth(x, z) > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
                             colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, (time.GetTimeThroughSeason() / 4.0f));
                         } else {
                             colours[x + (z * widthX)] = basecol[x + (z * widthX)];
                         }
-
-
-/*                    if (time.IsSpring()) {
-                        colours[x + (z * widthX)] = basecol[x + (z * widthX)];
-                    } else if (time.IsSummer()) {
-                        if (depths[x, z] < (time.GetSnowline() + sls.GetGIAWaterHeight()))
-                        {
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.yellow, (time.GetTimeThroughSeason() / 4.0f));
-                        }
-                    } else if (time.IsAutumn()) {
-                        if (!treeSet) {
-                            if (depths[x, z] < (time.GetSnowline() + sls.GetGIAWaterHeight()) && depths[x, z] > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
-                                if (Random.Range(0, 100) < 15) {
-                                    trees[x, z] = true;
-                                } else {
-                                    trees[x, z] = false;
-                                }
-                            } else {
-                                trees[x, z] = false;
-                            }    
-                        }
-                        if (trees[x, z]) {
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, time.GetTimeThroughSeason());
-                        } else if (depths[x, z] > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
-                            colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, (time.GetTimeThroughSeason() / 4.0f));
-                        } else {
-                            colours[x + (z * widthX)] = basecol[x + (z * widthX)];
-                        }
-                    } else {
-                        float heightFac = (depths[x, z] - sls.GetGIAWaterHeight()) / (time.GetSnowline() - sls.GetGIAWaterHeight());
-                        colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], Color.white, (time.GetTimeThroughSeason() + (heightFac / 2.0f)) / 1.5f);
-                    }*/
-
 
 
                 }
@@ -463,7 +456,12 @@ public class MenuLandscapeImport : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
         }
         if (loadSceneBtn.WasReleasedThisFrame()) {
-            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
+            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y));
+            for (int x = 0; x < 16; x++)
+            {
+                Debug.Log("Depth on sheet " +  x + " is " + depths[x,(int)  clickedPoint.x,(int)  clickedPoint.y]);
+            }
+/*            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
             float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
             Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
             loadingScreen.SetActive(true);
@@ -471,7 +469,7 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");*/
         }
 
         if (timeJumpPlus.WasReleasedThisFrame()) {
@@ -490,7 +488,11 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (timePeriodChanged) {
             Debug.Log("Year is now " + time.GetYear());
+            DebugDepth();
             SetGlacierVisibility();
+            CreateMesh();
+            UpdateMesh();
+            UpdateMeshColors();
         }
         quittable = true;
     }
