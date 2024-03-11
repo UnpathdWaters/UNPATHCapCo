@@ -67,7 +67,6 @@ public class MenuLandscapeImport : MonoBehaviour
     int timeChangeAmount;
 
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -82,7 +81,10 @@ public class MenuLandscapeImport : MonoBehaviour
         CreateMesh();
         UpdateMesh();
         quittable = false;
+
+
     }
+
 
     void OnEnable()
     {
@@ -92,6 +94,7 @@ public class MenuLandscapeImport : MonoBehaviour
         timeJumpPlus.Enable();
         timeJumpMinus.Enable();
         controlsBtn.Enable();
+
     }
 
     void OnDisable()
@@ -125,6 +128,7 @@ public class MenuLandscapeImport : MonoBehaviour
             for (int headline = 0; headline < 6; headline++)
             {
                 inputLine = surfaceStream.ReadLine();
+//                Debug.Log(fileString +  " " + inputLine);
                 hdrArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
                 headerText[0,headline] = hdrArray[0];
                 headerText[1,headline] = hdrArray[1];
@@ -151,9 +155,9 @@ public class MenuLandscapeImport : MonoBehaviour
                 for (int x = 0; x < totCols; x++)
                 {
                     thisval = float.Parse(readArray[x]);
-//                    if (thisval == noData) {
-//                        thisval = 0.0f;
-//                    }
+                    if (thisval == noData) {
+                        thisval = 0.0f;
+                    }
                     depths[fileCount, xCount, zCount] = thisval;
                     if (thisval > maxVal)
                     {
@@ -197,7 +201,7 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             return depths[15, pX, pY];
         }
-        return Mathf.Lerp(depths[lowerbound, pX, pY], depths[lowerbound + 1, pX, pY], 1000.0f / (float) (time.GetYear() % 1000));
+        return sls.UseInterpolation(depths[lowerbound, pX, pY], depths[lowerbound + 1, pX, pY]);
     }
 
 
@@ -423,6 +427,8 @@ public class MenuLandscapeImport : MonoBehaviour
             UpdateMeshColors();
             time.IncrementDay();
         }
+
+
 
         //Insert Raycast hit to select clicked point
         RaycastHit hit;
