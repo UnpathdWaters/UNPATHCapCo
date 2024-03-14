@@ -373,9 +373,7 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                if (isBox(x, z)) {
-                    colours[x + (z * widthX)] = boxCol;
-                } else if (x == clickedPoint.x && z == clickedPoint.y) {
+                if (x == clickedPoint.x && z == clickedPoint.y) {
                     colours[x + (z * widthX)] = clickCol;
                 } else if (IsNeighbour(new Vector2(x, z), clickedPoint)) {
                     colours[x + (z * widthX)] = clickNeighbour;
