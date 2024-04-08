@@ -34,9 +34,24 @@ public class MenuLandscapeImport : MonoBehaviour
     Vector2 clickedPoint;
     [SerializeField] float coastSize;
     [SerializeField] Camera cam;
-    [SerializeField] GameObject glaciers20k;
-    [SerializeField] GameObject glaciers17k;
-    [SerializeField] GameObject glaciers15k;
+    [SerializeField] GameObject glaciers20kmax;
+    [SerializeField] GameObject glaciers19kmax;
+    [SerializeField] GameObject glaciers18kmax;
+    [SerializeField] GameObject glaciers17kmax;
+    [SerializeField] GameObject glaciers16kmax;
+    [SerializeField] GameObject glaciers15kmax;
+    [SerializeField] GameObject glaciers20kopt;
+    [SerializeField] GameObject glaciers19kopt;
+    [SerializeField] GameObject glaciers18kopt;
+    [SerializeField] GameObject glaciers17kopt;
+    [SerializeField] GameObject glaciers16kopt;
+    [SerializeField] GameObject glaciers15kopt;
+    [SerializeField] GameObject glaciers20kmin;
+    [SerializeField] GameObject glaciers19kmin;
+    [SerializeField] GameObject glaciers18kmin;
+    [SerializeField] GameObject glaciers17kmin;
+    [SerializeField] GameObject glaciers16kmin;
+    [SerializeField] GameObject glaciers15kmin;
     [SerializeField] int leftCol;
     [SerializeField] int rightCol;
     [SerializeField] int topRow;
@@ -65,6 +80,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     bool quittable;
     int timeChangeAmount;
+    int glacierMode;
 
 
     // Start is called before the first frame update
@@ -81,7 +97,7 @@ public class MenuLandscapeImport : MonoBehaviour
         CreateMesh();
         UpdateMesh();
         quittable = false;
-
+        glacierMode = 1;
 
     }
 
@@ -327,38 +343,90 @@ public class MenuLandscapeImport : MonoBehaviour
         return false;
     }
 
+    void increaseGlacierCoverage()
+    {
+        if (glacierMode < 2)
+        {
+            glacierMode++;
+        }
+    }
+
+    void decreaseGlacierCoverage()
+    {
+        if (glacierMode > 0)
+        {
+            glacierMode--;
+        }
+    }
+
+    void ClearAllGlaciers()
+    {
+                glaciers20kmax.SetActive(false);
+                glaciers19kmax.SetActive(false);
+                glaciers18kmax.SetActive(false);
+                glaciers17kmax.SetActive(false);
+                glaciers16kmax.SetActive(false);
+                glaciers15kmax.SetActive(false);
+                glaciers20kopt.SetActive(false);
+                glaciers19kopt.SetActive(false);
+                glaciers18kopt.SetActive(false);
+                glaciers17kopt.SetActive(false);
+                glaciers16kopt.SetActive(false);
+                glaciers15kopt.SetActive(false);
+                glaciers20kmin.SetActive(false);
+                glaciers19kmin.SetActive(false);
+                glaciers18kmin.SetActive(false);
+                glaciers17kmin.SetActive(false);
+                glaciers16kmin.SetActive(false);
+                glaciers15kmin.SetActive(false);
+    }
+
     void SetGlacierVisibility()
     {
-/*        if (time.GetYear() == 20000) {
-            glaciers20k.SetActive(true);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-        } else if (time.GetYear() > 17500) {
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(true);
-            glaciers15k.SetActive(false);
-        } else if (time.GetYear() > 15000) {
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(true);
-        } else if (time.GetYear() > 12500) {
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-        } else if (time.GetYear() > 10000) {
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
-        } else if (time.GetYear() > 7500) {
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
+        ClearAllGlaciers();
+        if (glacierMode == 2) {
+            if (time.GetYear() == 20000) {
+                glaciers20kmax.SetActive(true);
+            } else if (time.GetYear() > 19000) {
+                glaciers19kmax.SetActive(true);
+            } else if (time.GetYear() > 18000) {
+                glaciers18kmax.SetActive(true);
+            } else if (time.GetYear() > 17000) {
+                glaciers17kmax.SetActive(true);
+            } else if (time.GetYear() > 16000) {
+                glaciers16kmax.SetActive(true);
+            } else if (time.GetYear() > 15000) {
+                glaciers15kmax.SetActive(true);
+            }
+        } else if (glacierMode == 1) {
+            if (time.GetYear() == 20000) {
+                glaciers20kopt.SetActive(true);
+            } else if (time.GetYear() > 19000) {
+                glaciers19kopt.SetActive(true);
+            } else if (time.GetYear() > 18000) {
+                glaciers18kopt.SetActive(true);
+            } else if (time.GetYear() > 17000) {
+                glaciers17kopt.SetActive(true);
+            } else if (time.GetYear() > 16000) {
+                glaciers16kopt.SetActive(true);
+            } else if (time.GetYear() > 15000) {
+                glaciers15kopt.SetActive(true);
+            }
         } else {
-            glaciers20k.SetActive(false);
-            glaciers17k.SetActive(false);
-            glaciers15k.SetActive(false);
+            if (time.GetYear() == 20000) {
+                glaciers20kmin.SetActive(true);
+            } else if (time.GetYear() > 19000) {
+                glaciers19kmin.SetActive(true);
+            } else if (time.GetYear() > 18000) {
+                glaciers18kmin.SetActive(true);
+            } else if (time.GetYear() > 17000) {
+                glaciers17kmin.SetActive(true);
+            } else if (time.GetYear() > 16000) {
+                glaciers16kmin.SetActive(true);
+            } else if (time.GetYear() > 15000) {
+                glaciers15kmin.SetActive(true);
+            }
         }
-*/
     }
 
     void UpdateMeshColors()
