@@ -26,6 +26,7 @@ public class MenuLandscapeImport : MonoBehaviour
     int[] triangles;
     Color[] colours;
     Color[] basecol;
+    string[] glacierModeNames = new string[3] { "Minimum", "Optimal", "Maximum" };
     Mesh mesh;
     public Gradient gradient;
     float maxVal;
@@ -57,6 +58,7 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField] int topRow;
     [SerializeField] int bottomRow;
     [SerializeField] int timeJumpAmt;
+    [SerializeField] TMP_Text glacierText;
     TimeServer time;
     SeaLevelServer sls;
 
@@ -66,6 +68,7 @@ public class MenuLandscapeImport : MonoBehaviour
     public InputAction timeJumpPlus;
     public InputAction timeJumpMinus;
     public InputAction controlsBtn;
+    public InputAction glacierModeBtn;
     public float timeSpeed;
     public GameObject loadingScreen;
     public GameObject controlScreen;
@@ -98,7 +101,7 @@ public class MenuLandscapeImport : MonoBehaviour
         UpdateMesh();
         quittable = false;
         glacierMode = 1;
-
+        updateGlacierModeText();
     }
 
 
@@ -110,6 +113,7 @@ public class MenuLandscapeImport : MonoBehaviour
         timeJumpPlus.Enable();
         timeJumpMinus.Enable();
         controlsBtn.Enable();
+        glacierModeBtn.Enable();
 
     }
 
@@ -121,6 +125,7 @@ public class MenuLandscapeImport : MonoBehaviour
         timeJumpPlus.Disable();
         timeJumpMinus.Disable();
         controlsBtn.Disable();
+        glacierModeBtn.Disable();
     }
 
     void ImportData()
@@ -343,21 +348,22 @@ public class MenuLandscapeImport : MonoBehaviour
         return false;
     }
 
-    void increaseGlacierCoverage()
+    void cycleGlacierCoverage()
     {
         if (glacierMode < 2)
         {
             glacierMode++;
+        } else {
+            glacierMode = 0;
         }
+        updateGlacierModeText();
     }
 
-    void decreaseGlacierCoverage()
+    void updateGlacierModeText()
     {
-        if (glacierMode > 0)
-        {
-            glacierMode--;
-        }
+        glacierText.text = "Glacier Mode: " + glacierModeNames[glacierMode];
     }
+
 
     void ClearAllGlaciers()
     {
@@ -556,6 +562,10 @@ public class MenuLandscapeImport : MonoBehaviour
             controlScreen.SetActive(true);
         } else {
             controlScreen.SetActive(false);
+        }
+        if (glacierModeBtn.WasReleasedThisFrame()) {
+            cycleGlacierCoverage();
+            SetGlacierVisibility();
         }
 
         if (timePeriodChanged) {
