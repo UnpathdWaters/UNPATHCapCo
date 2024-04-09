@@ -83,7 +83,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
     bool quittable;
     int timeChangeAmount;
-    int glacierMode;
+    int glacierMode = 1;
 
 
     // Start is called before the first frame update
@@ -100,7 +100,6 @@ public class MenuLandscapeImport : MonoBehaviour
         CreateMesh();
         UpdateMesh();
         quittable = false;
-        glacierMode = 1;
         updateGlacierModeText();
     }
 
