@@ -220,8 +220,11 @@ public class MenuLandscapeImport : MonoBehaviour
         if (lowerbound == 15)
         {
             return depths[15, pX, pY];
+        } else if (lowerbound == 0) {
+            return depths[0, pX, pY];
+        } else {
+            return sls.UseInterpolation(depths[lowerbound - 1, pX, pY], depths[lowerbound, pX, pY]);
         }
-        return sls.UseInterpolation(depths[lowerbound, pX, pY], depths[lowerbound + 1, pX, pY]);
     }
 
 
