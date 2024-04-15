@@ -539,7 +539,7 @@ public class MenuLandscapeImport : MonoBehaviour
             Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y));
             for (int x = 0; x < 16; x++)
             {
-                Debug.Log("Depth on sheet " +  x + " is " + depths[x,(int)  clickedPoint.x,(int)  clickedPoint.y]);
+                Debug.Log("Depth of point " + (int) clickedPoint.x + "," + (int) clickedPoint.y + "on sheet " +  x + " is " + depths[x,(int)  clickedPoint.x,(int)  clickedPoint.y]);
             }
 /*            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
             float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
