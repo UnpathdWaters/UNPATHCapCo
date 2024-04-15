@@ -8,6 +8,7 @@ public static class DataStore
     public static Vector3 cameraPosition;
     public static Quaternion cameraRotation;
     public static bool subsequentRun;
+    public static float[,] baseTerrain;
 
 
 

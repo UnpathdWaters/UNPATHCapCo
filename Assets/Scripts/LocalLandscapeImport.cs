@@ -129,7 +129,9 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void ImportLocalSection()
     {
-        surfaceFile = new FileInfo (".\\SquareSelectableArea18764.asc");
+
+
+/*        surfaceFile = new FileInfo (".\\SquareSelectableArea18764.asc");
         surfaceStream = surfaceFile.OpenText();
         string[] hdrArray;
         depths = new float[widthX, heightZ];
@@ -216,7 +218,10 @@ public class LocalLandscapeImport : MonoBehaviour
                 zCount--;
             }
         }
-        midVal = CalculateMedian(tempArray);
+        midVal = CalculateMedian(tempArray);*/
+
+
+
     }
 
     float AddNoiseToDepths(float depth)

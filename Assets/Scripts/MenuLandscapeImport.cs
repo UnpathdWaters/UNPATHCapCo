@@ -535,21 +535,31 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.subsequentRun = true;
             UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
         }
+
         if (loadSceneBtn.WasReleasedThisFrame()) {
             Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y));
             for (int x = 0; x < 16; x++)
             {
-                Debug.Log("Depth of point " + (int) clickedPoint.x + "," + (int) clickedPoint.y + "on sheet " +  x + " is " + depths[x,(int)  clickedPoint.x,(int)  clickedPoint.y]);
+                Debug.Log("Depth of point " + (int) clickedPoint.x + "," + (int) clickedPoint.y + " on sheet " +  x + " is " + depths[x,(int)  clickedPoint.x,(int)  clickedPoint.y]);
             }
-/*            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
-            float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
-            Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
+
             loadingScreen.SetActive(true);
-            DataStore.selectedLocation = clickedPointAsPercent;
+//            DataStore.selectedLocation = clickedPointAsPercent;
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");*/
+
+            float[,] tempTerrain = new float[11, 11];
+            int clickx = (int) clickedPoint.x;
+            int clicky = (int) clickedPoint.y;
+            for (int x = 0; x <= 10; x++) {
+                for (int y = 0; y <= 10; y++) {
+                    tempTerrain[x, y] = GetVertexDepth(clickx - 5 + x, clicky - 5 + y);
+                    Debug.Log("tempTerrain " + x + "," + y + " is " + GetVertexDepth(clickx - 5 + x, clicky - 5 + y));
+                }
+            }
+            DataStore.baseTerrain = tempTerrain;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");
         }
 
         if (timeJumpPlus.WasReleasedThisFrame()) {
