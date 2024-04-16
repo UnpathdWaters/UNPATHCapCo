@@ -130,6 +130,14 @@ public class LocalLandscapeImport : MonoBehaviour
     void ImportLocalSection()
     {
 
+        depths = new float[widthX, heightZ];
+        int arrayAdjust = (int) (widthX / DataStore.baseTerrain.GetLength(0));
+        for (int x = 0; x < widthX; x++) {
+            for (int y = 0; y < heightZ; y++) {
+                depths[x, y] = DataStore.baseTerrain[(int) x / arrayAdjust, (int) y / arrayAdjust];
+            }
+        }
+
 
 /*        surfaceFile = new FileInfo (".\\SquareSelectableArea18764.asc");
         surfaceStream = surfaceFile.OpenText();
