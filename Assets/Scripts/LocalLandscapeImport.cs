@@ -15,7 +15,6 @@ public class LocalLandscapeImport : MonoBehaviour
     protected string inputLine = " ";
     int widthX = 512;
     int heightZ = 512;
-    float[,] depths;
     string[,] headerText;
     int totCols;
     int totRows;
@@ -40,6 +39,7 @@ public class LocalLandscapeImport : MonoBehaviour
     public Texture2D landuseMap;
     bool[,] river;
     bool[,] marsh;
+    float[,] depths;
 
 
     public GameObject tree;
@@ -64,6 +64,7 @@ public class LocalLandscapeImport : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
         river = new bool[widthX, heightZ];
         marsh = new bool[widthX, heightZ];
+        depths = new float[widthX, heightZ];
         sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
         time = GameObject.Find("TimeServer").GetComponent<TimeServer>();
         time.SetLocalMode(true);
@@ -73,12 +74,12 @@ public class LocalLandscapeImport : MonoBehaviour
 
         seaPos = sls.GetGIAWaterHeight();
         ImportLocalSection();
-        CreateMesh();
-        UpdateMesh();
+//        CreateMesh();
+//        UpdateMesh();
 //        GenerateRiverAndMarsh();
-        CreateTrees();
-        CreateReeds();
-        UpdateMeshColors();
+//        CreateTrees();
+//        CreateReeds();
+//        UpdateMeshColors();
         Debug.Log("Local maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
 
@@ -130,13 +131,18 @@ public class LocalLandscapeImport : MonoBehaviour
     void ImportLocalSection()
     {
 
-        depths = new float[widthX, heightZ];
+        Debug.Log("widthX " + widthX + " heightZ" + heightZ);
         int arrayAdjust = (int) (widthX / DataStore.baseTerrain.GetLength(0));
-        for (int x = 0; x < widthX; x++) {
+        
+        Debug.Log("arrayAdjust is " + arrayAdjust);
+        
+/*        for (int x = 0; x < widthX; x++) {
             for (int y = 0; y < heightZ; y++) {
                 depths[x, y] = DataStore.baseTerrain[(int) x / arrayAdjust, (int) y / arrayAdjust];
             }
-        }
+        }*/
+
+
 
 
 /*        surfaceFile = new FileInfo (".\\SquareSelectableArea18764.asc");

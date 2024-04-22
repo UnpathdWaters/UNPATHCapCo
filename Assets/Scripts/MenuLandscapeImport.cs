@@ -543,7 +543,7 @@ public class MenuLandscapeImport : MonoBehaviour
                 Debug.Log("Depth of point " + (int) clickedPoint.x + "," + (int) clickedPoint.y + " on sheet " +  x + " is " + depths[x,(int)  clickedPoint.x,(int)  clickedPoint.y]);
             }
 
-            loadingScreen.SetActive(true);
+//            loadingScreen.SetActive(true);
 //            DataStore.selectedLocation = clickedPointAsPercent;
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
