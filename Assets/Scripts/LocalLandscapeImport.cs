@@ -131,14 +131,25 @@ public class LocalLandscapeImport : MonoBehaviour
     void ImportLocalSection()
     {
 
+<<<<<<< Updated upstream
         Debug.Log("widthX " + widthX + " heightZ" + heightZ);
         int arrayAdjust = (int) (widthX / DataStore.baseTerrain.GetLength(0));
         
         Debug.Log("arrayAdjust is " + arrayAdjust);
         
 /*        for (int x = 0; x < widthX; x++) {
+=======
+        depths = new float[widthX, heightZ];
+        int arrayAdjust = (int) (widthX / (DataStore.baseTerrain.GetLength(0) - 1));
+        Debug.Log("ArrayAdjust is " + arrayAdjust);
+        int thisX, thisY;
+        for (int x = 0; x < widthX; x++) {
+>>>>>>> Stashed changes
             for (int y = 0; y < heightZ; y++) {
-                depths[x, y] = DataStore.baseTerrain[(int) x / arrayAdjust, (int) y / arrayAdjust];
+                thisX = x / arrayAdjust;
+                thisY = y / arrayAdjust;
+                Debug.Log("x=" + x + " y=" + y + " thisX =" + thisX + " thisY=" + thisY);
+                depths[x, y] = DataStore.baseTerrain[thisX, thisY];
             }
         }*/
 
