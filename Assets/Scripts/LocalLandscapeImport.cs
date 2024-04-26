@@ -13,8 +13,8 @@ public class LocalLandscapeImport : MonoBehaviour
     protected FileInfo surfaceFile = null;
     protected StreamReader surfaceStream = null;
     protected string inputLine = " ";
-    int widthX = 512;
-    int heightZ = 512;
+    int widthX = 256;
+    int heightZ = 256;
     string[,] headerText;
     int totCols;
     int totRows;
@@ -76,9 +76,9 @@ public class LocalLandscapeImport : MonoBehaviour
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();
-        GenerateRiverAndMarsh();
-        CreateTrees();
-        CreateReeds();
+//        GenerateRiverAndMarsh();
+//        CreateTrees();
+//        CreateReeds();
         UpdateMeshColors();
         Debug.Log("Local maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
@@ -134,13 +134,22 @@ public class LocalLandscapeImport : MonoBehaviour
         depths = new float[widthX, heightZ];
         int arrayAdjust = (int) (widthX / (DataStore.baseTerrain.GetLength(0) - 1));
 //        Debug.Log("ArrayAdjust is " + arrayAdjust);
-        int thisX, thisY;
+        int thisX, thisY, xMod, yMod;
+        int maxX = widthX / arrayAdjust;
+        int maxY = heightZ / arrayAdjust;
         for (int x = 0; x < widthX; x++) {
             for (int y = 0; y < heightZ; y++) {
                 thisX = x / arrayAdjust;
                 thisY = y / arrayAdjust;
-//                Debug.Log("x=" + x + " y=" + y + " thisX =" + thisX + " thisY=" + thisY);
-                depths[x, y] = DataStore.baseTerrain[thisX, thisY];
+                if (thisX == maxX || thisY == maxY) {
+                    depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY]);
+                } else {
+                    xMod = x % arrayAdjust;
+                    yMod = y % arrayAdjust;
+                    float xComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX + 1, thisY], xMod / arrayAdjust);
+                    float yComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX, thisY + 1], yMod / arrayAdjust);
+                    depths[x, y] = AddNoiseToDepths((xComponent + yComponent) / 2);
+                }
             }
         }
     }
