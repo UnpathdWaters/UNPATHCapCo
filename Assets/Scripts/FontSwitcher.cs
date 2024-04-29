@@ -9,8 +9,8 @@ public class FontSwitcher : MonoBehaviour
     [SerializeField] TMP_FontAsset font1;
     [SerializeField] TMP_FontAsset font2;
     bool fontUsed;
-    TMP_Text[] thisText = new TMP_Text[5];
-    public GameObject[] textFields = new GameObject[5];
+    TMP_Text[] thisText = new TMP_Text[4];
+    public GameObject[] textFields = new GameObject[4];
     public InputAction fontToggle;
 
     // Start is called before the first frame update

@@ -4815,9 +4815,8 @@ MonoBehaviour:
   textFields:
   - {fileID: 68253697}
   - {fileID: 1229858347}
-  - {fileID: 0}
-  - {fileID: 627051025}
   - {fileID: 2107573829}
+  - {fileID: 627051025}
   fontToggle:
     m_Name: Font Toggle
     m_Type: 0

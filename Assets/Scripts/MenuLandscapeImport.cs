@@ -538,10 +538,6 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (loadSceneBtn.WasReleasedThisFrame()) {
             Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y));
-            for (int x = 0; x < 16; x++)
-            {
-                Debug.Log("Depth of point " + (int) clickedPoint.x + "," + (int) clickedPoint.y + " on sheet " +  x + " is " + depths[x,(int)  clickedPoint.x,(int)  clickedPoint.y]);
-            }
 
 //            loadingScreen.SetActive(true);
 //            DataStore.selectedLocation = clickedPointAsPercent;
@@ -555,7 +551,7 @@ public class MenuLandscapeImport : MonoBehaviour
             for (int x = 0; x <= 10; x++) {
                 for (int y = 0; y <= 10; y++) {
                     tempTerrain[x, y] = GetVertexDepth(clickx - 5 + x, clicky - 5 + y);
-                    Debug.Log("tempTerrain " + x + "," + y + " is " + GetVertexDepth(clickx - 5 + x, clicky - 5 + y));
+//                    Debug.Log("tempTerrain " + x + "," + y + " is " + GetVertexDepth(clickx - 5 + x, clicky - 5 + y));
                 }
             }
             DataStore.baseTerrain = tempTerrain;
@@ -582,7 +578,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (timePeriodChanged) {
             Debug.Log("Year is now " + time.GetYear());
-            DebugDepth();
+//            DebugDepth();
             SetGlacierVisibility();
             CreateMesh();
             UpdateMesh();

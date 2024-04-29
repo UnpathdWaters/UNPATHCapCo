@@ -141,14 +141,17 @@ public class LocalLandscapeImport : MonoBehaviour
             for (int y = 0; y < heightZ; y++) {
                 thisX = x / arrayAdjust;
                 thisY = y / arrayAdjust;
+                xMod = x % arrayAdjust;
+                yMod = y % arrayAdjust;
                 if (thisX == maxX || thisY == maxY) {
                     depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY]);
                 } else {
-                    xMod = x % arrayAdjust;
-                    yMod = y % arrayAdjust;
-                    float xComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX + 1, thisY], xMod / arrayAdjust);
-                    float yComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX, thisY + 1], yMod / arrayAdjust);
-                    depths[x, y] = AddNoiseToDepths((xComponent + yComponent) / 2);
+                    float xFactor = (float) xMod / (float) arrayAdjust;
+                    float yFactor = (float) yMod / (float) arrayAdjust;
+                    float xComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX + 1, thisY], xFactor);
+                    float yComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX, thisY + 1], yFactor);
+//                    depths[x, y] = AddNoiseToDepths(((xComponent - DataStore.baseTerrain[thisX, thisY]) * xFactor) + ((yComponent - DataStore.baseTerrain[thisX, thisY]) * yFactor) + DataStore.baseTerrain[thisX, thisY]);
+                    depths[x, y] = AddNoiseToDepths(yComponent);
                 }
             }
         }
