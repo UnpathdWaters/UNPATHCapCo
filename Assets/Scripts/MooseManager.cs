@@ -151,7 +151,7 @@ public class MooseManager : MonoBehaviour
             LocalLandscapeImport land = landscapeManager.GetComponent<LocalLandscapeImport>();
             depths = land.GetDepths();
             zScale = land.getZScale();
-            landscapeMidval = land.GetMidVal();
+//            landscapeMidval = land.GetMidVal();
             depthsPop = true;
             leaderPos = new Vector2[100];
         }
@@ -199,7 +199,8 @@ public class MooseManager : MonoBehaviour
             }
         }
 
-        if ((herds - deletedHerds) < maxHerds && (time.GetSnowline() + sls.GetGIAWaterHeight()) < landscapeMidval)
+        if ((herds - deletedHerds) < maxHerds)
+        //&& (time.GetSnowline() + sls.GetGIAWaterHeight()) < landscapeMidval)
         {
             Debug.Log("Creating replacement herd");
             CreateHerd(Random.Range(1,40));

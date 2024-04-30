@@ -20,6 +20,8 @@ public class LocalLandscapeImport : MonoBehaviour
     public float zScale;
     public Gradient gradient;
     [SerializeField] float coastSize;
+    [SerializeField] float minVal;
+    [SerializeField] float maxVal;
 
     public Color seaCol;
     public Color coastCol;
@@ -35,8 +37,8 @@ public class LocalLandscapeImport : MonoBehaviour
     public GameObject tree;
     public GameObject reeds;
 
-    public int reedDensity;
-    public int treeDensity;
+    public int reedsPerPoint;
+    public int treesPerPoint;
 
     public InputAction quitBtn;
     public InputAction controlsBtn;
@@ -70,7 +72,6 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
-        Debug.Log("Local maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
 
     void OnEnable()
@@ -238,18 +239,16 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void CreateTrees()
     {
-        
-
-/*        for (int y = 2; y < landuseMap.height - 2; y++){
-            for (int x = 2; x < landuseMap.width - 2; x++) {
-                if (depths[x, y] > midVal && depths[x, y] > sls.GetGIAWaterHeight() + coastSize) {
-                    if (UnityEngine.Random.Range(midVal, maxVal) < depths[x, y]) {
+        for (int x = 2; x < widthX - 2; x++) {
+            for (int y = 2; y < heightZ - 2; y++) {
+                if (UnityEngine.Random.Range(coastSize + 2, 20) < depths[x, y] && !river[x, y] && !marsh[x, y]) {
+                    for (int t = 0; t < treesPerPoint; t++) {
                         Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
                         Instantiate(tree, treePos, Quaternion.identity);
                     }
                 }
             }
-        }*/
+        }
     }
 
     float CalculateMedian(float[] inArray) {
@@ -259,24 +258,17 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void CreateReeds()
     {
-/*        for (int y = 2; y < landuseMap.height - 2; y++){
-            for (int x = 2; x < landuseMap.width - 2; x++) {
+
+        for (int x = 2; x < widthX - 2; x++) {
+            for (int y = 2; y < heightZ - 2; y++) {
                 if (marsh[x, y]) {
-                    if (UnityEngine.Random.Range(0, 100) < reedDensity) {
-                        Vector3 reedPos = new Vector3(x, depths[x, y] * zScale, y);
+                    for (int r = 0; r < reedsPerPoint; r++) {
+                        Vector3 reedPos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
                         Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
-                    }
-                } else {
-                    if (depths[x, y] < midVal) {
-                        if (UnityEngine.Random.Range(midVal, minVal) > depths[x, y]) {
-                            Vector3 reedPos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
-                            Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
-                        }
                     }
                 }
             }
-        }*/
-
+        }
     }
 
     Color CreateSands(Color inColor, float seaDist)
@@ -332,10 +324,6 @@ public class LocalLandscapeImport : MonoBehaviour
 
     public float GetCoastSize() {
         return coastSize;
-    }
-
-    public float GetMidVal() {
-        return midVal;
     }
 
     public bool IsSnow(int pX, int pY)
