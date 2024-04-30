@@ -537,8 +537,8 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;
 
-            int baseTerrainX = 9;
-            int baseTerrainY = 9;
+            int baseTerrainX = 5;
+            int baseTerrainY = 5;
 
             float[,] tempTerrain = new float[baseTerrainX, baseTerrainY];
             int clickx = (int) clickedPoint.x;

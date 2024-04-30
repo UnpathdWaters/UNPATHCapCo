@@ -68,7 +68,7 @@ public class LocalLandscapeImport : MonoBehaviour
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();
-        GenerateRiverAndMarsh();
+//        GenerateRiverAndMarsh();
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
@@ -135,7 +135,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 xMod = x % arrayAdjust;
                 yMod = y % arrayAdjust;
                 if (thisX == maxX || thisY == maxY) {
-                    depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY]);
+                    depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY], x, y);
                 } else {
                     float xFactor = (float) xMod / (float) arrayAdjust;
                     float yFactor = (float) yMod / (float) arrayAdjust;
@@ -146,15 +146,20 @@ public class LocalLandscapeImport : MonoBehaviour
                     float bottomRight = DataStore.baseTerrain[thisX + 1, thisY];
 
                     float calculatedHeight = Mathf.Lerp(Mathf.Lerp(bottomLeft, bottomRight, xFactor), Mathf.Lerp(topLeft, topRight, xFactor), yFactor);
-                    depths[x, y] = AddNoiseToDepths(calculatedHeight);
+                    depths[x, y] = AddNoiseToDepths(calculatedHeight, x, y);
                 }
             }
         }
     }
 
-    float AddNoiseToDepths(float depth)
+    float AddNoiseToDepths(float depth, int pX, int pY)
     {
-        return depth + UnityEngine.Random.Range(-0.5f, 0.5f);
+        float largeScale = 1.00f;
+        float smallScale = 0.10f;
+        float largeScaleNoise = depth + (Mathf.PerlinNoise((float) pX * largeScale, (float) pY * largeScale) * 10.0f - 5.0f);
+        float smallScaleNoise = largeScaleNoise + Mathf.PerlinNoise((float) pX * smallScale, (float) pY * smallScale) * 10.0f - 5.0f;
+        return smallScaleNoise;
+//        return Mathf.PerlinNoise((float) pX * scale, (float) pY * scale) * 100.0f;
     }
 
     void CreateMesh()
