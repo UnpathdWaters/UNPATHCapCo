@@ -10,22 +10,12 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(MeshFilter))]
 public class LocalLandscapeImport : MonoBehaviour
 {
-    protected FileInfo surfaceFile = null;
-    protected StreamReader surfaceStream = null;
-    protected string inputLine = " ";
     int widthX = 256;
     int heightZ = 256;
-    string[,] headerText;
-    int totCols;
-    int totRows;
-    float noData;
     Vector3[] vertices;
     int[] triangles;
     Color[] colours;
     Mesh mesh;
-    float maxVal = -9999;
-    float minVal = 9999;
-    float midVal = 0;
     float seaPos;
     public float zScale;
     public Gradient gradient;
@@ -36,7 +26,7 @@ public class LocalLandscapeImport : MonoBehaviour
     public Color marshCol;
 
 
-    public Texture2D landuseMap;
+//    public Texture2D landuseMap;
     bool[,] river;
     bool[,] marsh;
     float[,] depths;
@@ -76,9 +66,9 @@ public class LocalLandscapeImport : MonoBehaviour
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();
-//        GenerateRiverAndMarsh();
-//        CreateTrees();
-//        CreateReeds();
+        GenerateRiverAndMarsh();
+        CreateTrees();
+        CreateReeds();
         UpdateMeshColors();
         Debug.Log("Local maxval is " + maxVal + " and minval is " + minVal + " and midVal is " + midVal);
     }
@@ -148,10 +138,14 @@ public class LocalLandscapeImport : MonoBehaviour
                 } else {
                     float xFactor = (float) xMod / (float) arrayAdjust;
                     float yFactor = (float) yMod / (float) arrayAdjust;
-                    float xComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX + 1, thisY], xFactor);
-                    float yComponent = Mathf.Lerp(DataStore.baseTerrain[thisX, thisY], DataStore.baseTerrain[thisX, thisY + 1], yFactor);
-//                    depths[x, y] = AddNoiseToDepths(((xComponent - DataStore.baseTerrain[thisX, thisY]) * xFactor) + ((yComponent - DataStore.baseTerrain[thisX, thisY]) * yFactor) + DataStore.baseTerrain[thisX, thisY]);
-                    depths[x, y] = AddNoiseToDepths(yComponent);
+
+                    float topLeft = DataStore.baseTerrain[thisX, thisY + 1];
+                    float topRight = DataStore.baseTerrain[thisX + 1, thisY + 1];
+                    float bottomLeft = DataStore.baseTerrain[thisX, thisY];
+                    float bottomRight = DataStore.baseTerrain[thisX + 1, thisY];
+
+                    float calculatedHeight = Mathf.Lerp(Mathf.Lerp(bottomLeft, bottomRight, xFactor), Mathf.Lerp(topLeft, topRight, xFactor), yFactor);
+                    depths[x, y] = AddNoiseToDepths(calculatedHeight);
                 }
             }
         }
@@ -244,7 +238,9 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void CreateTrees()
     {
-        for (int y = 2; y < landuseMap.height - 2; y++){
+        
+
+/*        for (int y = 2; y < landuseMap.height - 2; y++){
             for (int x = 2; x < landuseMap.width - 2; x++) {
                 if (depths[x, y] > midVal && depths[x, y] > sls.GetGIAWaterHeight() + coastSize) {
                     if (UnityEngine.Random.Range(midVal, maxVal) < depths[x, y]) {
@@ -253,7 +249,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
     }
 
     float CalculateMedian(float[] inArray) {
@@ -263,7 +259,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void CreateReeds()
     {
-        for (int y = 2; y < landuseMap.height - 2; y++){
+/*        for (int y = 2; y < landuseMap.height - 2; y++){
             for (int x = 2; x < landuseMap.width - 2; x++) {
                 if (marsh[x, y]) {
                     if (UnityEngine.Random.Range(0, 100) < reedDensity) {
@@ -279,7 +275,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
 
     }
 
@@ -305,18 +301,13 @@ public class LocalLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
                 } else if (depths[x, z] - seaPos < coastSize) {
                     colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - seaPos);
-                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
-                    colours[x + (z * widthX)] = Color.white;
                 } else if (river[x, z]) {
                     colours[x + (z * widthX)] = AddNoiseToColor(Color.blue);
+                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
+                    colours[x + (z * widthX)] = Color.white;
                 } else if (marsh[x, z]) {
                     colours[x + (z * widthX)] = marshCol;
-                } else {
-                    if (time.FirstDayOfSeason(updateFrequency)) {
-                        float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                        colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
-                    } 
-                }
+                } 
             }
         }
         mesh.colors = colours;
@@ -364,10 +355,10 @@ public class LocalLandscapeImport : MonoBehaviour
     void Update()
     {
         seaPos = sls.GetGIAWaterHeight();
-        if (time.GetDay() % updateFrequency == 0) {
+        if (time.GetDay() % updateFrequency == 0 && time.GetHour() == 1 && time.GetMinute() == 1) {
             UpdateMeshColors();
         }
-        time.IncrementHour();
+        time.IncrementMinute();
         if (quitBtn.WasPressedThisFrame()) {
             UnityEngine.SceneManagement.SceneManager.LoadScene("02MenuScene");
         }

@@ -206,14 +206,6 @@ public class MenuLandscapeImport : MonoBehaviour
         }
     }
 
-    void DebugDepth()
-    {
-        int x = Random.Range(0, 511);
-        int y = Random.Range(0, 511);
-        int sheet = Random.Range(0, 15);
-        Debug.Log(x + "," + y + " on sheet " + sheet + " is " + depths[sheet, x, y] + " and GVD is " + GetVertexDepth(x, y));
-    }
-
     float GetVertexDepth(int pX, int pY)
     {
         int lowerbound = 20 - (time.GetYear() / 1000);
@@ -545,12 +537,15 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;
 
-            float[,] tempTerrain = new float[11, 11];
+            int baseTerrainX = 9;
+            int baseTerrainY = 9;
+
+            float[,] tempTerrain = new float[baseTerrainX, baseTerrainY];
             int clickx = (int) clickedPoint.x;
             int clicky = (int) clickedPoint.y;
-            for (int x = 0; x <= 10; x++) {
-                for (int y = 0; y <= 10; y++) {
-                    tempTerrain[x, y] = GetVertexDepth(clickx - 5 + x, clicky - 5 + y);
+            for (int x = 0; x < baseTerrainX; x++) {
+                for (int y = 0; y < baseTerrainY; y++) {
+                    tempTerrain[x, y] = GetVertexDepth(clickx - (baseTerrainX / 2) + x, clicky - (baseTerrainY / 2) + y);
 //                    Debug.Log("tempTerrain " + x + "," + y + " is " + GetVertexDepth(clickx - 5 + x, clicky - 5 + y));
                 }
             }

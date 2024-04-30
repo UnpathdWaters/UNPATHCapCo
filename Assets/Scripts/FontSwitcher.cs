@@ -16,7 +16,7 @@ public class FontSwitcher : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for (int x = 0; x < 5; x++) {
+        for (int x = 0; x < 4; x++) {
             thisText[x] = textFields[x].GetComponent<TMP_Text>();
             thisText[x].font = font1;
         }

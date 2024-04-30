@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimeServer : MonoBehaviour
 {
-    int year, day, hour;
+    int year, day, hour, minute;
     Seasons season;
     int SEASONLENGTH = 91;
     GameObject arrow1;
@@ -35,6 +35,7 @@ public class TimeServer : MonoBehaviour
             year = maxYear;
             day = 1;
             hour = 1;
+            minute = 1;
             Debug.Log("TIME SERVER AWAKES!");
             RefreshArrowIcon();
         }
@@ -65,6 +66,14 @@ public class TimeServer : MonoBehaviour
         return day;
     }
 
+    public int GetHour() {
+        return hour;
+    }
+
+    public int GetMinute() {
+        return minute;
+    }
+
     public void SetLocalMode(bool pLocal) {
         localMode = pLocal;
     }
@@ -75,18 +84,29 @@ public class TimeServer : MonoBehaviour
     }
 
     public void IncrementYear() {
-        year = ValidYear(year--);
+        year = ValidYear(--year);
+        Debug.Log("Year is " + year);
     }
 
     public void IncrementDay() {
         day++;
         if (day > 365) {
-            year = ValidYear(year--);
+            if (localMode) {
+                year = ValidYear(--year);
+            }
             SetArrowPosition();
             day = 1;
         }
         season = (Seasons) (day / SEASONLENGTH);
 //        Debug.Log("Day is " + day + " and snowfactor is " + GetSnowFactor() + " so snowline is " + GetSnowline());
+    }
+
+    public void IncrementMinute() {
+        minute++;
+        if (minute > 60) {
+            IncrementHour();
+            minute = 1;
+        }
     }
 
     public void IncrementHour() {
