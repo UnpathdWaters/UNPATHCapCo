@@ -22,10 +22,13 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] float coastSize;
     [SerializeField] float minVal;
     [SerializeField] float maxVal;
+    [SerializeField] float colourNoiseMin, colourNoiseMax;
+    [SerializeField] float riverCutoff, marshCutoff;
 
     public Color seaCol;
     public Color coastCol;
     public Color marshCol;
+    public Color riverCol;
 
 
 //    public Texture2D landuseMap;
@@ -68,10 +71,11 @@ public class LocalLandscapeImport : MonoBehaviour
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();
-//        GenerateRiverAndMarsh();
+        GenerateRiverAndMarsh();
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
+        AddMeshCollider();
     }
 
     void OnEnable()
@@ -88,19 +92,85 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void GenerateRiverAndMarsh()
     {
-        for (int x = 1; x < widthX - 1; x++)
+        float[,] flow = new float[widthX, heightZ];
+        float[,] water = new float[widthX, heightZ];
+
+        for (int x = 0; x < widthX; x++)
         {
-            for (int y = 1; y < heightZ - 1; y++)
+            for (int y = 0; y < heightZ; y++)
             {
-                if (NumberOfLowerNeighbours(x, y) == 1)
-                {
-                    river[x,y] = true;
-                } else if (NumberOfLowerNeighbours(x, y) == 0)
-                {
-                    marsh[x,y] = true;
-                } 
+                water[x, y] = 1.0f;
             }
         }
+
+        for (int ticks = 0; ticks < widthX; ticks++)
+        {
+//            Debug.Log("Tick# " + ticks);
+            for (int x = 0; x < widthX; x++)
+            {
+                for (int y = 0; y < heightZ; y++)
+                {
+                    if (water[x, y] > 0.0f)
+                    {
+                        float lowestNeighbour = 9999.0f;
+                        int lowestNeighbourX = 0;
+                        int lowestNeighbourY = 0;
+                        for (int nX = x - 1; nX <= x + 1; nX++)
+                        {
+                            for (int nY = y - 1; nY <= y + 1; nY++)
+                            {
+                                if (nX >= 0 && nX < widthX && nY >= 0 && nY < heightZ)
+                                {
+                                    if (depths[nX, nY] + water[nX, nY] < depths[x, y] + water[x, y] && depths[nX, nY] + water[nX, nY] < lowestNeighbour)
+                                    {   
+                                        lowestNeighbour = depths[nX, nY] + water[nX, nY];
+                                        lowestNeighbourX = nX;
+                                        lowestNeighbourY = nY;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (lowestNeighbour < 1999.0f)
+                        {
+                            if (water[x, y] > (depths[x, y] + water[x, y]) - lowestNeighbour)
+                            {
+                                float waterSlosh = (depths[x, y] + water[x, y] - lowestNeighbour) / 2.0f;
+                                water[x, y] = water[x, y] - waterSlosh;
+                                water[lowestNeighbourX, lowestNeighbourY] = water[lowestNeighbourX, lowestNeighbourY] + waterSlosh;
+                                flow[x, y] = flow[x, y] + waterSlosh;
+                            } else {
+                                water[lowestNeighbourX, lowestNeighbourY] = water[lowestNeighbourX, lowestNeighbourY] + water[x, y];
+                                flow[x, y] = flow[x, y] + water[x, y];
+                                water[x, y] = 0;
+                            }
+                        }
+                    }
+
+
+
+                }
+            }
+
+        }
+
+        for (int x = 0; x < widthX; x++)
+        {
+            for (int y = 0; y < heightZ; y++)
+            {
+                if (flow[x, y] > riverCutoff && depths[x, y] > seaPos + coastSize)
+                {
+                    river[x, y] = true;
+//                    Debug.Log("Flow at " + x + "," + y + " is " + flow[x, y]);
+                } else if (water[x, y] > marshCutoff && depths[x, y] > seaPos + coastSize)
+                {
+                    marsh[x, y] = true;
+//                    Debug.Log("Water at " + x + "," + y + " is " + water[x, y]);
+                }
+            }
+        }
+
+
     }
 
     int NumberOfLowerNeighbours(int pX, int pY)
@@ -156,10 +226,11 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         float largeScale = 1.00f;
         float smallScale = 0.10f;
-        float largeScaleNoise = depth + (Mathf.PerlinNoise((float) pX * largeScale, (float) pY * largeScale) * 10.0f - 5.0f);
-        float smallScaleNoise = largeScaleNoise + Mathf.PerlinNoise((float) pX * smallScale, (float) pY * smallScale) * 10.0f - 5.0f;
+        float magnitudeLP = 20.0f;
+        float magnitudeSP = 2.0f;
+        float largeScaleNoise = depth + (Mathf.PerlinNoise((float) pX * largeScale, (float) pY * largeScale) * magnitudeLP - (magnitudeLP / 2));
+        float smallScaleNoise = largeScaleNoise + Mathf.PerlinNoise((float) pX * smallScale, (float) pY * smallScale) * magnitudeSP - (magnitudeSP / 2);
         return smallScaleNoise;
-//        return Mathf.PerlinNoise((float) pX * scale, (float) pY * scale) * 100.0f;
     }
 
     void CreateMesh()
@@ -200,11 +271,18 @@ public class LocalLandscapeImport : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
+    void AddMeshCollider()
+    {
+        MeshCollider thisMC = this.gameObject.AddComponent<MeshCollider>();
+//        thisMC.sharedMesh = GetComponent<MeshFilter>().mesh;
+        thisMC.sharedMesh = mesh;
+    }
+
     Color AddNoiseToColor(Color inColor)
     {
-        float rRand = UnityEngine.Random.Range(-0.03f, 0.04f);
-        float gRand = UnityEngine.Random.Range(-0.03f, 0.04f);
-        float bRand = UnityEngine.Random.Range(-0.03f, 0.04f);
+        float rRand = UnityEngine.Random.Range(colourNoiseMin, colourNoiseMax);
+        float gRand = UnityEngine.Random.Range(colourNoiseMin, colourNoiseMax);
+        float bRand = UnityEngine.Random.Range(colourNoiseMin, colourNoiseMax);
         float newR = ColNormal(inColor.r + rRand);
         float newG = ColNormal(inColor.g + gRand);
         float newB = ColNormal(inColor.b + bRand);
@@ -279,11 +357,11 @@ public class LocalLandscapeImport : MonoBehaviour
     Color CreateSands(Color inColor, float seaDist)
     {
         float rAdj, gAdj, bAdj;
-        float ripple = ColNormal((float) (((seaDist % 0.5f) - 0.25f) / 10.0f));
+        float ripple = ColNormal((seaDist - (int) seaDist) / 2.0f);
 //        Debug.Log(ripple);
-        rAdj = inColor.r + ripple;
-        gAdj = inColor.g;
-        bAdj = inColor.b;
+        rAdj = ColNormal(inColor.r + ripple);
+        gAdj = ColNormal(inColor.g);
+        bAdj = ColNormal(inColor.b - ripple);
         return new Color(rAdj, gAdj, bAdj, 1);
     }
 
@@ -296,10 +374,10 @@ public class LocalLandscapeImport : MonoBehaviour
             {
                 if (depths[x, z] < seaPos) {
                     colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
-                } else if (depths[x, z] - seaPos < coastSize) {
-                    colours[x + (z * widthX)] = CreateSands(coastCol, depths[x, z] - seaPos);
                 } else if (river[x, z]) {
-                    colours[x + (z * widthX)] = AddNoiseToColor(Color.blue);
+                    colours[x + (z * widthX)] = AddNoiseToColor(riverCol);
+                } else if (depths[x, z] - seaPos < coastSize) {
+                    colours[x + (z * widthX)] = AddNoiseToColor(CreateSands(coastCol, depths[x, z] - seaPos));
                 } else if (depths[x, z] > seaPos + time.GetSnowline()) {
                     colours[x + (z * widthX)] = Color.white;
                 } else if (marsh[x, z]) {
