@@ -38,12 +38,14 @@ public class LocalLandscapeImport : MonoBehaviour
     float[,] depths;
 
     List<GameObject> allReeds = new List<GameObject>();
+    List<GameObject> allTrees = new List<GameObject>();
+
 
     public GameObject tree;
     public GameObject reeds;
 
-    public int reedsPerPoint;
-    public int treesPerPoint;
+    public int reedsPercent;
+    public int treesPercent;
 
     public InputAction quitBtn;
     public InputAction controlsBtn;
@@ -97,7 +99,7 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateMesh();
         UpdateMesh();
         GenerateRiverAndMarsh();
-//        CreateTrees();
+        CreateTrees();
         CreateReeds();
         UpdateMeshColors();
         AddMeshCollider();
@@ -190,7 +192,7 @@ public class LocalLandscapeImport : MonoBehaviour
             }
         }
 
-        for (int ticks = 0; ticks < widthX; ticks++)
+        for (int ticks = 0; ticks < (widthX / 2); ticks++)
         {
 //            Debug.Log("Tick# " + ticks);
             for (int x = 0; x < widthX; x++)
@@ -262,12 +264,21 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void CreateTrees()
     {
+        foreach(GameObject thisTree in allTrees)
+        {
+            Destroy(thisTree);
+        }
+
         for (int x = 2; x < widthX - 2; x++) {
             for (int y = 2; y < heightZ - 2; y++) {
-                if (UnityEngine.Random.Range(coastSize + 2, 20) < depths[x, y] && !river[x, y] && !marsh[x, y]) {
-                    for (int t = 0; t < treesPerPoint; t++) {
-                        Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
-                        Instantiate(tree, treePos, Quaternion.identity);
+                if (UnityEngine.Random.Range(coastSize + 2, 20) < depths[x, y] && !river[x, y] && !marsh[x, y] && depths[x, y] < time.GetMaxSnowline()) {
+                    if (treesPercent > 100) {
+                        for (int t = 0; t < treesPercent / 100; t++) {
+                            InstatiateTree(x, y);
+                        }
+                    }
+                    if (UnityEngine.Random.Range(0, 100) < treesPercent % 100) {
+                        InstatiateTree(x, y);
                     }
                 }
             }
@@ -284,9 +295,13 @@ public class LocalLandscapeImport : MonoBehaviour
         for (int x = 2; x < widthX - 2; x++) {
             for (int y = 2; y < heightZ - 2; y++) {
                 if (marsh[x, y]) {
-                    for (int r = 0; r < reedsPerPoint; r++) {
-                        Vector3 reedPos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
-                        allReeds.Add(Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+                    if (reedsPercent > 100) {
+                        for (int t = 0; t < reedsPercent / 100; t++) {
+                            InstantiateReeds(x, y);
+                        }
+                    }
+                    if (UnityEngine.Random.Range(0, 100) < reedsPercent % 100) {
+                        InstantiateReeds(x, y);
                     }
                 }
             }
@@ -324,6 +339,19 @@ public class LocalLandscapeImport : MonoBehaviour
 //        thisMC.sharedMesh = GetComponent<MeshFilter>().mesh;
         thisMC.sharedMesh = mesh;
     }
+
+    void InstatiateTree(int pX, int  pY)
+    {
+        Vector3 treePos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
+        allTrees.Add(Instantiate(tree, treePos, Quaternion.identity));
+    }
+
+    void InstantiateReeds(int pX, int  pY)
+    {
+        Vector3 reedPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
+        allReeds.Add(Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+    }
+
 
     int NumberOfLowerNeighbours(int pX, int pY)
     {

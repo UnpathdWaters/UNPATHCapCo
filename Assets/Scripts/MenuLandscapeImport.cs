@@ -72,6 +72,7 @@ public class MenuLandscapeImport : MonoBehaviour
     public float timeSpeed;
     public GameObject loadingScreen;
     public GameObject controlScreen;
+    [SerializeField] GameObject glacierWarningScreen;
     public float gradientAnchor;
 
     Color seaCol = new Color(0.0f, 0.0f, 0.9f, 1.0f);
@@ -479,24 +480,8 @@ public class MenuLandscapeImport : MonoBehaviour
         mesh.colors = colours;
     }
 
-    void Update()
+    bool CheckClickedPointIsGlacier()
     {
-        bool timePeriodChanged = false;
-        timeChangeAmount = (int) (timeControl.ReadValue<float>() * timeSpeed);
-
-        if (timeChangeAmount != 0) {
-            time.AdjustYear(timeChangeAmount);
-            timePeriodChanged = true;
-        }
-
-        if (!pause) {
-            UpdateMeshColors();
-            time.IncrementDay();
-        }
-
-
-
-        //Insert Raycast hit to select clicked point
         RaycastHit hit;
         if (Physics.Raycast(cam.transform.position, cam.transform.TransformDirection(Vector3.forward), out hit)) {
             clickedPoint.x = hit.point.x;
@@ -516,6 +501,36 @@ public class MenuLandscapeImport : MonoBehaviour
             clickedPoint.y = bottomRow;
         }
 
+        if (hit.collider.gameObject.tag == "glacier") {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    void DisableGlacierWarning()
+    {
+        glacierWarningScreen.SetActive(false);
+    }
+
+    void Update()
+    {
+        bool glacierHit = CheckClickedPointIsGlacier();
+        bool timePeriodChanged = false;
+        timeChangeAmount = (int) (timeControl.ReadValue<float>() * timeSpeed);
+
+        if (timeChangeAmount != 0) {
+            time.AdjustYear(timeChangeAmount);
+            timePeriodChanged = true;
+        }
+
+        if (!pause) {
+            UpdateMeshColors();
+            time.IncrementDay();
+        }
+
+
         if (quitBtn.WasReleasedThisFrame() && quittable) {
             float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
             float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
@@ -529,30 +544,34 @@ public class MenuLandscapeImport : MonoBehaviour
         }
 
         if (loadSceneBtn.WasReleasedThisFrame()) {
-            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y, time.GetYear()));
-
-//            loadingScreen.SetActive(true);
+//            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y, time.GetYear()));
+            if (!glacierHit) {
+                loadingScreen.SetActive(true);
 //            DataStore.selectedLocation = clickedPointAsPercent;
-            DataStore.cameraPosition = cam.transform.position;
-            DataStore.cameraRotation = cam.transform.rotation;
-            DataStore.subsequentRun = true;
+                DataStore.cameraPosition = cam.transform.position;
+                DataStore.cameraRotation = cam.transform.rotation;
+                DataStore.subsequentRun = true;
 
-            int baseTerrainX = 5;
-            int baseTerrainY = 5;
+                int baseTerrainX = 5;
+                int baseTerrainY = 5;
 
-            float[,,] tempTerrain = new float[baseTerrainX, baseTerrainY, 15001];
-            int clickx = (int) clickedPoint.x;
-            int clicky = (int) clickedPoint.y;
-            for (int x = 0; x < baseTerrainX; x++) {
-                for (int y = 0; y < baseTerrainY; y++) {
-                    for (int yr = 0; yr <= 15000; yr++) {
-                        tempTerrain[x, y, yr] = GetVertexDepth(clickx - (baseTerrainX / 2) + x, clicky - (baseTerrainY / 2) + y, yr + 5000);
+                float[,,] tempTerrain = new float[baseTerrainX, baseTerrainY, 15001];
+                int clickx = (int) clickedPoint.x;
+                int clicky = (int) clickedPoint.y;
+                for (int x = 0; x < baseTerrainX; x++) {
+                    for (int y = 0; y < baseTerrainY; y++) {
+                        for (int yr = 0; yr <= 15000; yr++) {
+                            tempTerrain[x, y, yr] = GetVertexDepth(clickx - (baseTerrainX / 2) + x, clicky - (baseTerrainY / 2) + y, yr + 5000);
 //                        Debug.Log("tempTerrain " + x + "," + y + " at year " + (yr + 5000) + " is " + tempTerrain[x, y, yr]);
+                        }
                     }
                 }
+                DataStore.baseTerrain = tempTerrain;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");
+            } else {
+                glacierWarningScreen.SetActive(true);
+                Invoke("DisableGlacierWarning", 2.0f);
             }
-            DataStore.baseTerrain = tempTerrain;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");
         }
 
         if (timeJumpPlus.WasReleasedThisFrame()) {
