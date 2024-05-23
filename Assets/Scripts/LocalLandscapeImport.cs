@@ -24,6 +24,7 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] float maxVal;
     [SerializeField] float colourNoiseMin, colourNoiseMax;
     [SerializeField] float riverCutoff, marshCutoff;
+    [SerializeField] int timeJumpAmt;
 
     public Color seaCol;
     public Color coastCol;
@@ -36,6 +37,7 @@ public class LocalLandscapeImport : MonoBehaviour
     bool[,] marsh;
     float[,] depths;
 
+    List<GameObject> allReeds = new List<GameObject>();
 
     public GameObject tree;
     public GameObject reeds;
@@ -45,13 +47,31 @@ public class LocalLandscapeImport : MonoBehaviour
 
     public InputAction quitBtn;
     public InputAction controlsBtn;
+    public InputAction timeJumpPlus;
+    public InputAction timeJumpMinus;
+
     public GameObject controlScreen;
     public int updateFrequency;
 
     SeaLevelServer sls;
     TimeServer time;
 
-    // Start is called before the first frame update
+    void OnEnable()
+    {
+        quitBtn.Enable();
+        controlsBtn.Enable();
+        timeJumpPlus.Enable();
+        timeJumpMinus.Enable();
+    }
+
+    void OnDisable()
+    {
+        quitBtn.Disable();
+        controlsBtn.Disable();
+        timeJumpPlus.Disable();
+        timeJumpMinus.Disable();
+    }
+
     void Start()
     {
         mesh = new Mesh();
@@ -68,30 +88,97 @@ public class LocalLandscapeImport : MonoBehaviour
         Debug.Log("Year is " + time.GetYear());
 
         seaPos = sls.GetGIAWaterHeight();
+        RefreshEnvironment();
+    }
+
+    void RefreshEnvironment()
+    {
         ImportLocalSection();
         CreateMesh();
         UpdateMesh();
         GenerateRiverAndMarsh();
-        CreateTrees();
+//        CreateTrees();
         CreateReeds();
         UpdateMeshColors();
         AddMeshCollider();
     }
 
-    void OnEnable()
+    void ImportLocalSection()
     {
-        quitBtn.Enable();
-        controlsBtn.Enable();
+
+        depths = new float[widthX, heightZ];
+        int arrayAdjust = (int) (widthX / (DataStore.baseTerrain.GetLength(0) - 1));
+//        Debug.Log("ArrayAdjust is " + arrayAdjust);
+        int thisX, thisY, xMod, yMod;
+        int maxX = widthX / arrayAdjust;
+        int maxY = heightZ / arrayAdjust;
+        for (int x = 0; x < widthX; x++) {
+            for (int y = 0; y < heightZ; y++) {
+                thisX = x / arrayAdjust;
+                thisY = y / arrayAdjust;
+                xMod = x % arrayAdjust;
+                yMod = y % arrayAdjust;
+                if (thisX == maxX || thisY == maxY) {
+                    depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY, time.GetYear() - 5000], x, y);
+                } else {
+                    float xFactor = (float) xMod / (float) arrayAdjust;
+                    float yFactor = (float) yMod / (float) arrayAdjust;
+
+                    float topLeft = DataStore.baseTerrain[thisX, thisY + 1, time.GetYear() - 5000];
+                    float topRight = DataStore.baseTerrain[thisX + 1, thisY + 1, time.GetYear() - 5000];
+                    float bottomLeft = DataStore.baseTerrain[thisX, thisY, time.GetYear() - 5000];
+                    float bottomRight = DataStore.baseTerrain[thisX + 1, thisY, time.GetYear() - 5000];
+
+                    float calculatedHeight = Mathf.Lerp(Mathf.Lerp(bottomLeft, bottomRight, xFactor), Mathf.Lerp(topLeft, topRight, xFactor), yFactor);
+                    depths[x, y] = AddNoiseToDepths(calculatedHeight, x, y);
+                }
+            }
+        }
     }
 
-    void OnDisable()
+    void CreateMesh()
     {
-        quitBtn.Disable();
-        controlsBtn.Disable();
+        vertices = new Vector3[widthX * heightZ];
+        triangles = new int[(1 + widthX * heightZ) * 6];
+        colours = new Color[vertices.Length];
+        
+        // Create vertices from depth array
+        for (int z = 0; z < heightZ; z++)
+        {
+            for (int x = 0; x < widthX; x++)
+            {
+                vertices[x + (z * widthX)] = new Vector3(x, depths[x , z] * zScale, z);
+                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
+                colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
+
+                if (x > 0 && z > 0)
+                {
+                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 0] = x + (z * widthX); 
+                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 1] = (x - 1) + ((z - 1) * widthX); 
+                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 2] = (x - 1) + (z * widthX); 
+                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 3] = x + (z * widthX); 
+                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 4] = x + ((z - 1) * widthX); 
+                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 5] = (x - 1) + ((z - 1) * widthX); 
+                }
+
+            }
+        }
+    }
+
+    void UpdateMesh()
+    {
+        mesh.Clear();
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.colors = colours;
+        mesh.RecalculateNormals();
     }
 
     void GenerateRiverAndMarsh()
     {
+        river = new bool[widthX, heightZ];
+        marsh = new bool[widthX, heightZ];
+
         float[,] flow = new float[widthX, heightZ];
         float[,] water = new float[widthX, heightZ];
 
@@ -173,6 +260,71 @@ public class LocalLandscapeImport : MonoBehaviour
 
     }
 
+    void CreateTrees()
+    {
+        for (int x = 2; x < widthX - 2; x++) {
+            for (int y = 2; y < heightZ - 2; y++) {
+                if (UnityEngine.Random.Range(coastSize + 2, 20) < depths[x, y] && !river[x, y] && !marsh[x, y]) {
+                    for (int t = 0; t < treesPerPoint; t++) {
+                        Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
+                        Instantiate(tree, treePos, Quaternion.identity);
+                    }
+                }
+            }
+        }
+    }
+
+    void CreateReeds()
+    {
+        foreach(GameObject thisReeds in allReeds)
+        {
+            Destroy(thisReeds);
+        }
+        
+        for (int x = 2; x < widthX - 2; x++) {
+            for (int y = 2; y < heightZ - 2; y++) {
+                if (marsh[x, y]) {
+                    for (int r = 0; r < reedsPerPoint; r++) {
+                        Vector3 reedPos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
+                        allReeds.Add(Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+                    }
+                }
+            }
+        }
+    }
+
+    void UpdateMeshColors()
+    {
+        // Assign colours to vertices
+        for (int z = 0; z < heightZ; z++)
+        {
+            for (int x = 0; x < widthX; x++)
+            {
+                if (depths[x, z] < seaPos) {
+                    colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
+                } else if (river[x, z]) {
+                    colours[x + (z * widthX)] = AddNoiseToColor(riverCol);
+                } else if (depths[x, z] - seaPos < coastSize) {
+                    colours[x + (z * widthX)] = AddNoiseToColor(CreateSands(coastCol, depths[x, z] - seaPos));
+                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
+                    colours[x + (z * widthX)] = Color.white;
+                } else if (marsh[x, z]) {
+                    colours[x + (z * widthX)] = marshCol;
+                } 
+            }
+        }
+        mesh.colors = colours;
+//        Debug.Log("Updating mesh colours on day " + time.GetDay() + " of year " + time.GetYear() + " when snowline is " + time.GetSnowline());
+    }
+
+    void AddMeshCollider()
+    {
+        Destroy(GetComponent<MeshCollider>());
+        MeshCollider thisMC = this.gameObject.AddComponent<MeshCollider>();
+//        thisMC.sharedMesh = GetComponent<MeshFilter>().mesh;
+        thisMC.sharedMesh = mesh;
+    }
+
     int NumberOfLowerNeighbours(int pX, int pY)
     {
         int lowerNeighbours = 0;
@@ -189,38 +341,6 @@ public class LocalLandscapeImport : MonoBehaviour
         return lowerNeighbours;
     }
 
-    void ImportLocalSection()
-    {
-
-        depths = new float[widthX, heightZ];
-        int arrayAdjust = (int) (widthX / (DataStore.baseTerrain.GetLength(0) - 1));
-//        Debug.Log("ArrayAdjust is " + arrayAdjust);
-        int thisX, thisY, xMod, yMod;
-        int maxX = widthX / arrayAdjust;
-        int maxY = heightZ / arrayAdjust;
-        for (int x = 0; x < widthX; x++) {
-            for (int y = 0; y < heightZ; y++) {
-                thisX = x / arrayAdjust;
-                thisY = y / arrayAdjust;
-                xMod = x % arrayAdjust;
-                yMod = y % arrayAdjust;
-                if (thisX == maxX || thisY == maxY) {
-                    depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY], x, y);
-                } else {
-                    float xFactor = (float) xMod / (float) arrayAdjust;
-                    float yFactor = (float) yMod / (float) arrayAdjust;
-
-                    float topLeft = DataStore.baseTerrain[thisX, thisY + 1];
-                    float topRight = DataStore.baseTerrain[thisX + 1, thisY + 1];
-                    float bottomLeft = DataStore.baseTerrain[thisX, thisY];
-                    float bottomRight = DataStore.baseTerrain[thisX + 1, thisY];
-
-                    float calculatedHeight = Mathf.Lerp(Mathf.Lerp(bottomLeft, bottomRight, xFactor), Mathf.Lerp(topLeft, topRight, xFactor), yFactor);
-                    depths[x, y] = AddNoiseToDepths(calculatedHeight, x, y);
-                }
-            }
-        }
-    }
 
     float AddNoiseToDepths(float depth, int pX, int pY)
     {
@@ -233,50 +353,6 @@ public class LocalLandscapeImport : MonoBehaviour
         return smallScaleNoise;
     }
 
-    void CreateMesh()
-    {
-        vertices = new Vector3[widthX * heightZ];
-        triangles = new int[(1 + widthX * heightZ) * 6];
-        colours = new Color[vertices.Length];
-        
-        // Create vertices from depth array
-        for (int z = 0; z < heightZ; z++)
-        {
-            for (int x = 0; x < widthX; x++)
-            {
-                vertices[x + (z * widthX)] = new Vector3(x, depths[x , z] * zScale, z);
-                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
-
-                if (x > 0 && z > 0)
-                {
-                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 0] = x + (z * widthX); 
-                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 1] = (x - 1) + ((z - 1) * widthX); 
-                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 2] = (x - 1) + (z * widthX); 
-                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 3] = x + (z * widthX); 
-                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 4] = x + ((z - 1) * widthX); 
-                    triangles[(((x - 1) + ((z - 1) * widthX)) * 6) + 5] = (x - 1) + ((z - 1) * widthX); 
-                }
-
-            }
-        }
-    }
-
-    void UpdateMesh()
-    {
-        mesh.Clear();
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.colors = colours;
-        mesh.RecalculateNormals();
-    }
-
-    void AddMeshCollider()
-    {
-        MeshCollider thisMC = this.gameObject.AddComponent<MeshCollider>();
-//        thisMC.sharedMesh = GetComponent<MeshFilter>().mesh;
-        thisMC.sharedMesh = mesh;
-    }
 
     Color AddNoiseToColor(Color inColor)
     {
@@ -320,39 +396,11 @@ public class LocalLandscapeImport : MonoBehaviour
         return inVec + adj;
     }
 
-    void CreateTrees()
-    {
-        for (int x = 2; x < widthX - 2; x++) {
-            for (int y = 2; y < heightZ - 2; y++) {
-                if (UnityEngine.Random.Range(coastSize + 2, 20) < depths[x, y] && !river[x, y] && !marsh[x, y]) {
-                    for (int t = 0; t < treesPerPoint; t++) {
-                        Vector3 treePos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
-                        Instantiate(tree, treePos, Quaternion.identity);
-                    }
-                }
-            }
-        }
-    }
-
     float CalculateMedian(float[] inArray) {
         Array.Sort(inArray);
         return inArray[inArray.Length / 2];
     }
 
-    void CreateReeds()
-    {
-
-        for (int x = 2; x < widthX - 2; x++) {
-            for (int y = 2; y < heightZ - 2; y++) {
-                if (marsh[x, y]) {
-                    for (int r = 0; r < reedsPerPoint; r++) {
-                        Vector3 reedPos = JigglePosition(new Vector3(x, depths[x, y] * zScale, y));
-                        Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
-                    }
-                }
-            }
-        }
-    }
 
     Color CreateSands(Color inColor, float seaDist)
     {
@@ -363,30 +411,6 @@ public class LocalLandscapeImport : MonoBehaviour
         gAdj = ColNormal(inColor.g);
         bAdj = ColNormal(inColor.b - ripple);
         return new Color(rAdj, gAdj, bAdj, 1);
-    }
-
-    void UpdateMeshColors()
-    {
-        // Assign colours to vertices
-        for (int z = 0; z < heightZ; z++)
-        {
-            for (int x = 0; x < widthX; x++)
-            {
-                if (depths[x, z] < seaPos) {
-                    colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
-                } else if (river[x, z]) {
-                    colours[x + (z * widthX)] = AddNoiseToColor(riverCol);
-                } else if (depths[x, z] - seaPos < coastSize) {
-                    colours[x + (z * widthX)] = AddNoiseToColor(CreateSands(coastCol, depths[x, z] - seaPos));
-                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
-                    colours[x + (z * widthX)] = Color.white;
-                } else if (marsh[x, z]) {
-                    colours[x + (z * widthX)] = marshCol;
-                } 
-            }
-        }
-        mesh.colors = colours;
-//        Debug.Log("Updating mesh colours on day " + time.GetDay() + " of year " + time.GetYear() + " when snowline is " + time.GetSnowline());
     }
 
     public float[,] GetDepths() {
@@ -422,10 +446,15 @@ public class LocalLandscapeImport : MonoBehaviour
         return depths[pX, pY] * zScale;
     }
 
+    void RefreshSeaPos()
+    {
+        seaPos = sls.GetGIAWaterHeight();
+    }
+
 
     void Update()
     {
-        seaPos = sls.GetGIAWaterHeight();
+        RefreshSeaPos();
         if (time.GetDay() % updateFrequency == 0 && time.GetHour() == 1 && time.GetMinute() == 1) {
             UpdateMeshColors();
         }
@@ -437,6 +466,18 @@ public class LocalLandscapeImport : MonoBehaviour
             controlScreen.SetActive(true);
         } else {
             controlScreen.SetActive(false);
+        }
+        if (timeJumpPlus.WasReleasedThisFrame()) {
+            time.AdjustYear(timeJumpAmt);
+            Debug.Log("Year is now " + time.GetYear());
+            RefreshSeaPos();
+            RefreshEnvironment();
+        }
+        if (timeJumpMinus.WasReleasedThisFrame()) {
+            time.AdjustYear(0 - timeJumpAmt);
+            Debug.Log("Year is now " + time.GetYear());
+            RefreshSeaPos();
+            RefreshEnvironment();
         }
 
     }

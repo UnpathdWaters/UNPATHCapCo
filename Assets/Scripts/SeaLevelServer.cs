@@ -65,9 +65,9 @@ public class SeaLevelServer : MonoBehaviour
         }
     }
 
-    public float UseInterpolation(float oldHeight, float newHeight)
+    public float UseInterpolation(float oldHeight, float newHeight, int pYear)
     {
-        return Mathf.Lerp(oldHeight, newHeight, interpolationModes[interpolationMode].Evaluate((time.GetYear() % 1000) / 1000.0f));
+        return Mathf.Lerp(oldHeight, newHeight, interpolationModes[interpolationMode].Evaluate((pYear % 1000) / 1000.0f));
     }
 
     public float GetGIAWaterHeight()

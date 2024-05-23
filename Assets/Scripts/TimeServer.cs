@@ -14,8 +14,8 @@ public class TimeServer : MonoBehaviour
     int minYear = 5000;
     bool localMode;
     Vector3 arrowPos;
-//    int[] SAT = new int[16] {10, 10, 10, 9, 8, 8, 7, 6, 4, 4, 3, -1, -1, -2, -2, -2};
-    float[] SAT = new float[16] {1.0f, 1.0f, 1.0f, 0.916f, 0.833f, 0.833f, 0.75f, 0.666f, 0.5f, 0.5f, 0.417f, 0.0833f, 0.0833f, 0.0f, 0.0f, 0.0f};
+//    float[] SAT = new float[16] {1.0f, 1.0f, 1.0f, 0.916f, 0.833f, 0.833f, 0.75f, 0.666f, 0.5f, 0.5f, 0.417f, 0.0833f, 0.0833f, 0.0f, 0.0f, 0.0f};
+    float[] SAT = new float[16] {1.0f, 1.0f, 1.0f, 0.916f, 0.9f, 0.833f, 0.833f, 0.2f, 0.0f, 1.0f, 0.417f, 0.0833f, 0.0833f, 0.0f, 0.0f, 0.0f};
     [SerializeField] float baseSnowline;
     [SerializeField] float seasonMultiplier;
     [SerializeField] float tempMultiplier;
@@ -203,7 +203,8 @@ public class TimeServer : MonoBehaviour
 
     public float GetTempFactor() {
         int SATindex = (year - 5000) / 1000;
-        float SATfudge = (float)(year % 1000) / 1000.0f;
+        float SATfudge = 0.0f;
+//        float SATfudge = (float)(year % 1000) / 1000.0f;
 //        Debug.Log("Year is " + year + " so satfudge is " + SATfudge);
         float SATfactor;
         if (SATindex > 0)

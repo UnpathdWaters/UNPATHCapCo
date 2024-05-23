@@ -206,16 +206,16 @@ public class MenuLandscapeImport : MonoBehaviour
         }
     }
 
-    float GetVertexDepth(int pX, int pY)
+    float GetVertexDepth(int pX, int pY, int pYear)
     {
-        int lowerbound = 20 - (time.GetYear() / 1000);
+        int lowerbound = 20 - (pYear / 1000);
         if (lowerbound == 15)
         {
             return depths[15, pX, pY];
         } else if (lowerbound == 0) {
             return depths[0, pX, pY];
         } else {
-            return sls.UseInterpolation(depths[lowerbound - 1, pX, pY], depths[lowerbound, pX, pY]);
+            return sls.UseInterpolation(depths[lowerbound - 1, pX, pY], depths[lowerbound, pX, pY], pYear);
         }
     }
 
@@ -233,7 +233,7 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                vertices[x + (z * widthX)] = new Vector3(x, GetVertexDepth(x, z) * zScale, z);
+                vertices[x + (z * widthX)] = new Vector3(x, GetVertexDepth(x, z, time.GetYear()) * zScale, z);
 
                 if (x > 0 && z > 0)
                 {
@@ -258,7 +258,7 @@ public class MenuLandscapeImport : MonoBehaviour
             for (int x = 0; x < widthX; x++)
             {
 //                float vertHeight = Mathf.InverseLerp(minVal, maxVal, depths[x, z]);
-                float vertHeight = Mathf.InverseLerp(sls.GetGIAWaterHeight(), sls.GetGIAWaterHeight() + gradientAnchor, GetVertexDepth(x, z));
+                float vertHeight = Mathf.InverseLerp(sls.GetGIAWaterHeight(), sls.GetGIAWaterHeight() + gradientAnchor, GetVertexDepth(x, z, time.GetYear()));
                 colours[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
                 basecol[x + (z * widthX)] = AddNoiseToColor(gradient.Evaluate(vertHeight));
 
@@ -445,16 +445,16 @@ public class MenuLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = clickCol;
                 } else if (IsNeighbour(new Vector2(x, z), clickedPoint)) {
                     colours[x + (z * widthX)] = clickNeighbour;
-                } else if (GetVertexDepth(x, z) < sls.GetGIAWaterHeight()) {
+                } else if (GetVertexDepth(x, z, time.GetYear()) < sls.GetGIAWaterHeight()) {
                     colours[x + (z * widthX)] = seaCol;
-                } else if (GetVertexDepth(x, z) - sls.GetGIAWaterHeight() < coastSize) {
+                } else if (GetVertexDepth(x, z, time.GetYear()) - sls.GetGIAWaterHeight() < coastSize) {
                     colours[x + (z * widthX)] = coastCol;
-                } else if (GetVertexDepth(x, z) > (time.GetSnowline() + sls.GetGIAWaterHeight())) {
+                } else if (GetVertexDepth(x, z, time.GetYear()) > (time.GetSnowline() + sls.GetGIAWaterHeight())) {
                     colours[x + (z * widthX)] = Color.white;
                 } else {
 
                         if (!treeSet) {
-                            if (GetVertexDepth(x, z) < (time.GetSnowline() + sls.GetGIAWaterHeight()) && GetVertexDepth(x, z) > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
+                            if (GetVertexDepth(x, z, time.GetYear()) < (time.GetSnowline() + sls.GetGIAWaterHeight()) && GetVertexDepth(x, z, time.GetYear()) > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
                                 if (Random.Range(0, 100) < 15) {
                                     trees[x, z] = true;
                                 } else {
@@ -466,7 +466,7 @@ public class MenuLandscapeImport : MonoBehaviour
                         }
                         if (trees[x, z]) {
                             colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, time.GetTimeThroughSeason());
-                        } else if (GetVertexDepth(x, z) > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
+                        } else if (GetVertexDepth(x, z, time.GetYear()) > (sls.GetGIAWaterHeight() + (coastSize * 5))) {
                             colours[x + (z * widthX)] = Color.Lerp(basecol[x + (z * widthX)], autumnTrees, (time.GetTimeThroughSeason() / 4.0f));
                         } else {
                             colours[x + (z * widthX)] = basecol[x + (z * widthX)];
@@ -529,7 +529,7 @@ public class MenuLandscapeImport : MonoBehaviour
         }
 
         if (loadSceneBtn.WasReleasedThisFrame()) {
-            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y));
+            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y, time.GetYear()));
 
 //            loadingScreen.SetActive(true);
 //            DataStore.selectedLocation = clickedPointAsPercent;
@@ -540,13 +540,15 @@ public class MenuLandscapeImport : MonoBehaviour
             int baseTerrainX = 5;
             int baseTerrainY = 5;
 
-            float[,] tempTerrain = new float[baseTerrainX, baseTerrainY];
+            float[,,] tempTerrain = new float[baseTerrainX, baseTerrainY, 15001];
             int clickx = (int) clickedPoint.x;
             int clicky = (int) clickedPoint.y;
             for (int x = 0; x < baseTerrainX; x++) {
                 for (int y = 0; y < baseTerrainY; y++) {
-                    tempTerrain[x, y] = GetVertexDepth(clickx - (baseTerrainX / 2) + x, clicky - (baseTerrainY / 2) + y);
-//                    Debug.Log("tempTerrain " + x + "," + y + " is " + GetVertexDepth(clickx - 5 + x, clicky - 5 + y));
+                    for (int yr = 0; yr <= 15000; yr++) {
+                        tempTerrain[x, y, yr] = GetVertexDepth(clickx - (baseTerrainX / 2) + x, clicky - (baseTerrainY / 2) + y, yr + 5000);
+//                        Debug.Log("tempTerrain " + x + "," + y + " at year " + (yr + 5000) + " is " + tempTerrain[x, y, yr]);
+                    }
                 }
             }
             DataStore.baseTerrain = tempTerrain;
