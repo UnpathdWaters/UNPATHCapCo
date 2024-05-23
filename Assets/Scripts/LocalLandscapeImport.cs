@@ -19,6 +19,7 @@ public class LocalLandscapeImport : MonoBehaviour
     float seaPos;
     public float zScale;
     public Gradient gradient;
+    [SerializeField] Gradient seaGradient;
     [SerializeField] float coastSize;
     [SerializeField] float minVal;
     [SerializeField] float maxVal;
@@ -39,6 +40,8 @@ public class LocalLandscapeImport : MonoBehaviour
 
     List<GameObject> allReeds = new List<GameObject>();
     List<GameObject> allTrees = new List<GameObject>();
+
+    float maxTerrainForTundraCalc, minTerrainForTundraCalc;
 
 
     public GameObject tree;
@@ -120,8 +123,12 @@ public class LocalLandscapeImport : MonoBehaviour
                 thisY = y / arrayAdjust;
                 xMod = x % arrayAdjust;
                 yMod = y % arrayAdjust;
+                if (x == 0 && y == 0) {
+                    maxTerrainForTundraCalc = DataStore.baseTerrain[thisX, thisY, time.GetYear() - 5000];
+                    minTerrainForTundraCalc = maxTerrainForTundraCalc;
+                }
                 if (thisX == maxX || thisY == maxY) {
-                    depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY, time.GetYear() - 5000], x, y);
+                    depths[x, y] = AddNoiseToDepths(DataStore.baseTerrain[thisX, thisY, time.GetYear() - 5000], x, y, minTerrainForTundraCalc, maxTerrainForTundraCalc);
                 } else {
                     float xFactor = (float) xMod / (float) arrayAdjust;
                     float yFactor = (float) yMod / (float) arrayAdjust;
@@ -132,7 +139,12 @@ public class LocalLandscapeImport : MonoBehaviour
                     float bottomRight = DataStore.baseTerrain[thisX + 1, thisY, time.GetYear() - 5000];
 
                     float calculatedHeight = Mathf.Lerp(Mathf.Lerp(bottomLeft, bottomRight, xFactor), Mathf.Lerp(topLeft, topRight, xFactor), yFactor);
-                    depths[x, y] = AddNoiseToDepths(calculatedHeight, x, y);
+                    depths[x, y] = AddNoiseToDepths(calculatedHeight, x, y, minTerrainForTundraCalc, maxTerrainForTundraCalc);
+                    if (depths[x, y] > maxTerrainForTundraCalc) {
+                        maxTerrainForTundraCalc = depths[x, y];
+                    } else if (depths[x, y] < minTerrainForTundraCalc) {
+                        minTerrainForTundraCalc = depths[x, y];
+                    }
                 }
             }
         }
@@ -181,84 +193,87 @@ public class LocalLandscapeImport : MonoBehaviour
         river = new bool[widthX, heightZ];
         marsh = new bool[widthX, heightZ];
 
-        float[,] flow = new float[widthX, heightZ];
-        float[,] water = new float[widthX, heightZ];
+        if (time.GetMaxSnowline() > minTerrainForTundraCalc) {
+            float[,] flow = new float[widthX, heightZ];
+            float[,] water = new float[widthX, heightZ];
 
-        for (int x = 0; x < widthX; x++)
-        {
-            for (int y = 0; y < heightZ; y++)
-            {
-                water[x, y] = 1.0f;
-            }
-        }
-
-        for (int ticks = 0; ticks < (widthX / 2); ticks++)
-        {
-//            Debug.Log("Tick# " + ticks);
             for (int x = 0; x < widthX; x++)
             {
                 for (int y = 0; y < heightZ; y++)
                 {
-                    if (water[x, y] > 0.0f)
+                    water[x, y] = 1.0f;
+                }
+            }
+
+            for (int ticks = 0; ticks < (widthX / 2); ticks++)
+            {
+    //            Debug.Log("Tick# " + ticks);
+                for (int x = 0; x < widthX; x++)
+                {
+                    for (int y = 0; y < heightZ; y++)
                     {
-                        float lowestNeighbour = 9999.0f;
-                        int lowestNeighbourX = 0;
-                        int lowestNeighbourY = 0;
-                        for (int nX = x - 1; nX <= x + 1; nX++)
+                        if (water[x, y] > 0.0f)
                         {
-                            for (int nY = y - 1; nY <= y + 1; nY++)
+                            float lowestNeighbour = 9999.0f;
+                            int lowestNeighbourX = 0;
+                            int lowestNeighbourY = 0;
+                            for (int nX = x - 1; nX <= x + 1; nX++)
                             {
-                                if (nX >= 0 && nX < widthX && nY >= 0 && nY < heightZ)
+                                for (int nY = y - 1; nY <= y + 1; nY++)
                                 {
-                                    if (depths[nX, nY] + water[nX, nY] < depths[x, y] + water[x, y] && depths[nX, nY] + water[nX, nY] < lowestNeighbour)
-                                    {   
-                                        lowestNeighbour = depths[nX, nY] + water[nX, nY];
-                                        lowestNeighbourX = nX;
-                                        lowestNeighbourY = nY;
+                                    if (nX >= 0 && nX < widthX && nY >= 0 && nY < heightZ)
+                                    {
+                                        if (depths[nX, nY] + water[nX, nY] < depths[x, y] + water[x, y] && depths[nX, nY] + water[nX, nY] < lowestNeighbour)
+                                        {   
+                                            lowestNeighbour = depths[nX, nY] + water[nX, nY];
+                                            lowestNeighbourX = nX;
+                                            lowestNeighbourY = nY;
+                                        }
                                     }
+                                }
+                            }
+
+                            if (lowestNeighbour < 1999.0f)
+                            {
+                                if (water[x, y] > (depths[x, y] + water[x, y]) - lowestNeighbour)
+                                {
+                                    float waterSlosh = (depths[x, y] + water[x, y] - lowestNeighbour) / 2.0f;
+                                    water[x, y] = water[x, y] - waterSlosh;
+                                    water[lowestNeighbourX, lowestNeighbourY] = water[lowestNeighbourX, lowestNeighbourY] + waterSlosh;
+                                    flow[x, y] = flow[x, y] + waterSlosh;
+                                } else {
+                                    water[lowestNeighbourX, lowestNeighbourY] = water[lowestNeighbourX, lowestNeighbourY] + water[x, y];
+                                    flow[x, y] = flow[x, y] + water[x, y];
+                                    water[x, y] = 0;
                                 }
                             }
                         }
 
-                        if (lowestNeighbour < 1999.0f)
-                        {
-                            if (water[x, y] > (depths[x, y] + water[x, y]) - lowestNeighbour)
-                            {
-                                float waterSlosh = (depths[x, y] + water[x, y] - lowestNeighbour) / 2.0f;
-                                water[x, y] = water[x, y] - waterSlosh;
-                                water[lowestNeighbourX, lowestNeighbourY] = water[lowestNeighbourX, lowestNeighbourY] + waterSlosh;
-                                flow[x, y] = flow[x, y] + waterSlosh;
-                            } else {
-                                water[lowestNeighbourX, lowestNeighbourY] = water[lowestNeighbourX, lowestNeighbourY] + water[x, y];
-                                flow[x, y] = flow[x, y] + water[x, y];
-                                water[x, y] = 0;
-                            }
-                        }
+
+
                     }
-
-
-
                 }
+
             }
 
-        }
-
-        for (int x = 0; x < widthX; x++)
-        {
-            for (int y = 0; y < heightZ; y++)
+            for (int x = 0; x < widthX; x++)
             {
-                if (flow[x, y] > riverCutoff && depths[x, y] > seaPos + coastSize)
+                for (int y = 0; y < heightZ; y++)
                 {
-                    river[x, y] = true;
-//                    Debug.Log("Flow at " + x + "," + y + " is " + flow[x, y]);
-                } else if (water[x, y] > marshCutoff && depths[x, y] > seaPos + coastSize)
-                {
-                    marsh[x, y] = true;
-//                    Debug.Log("Water at " + x + "," + y + " is " + water[x, y]);
+                    if (flow[x, y] > riverCutoff && depths[x, y] > seaPos + coastSize)
+                    {
+                        river[x, y] = true;
+    //                    Debug.Log("Flow at " + x + "," + y + " is " + flow[x, y]);
+                    } else if (water[x, y] > marshCutoff && depths[x, y] > seaPos + coastSize)
+                    {
+                        marsh[x, y] = true;
+    //                    Debug.Log("Water at " + x + "," + y + " is " + water[x, y]);
+                    }
                 }
             }
-        }
 
+            
+        }
 
     }
 
@@ -316,7 +331,7 @@ public class LocalLandscapeImport : MonoBehaviour
             for (int x = 0; x < widthX; x++)
             {
                 if (depths[x, z] < seaPos) {
-                    colours[x + (z * widthX)] = AddNoiseToColor(seaCol);
+                    colours[x + (z * widthX)] = AddNoiseToColor(seaGradient.Evaluate((depths[x, z] - minTerrainForTundraCalc) / (maxTerrainForTundraCalc - minTerrainForTundraCalc)));
                 } else if (river[x, z]) {
                     colours[x + (z * widthX)] = AddNoiseToColor(riverCol);
                 } else if (depths[x, z] - seaPos < coastSize) {
@@ -370,12 +385,12 @@ public class LocalLandscapeImport : MonoBehaviour
     }
 
 
-    float AddNoiseToDepths(float depth, int pX, int pY)
+    float AddNoiseToDepths(float depth, int pX, int pY, float pMin, float pMax)
     {
         float largeScale = 1.00f;
         float smallScale = 0.10f;
-        float magnitudeLP = 20.0f;
-        float magnitudeSP = 2.0f;
+        float magnitudeLP = (pMax - pMin) / 2.0f;
+        float magnitudeSP = (pMax - pMin) / 20.0f;
         float largeScaleNoise = depth + (Mathf.PerlinNoise((float) pX * largeScale, (float) pY * largeScale) * magnitudeLP - (magnitudeLP / 2));
         float smallScaleNoise = largeScaleNoise + Mathf.PerlinNoise((float) pX * smallScale, (float) pY * smallScale) * magnitudeSP - (magnitudeSP / 2);
         return smallScaleNoise;
