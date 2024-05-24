@@ -122,7 +122,7 @@ public class CampManager : MonoBehaviour
             {
                 if (j >= 0 && j < land.GetLandscapeSize() && k >= 0 && k < land.GetLandscapeSize())
                 {
-                    if (land.GetRiver(j, k) || land.GetMarsh(j, k) || land.GetDepths(j, k) < sls.GetGIAWaterHeight() + land.GetCoastSize()) {
+                    if (land.GetRiver(j, k) || land.GetMarsh(j, k) || land.GetDepths(j, k) < sls.GetGIAWaterHeight() + land.GetCoastSize() || land.GetTundra(j, k)) {
                         return false;
                     }
                 }

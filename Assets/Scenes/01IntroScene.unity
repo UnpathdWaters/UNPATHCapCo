@@ -4972,17 +4972,18 @@ MonoBehaviour:
 
     Press the A button on the gamepad
     or the space bar on the keyboard to advance to the space/time selection map.
+    Do the same again to advance to the local view.
 
 
 
-    Press
-    the Y button on the gamepad or ''Escape'' on the keyboard to quit.
+    Press the Y button on
+    the gamepad or ''Escape'' on the keyboard to quit.
 
 
 
-    Press
-    the right trigger button on the gamepad or ''i'' on the keyboard to see the controls
-    relevant to each subsequent screen.'
+    Press the right trigger
+    button on the gamepad or ''i'' on the keyboard to see the controls relevant to
+    each subsequent screen.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b6a94d6a0e377f0479eb12ab79dabdaa, type: 2}
   m_sharedMaterial: {fileID: 6069945575532142584, guid: b6a94d6a0e377f0479eb12ab79dabdaa, type: 2}

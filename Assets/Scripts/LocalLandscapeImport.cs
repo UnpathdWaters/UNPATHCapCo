@@ -515,6 +515,15 @@ public class LocalLandscapeImport : MonoBehaviour
         return marsh[pX, pY];
     }
 
+    public bool GetTundra(int pX, int pY)
+    {
+        if (depths[pX, pY] > time.GetMaxSnowline()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public float getZScale() {
         return zScale;
     }
