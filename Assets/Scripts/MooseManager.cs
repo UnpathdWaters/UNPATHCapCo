@@ -147,7 +147,7 @@ public class MooseManager : MonoBehaviour
 
     void Update()
     {
-        if (!depthsPop) {
+/*        if (!depthsPop) {
             LocalLandscapeImport land = landscapeManager.GetComponent<LocalLandscapeImport>();
             depths = land.GetDepths();
             zScale = land.getZScale();
@@ -204,7 +204,7 @@ public class MooseManager : MonoBehaviour
         {
             Debug.Log("Creating replacement herd");
             CreateHerd(Random.Range(1,40));
-        }
+        }*/
     }
 
 }

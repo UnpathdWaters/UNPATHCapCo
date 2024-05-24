@@ -6,17 +6,12 @@ public class CampManager : MonoBehaviour
 {
 
     public GameObject camp;
-    public int noOfCamps;
     List<GameObject> campList = new List<GameObject>();
     [SerializeField] GameObject landscapeManager;
-    float[,] depths;
-    bool[,] river;
-    bool[,] marsh;
-    bool depthsPop;
-    float zScale;
     [SerializeField] GameObject mooseManagerGO;
     MooseManager mooseManager;
     List<GameObject> meese;
+    int lastYear = 99999;
     
     SeaLevelServer sls;
     LocalLandscapeImport land;
@@ -31,21 +26,19 @@ public class CampManager : MonoBehaviour
 
     void Update()
     {
-        if (!depthsPop) {
-            depths = land.GetDepths();
-            zScale = land.getZScale();
-            river = land.GetRiver();
-            marsh = land.GetMarsh();
-            mooseManager = mooseManagerGO.GetComponent<MooseManager>();
-            meese = mooseManager.GetMeese();
-            for (int x = 0; x < noOfCamps; x++) {
+
+        if (time.GetYear() != lastYear) {
+            foreach(GameObject thisCamp in campList) {
+                Destroy(thisCamp);
+            }
+            for (int x = 0; x < land.GetNumberOfCamps(); x++) {
                 CreateCamp();
             }
-            SetupCamps();
-            depthsPop = true;
+//            SetupCamps();
         }
+        lastYear = time.GetYear();
 
-        foreach (var aCamp in campList)
+/*        foreach (var aCamp in campList)
         {
             Camp thisCamp = aCamp.GetComponent<Camp>();
             float nearestdist = 999999.0f;
@@ -72,11 +65,11 @@ public class CampManager : MonoBehaviour
         }
         if (campList.Count < noOfCamps) {
             CreateCamp();
-        }
+        }*/
 
     }
 
-    Vector2 FindNearestRiver(Vector2 pLoc)
+/*    Vector2 FindNearestRiver(Vector2 pLoc)
     {
         float nearestDist = 99999.0f;
         Vector2 nearestLoc = new Vector2(0.0f,0.0f);
@@ -91,9 +84,9 @@ public class CampManager : MonoBehaviour
             }
         }
         return nearestLoc;
-    }
+    }*/
 
-    Vector2 FindNearestMarsh(Vector2 pLoc)
+/*    Vector2 FindNearestMarsh(Vector2 pLoc)
     {
         float nearestDist = 99999.0f;
         Vector2 nearestLoc = new Vector2(0.0f,0.0f);
@@ -108,9 +101,9 @@ public class CampManager : MonoBehaviour
             }
         }
         return nearestLoc;
-    }
+    }*/
 
-    void SetupCamps()
+/*    void SetupCamps()
     {
         foreach (var camp in campList)
         {
@@ -119,7 +112,7 @@ public class CampManager : MonoBehaviour
             thisCamp.SetNearestRiver(FindNearestRiver(campLoc));
             thisCamp.SetNearestMarsh(FindNearestMarsh(campLoc));
         }
-    }
+    }*/
 
     bool CheckCampLoc(Vector2 pCampLoc)
     {
@@ -127,9 +120,9 @@ public class CampManager : MonoBehaviour
         {
             for (int k = (int) pCampLoc.y -2; k <= (int) pCampLoc.y + 2; k++)
             {
-                if (j >= 0 && j < depths.GetLength(0) && k >= 0 && k < depths.GetLength(1))
+                if (j >= 0 && j < land.GetLandscapeSize() && k >= 0 && k < land.GetLandscapeSize())
                 {
-                    if (river[j, k] || marsh[j, k] || depths[j, k] < sls.GetGIAWaterHeight() + land.GetCoastSize()) {
+                    if (land.GetRiver(j, k) || land.GetMarsh(j, k) || land.GetDepths(j, k) < sls.GetGIAWaterHeight() + land.GetCoastSize()) {
                         return false;
                     }
                 }
@@ -141,8 +134,8 @@ public class CampManager : MonoBehaviour
 
     Vector2 GenerateCampLoc()
     {
-        int x = Random.Range(0, depths.GetLength(0));
-        int y = Random.Range(0, depths.GetLength(1));
+        int x = Random.Range(0, land.GetLandscapeSize());
+        int y = Random.Range(0, land.GetLandscapeSize());
         return new Vector2(x, y);
     }
 
@@ -153,7 +146,7 @@ public class CampManager : MonoBehaviour
         while (!CheckCampLoc(campLoc)) {
             campLoc = GenerateCampLoc();
         }
-        Vector3 campLoc3D = new Vector3(campLoc.x, depths[(int) campLoc.x, (int) campLoc.y] * zScale, campLoc.y);
+        Vector3 campLoc3D = new Vector3(campLoc.x, land.GetDepths((int) campLoc.x, (int) campLoc.y) * land.getZScale(), campLoc.y);
         GameObject newCamp = Instantiate(camp, campLoc3D, Quaternion.identity);
         Debug.Log("New camp created at " + campLoc);
         campList.Add(newCamp);

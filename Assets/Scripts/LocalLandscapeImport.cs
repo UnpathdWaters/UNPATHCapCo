@@ -26,8 +26,8 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] float colourNoiseMin, colourNoiseMax;
     [SerializeField] float riverCutoff, marshCutoff;
     [SerializeField] int timeJumpAmt;
+    [SerializeField] TMP_Text tundraTMP, wetlandTMP, grasslandTMP, woodlandTMP, intertidalTMP, riverTMP, seaTMP;
 
-    public Color seaCol;
     public Color coastCol;
     public Color marshCol;
     public Color riverCol;
@@ -42,6 +42,7 @@ public class LocalLandscapeImport : MonoBehaviour
     List<GameObject> allTrees = new List<GameObject>();
 
     float maxTerrainForTundraCalc, minTerrainForTundraCalc;
+    int tundraCount, wetlandCount, woodlandCount, coastCount, grasslandCount, riverCount, seaCount;
 
 
     public GameObject tree;
@@ -105,6 +106,7 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateTrees();
         CreateReeds();
         UpdateMeshColors();
+        UpdateEnvironmentPanel();
         AddMeshCollider();
     }
 
@@ -192,6 +194,13 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         river = new bool[widthX, heightZ];
         marsh = new bool[widthX, heightZ];
+        riverCount = 0;
+        woodlandCount = 0;
+        tundraCount = 0;
+        wetlandCount = 0;
+        grasslandCount = 0;
+        coastCount = 0;
+        seaCount = 0;
 
         if (time.GetMaxSnowline() > minTerrainForTundraCalc) {
             float[,] flow = new float[widthX, heightZ];
@@ -260,13 +269,21 @@ public class LocalLandscapeImport : MonoBehaviour
             {
                 for (int y = 0; y < heightZ; y++)
                 {
-                    if (flow[x, y] > riverCutoff && depths[x, y] > seaPos + coastSize)
+                    if (depths[x, y] < seaPos - coastSize) {
+                        seaCount++;
+                    } else if (depths[x, y] > time.GetMaxSnowline()) {
+                        tundraCount++;
+                    } else if (depths[x, y] > (seaPos - coastSize) && depths[x, y] < (seaPos + coastSize)) {
+                        coastCount++;
+                    } else if (flow[x, y] > riverCutoff)
                     {
                         river[x, y] = true;
+                        riverCount++;
     //                    Debug.Log("Flow at " + x + "," + y + " is " + flow[x, y]);
-                    } else if (water[x, y] > marshCutoff && depths[x, y] > seaPos + coastSize)
+                    } else if (water[x, y] > marshCutoff)
                     {
                         marsh[x, y] = true;
+                        wetlandCount++;
     //                    Debug.Log("Water at " + x + "," + y + " is " + water[x, y]);
                     }
                 }
@@ -294,6 +311,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     }
                     if (UnityEngine.Random.Range(0, 100) < treesPercent % 100) {
                         InstatiateTree(x, y);
+                        woodlandCount++;
                     }
                 }
             }
@@ -345,6 +363,25 @@ public class LocalLandscapeImport : MonoBehaviour
         }
         mesh.colors = colours;
 //        Debug.Log("Updating mesh colours on day " + time.GetDay() + " of year " + time.GetYear() + " when snowline is " + time.GetSnowline());
+    }
+
+    void UpdateEnvironmentPanel()
+    {
+        int ungrassTotal = wetlandCount + riverCount + coastCount + woodlandCount + tundraCount + seaCount;
+        float total = widthX * heightZ;
+        grasslandCount = (int) total - ungrassTotal;
+        wetlandTMP.text = "Wetland: " + GetPercentEnv(wetlandCount) + "%";
+        riverTMP.text = "River: " + GetPercentEnv(riverCount) + "%";
+        intertidalTMP.text = "Intertidal: " + GetPercentEnv(coastCount) + "%";
+        woodlandTMP.text = "Woodland: " + GetPercentEnv(woodlandCount) + "%";
+        seaTMP.text = "Sea: " + GetPercentEnv(seaCount) + "%";
+        tundraTMP.text = "Tundra: " + GetPercentEnv(tundraCount) + "%";
+        grasslandTMP.text = "Grassland: " + GetPercentEnv(grasslandCount) + "%";
+    }
+
+    float GetPercentEnv(int pCount)
+    {
+        return ((float) pCount / (widthX * heightZ)) * 100.0f;
     }
 
     void AddMeshCollider()
@@ -420,6 +457,14 @@ public class LocalLandscapeImport : MonoBehaviour
         }
     }
 
+    public int GetNumberOfCamps()
+    {
+        if (GetPercentEnv(tundraCount) + GetPercentEnv(seaCount) + GetPercentEnv(coastCount) > 95.0f) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 
     bool IsNeighbour(Vector2 point1, Vector2 point2) {
         if (Mathf.Abs(point1.x - point2.x) <= 1 && Mathf.Abs(point1.y - point2.y) <= 1) {
@@ -456,22 +501,27 @@ public class LocalLandscapeImport : MonoBehaviour
         return new Color(rAdj, gAdj, bAdj, 1);
     }
 
-    public float[,] GetDepths() {
-        return depths;
+    public float GetDepths(int pX, int pY) {
+        return depths[pX, pY];
     }
 
-    public bool[,] GetRiver() {
-        return river;
+    public bool GetRiver(int pX, int pY) {
+        return river[pX, pY];
     }
 
-    public bool[,] GetMarsh() {
-        return marsh;
+    public bool GetMarsh(int pX, int pY) {
+        return marsh[pX, pY];
     }
 
     public float getZScale() {
         return zScale;
     }
 
+    public int GetLandscapeSize()
+    {
+        return widthX;
+    }
+    
     public float GetCoastSize() {
         return coastSize;
     }
@@ -501,7 +551,7 @@ public class LocalLandscapeImport : MonoBehaviour
         if (time.GetDay() % updateFrequency == 0 && time.GetHour() == 1 && time.GetMinute() == 1) {
             UpdateMeshColors();
         }
-        time.IncrementMinute();
+        time.IncrementHour();
         if (quitBtn.WasPressedThisFrame()) {
             UnityEngine.SceneManagement.SceneManager.LoadScene("02MenuScene");
         }
@@ -512,13 +562,13 @@ public class LocalLandscapeImport : MonoBehaviour
         }
         if (timeJumpPlus.WasReleasedThisFrame()) {
             time.AdjustYear(timeJumpAmt);
-            Debug.Log("Year is now " + time.GetYear());
+//            Debug.Log("Year is now " + time.GetYear());
             RefreshSeaPos();
             RefreshEnvironment();
         }
         if (timeJumpMinus.WasReleasedThisFrame()) {
             time.AdjustYear(0 - timeJumpAmt);
-            Debug.Log("Year is now " + time.GetYear());
+//            Debug.Log("Year is now " + time.GetYear());
             RefreshSeaPos();
             RefreshEnvironment();
         }

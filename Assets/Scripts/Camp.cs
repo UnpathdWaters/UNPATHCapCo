@@ -40,7 +40,7 @@ public class Camp : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        mooseDist = Vector2.Distance(nearestMoose, thisLoc);
+/*        mooseDist = Vector2.Distance(nearestMoose, thisLoc);
         List<GameObject> humansToDelete = new List<GameObject>();
 
 
@@ -83,7 +83,7 @@ public class Camp : MonoBehaviour
             GenerateHuman(true);
             lastHuman = food;
         }
-        food--;
+        food--;*/
     }
 
     bool IsHumanAtTarget(GameObject thisHuman, Vector2 pTarget)
