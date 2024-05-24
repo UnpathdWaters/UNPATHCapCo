@@ -290,6 +290,8 @@ public class LocalLandscapeImport : MonoBehaviour
             }
 
             
+        } else {
+            tundraCount = widthX * heightZ;
         }
 
     }
@@ -370,13 +372,13 @@ public class LocalLandscapeImport : MonoBehaviour
         int ungrassTotal = wetlandCount + riverCount + coastCount + woodlandCount + tundraCount + seaCount;
         float total = widthX * heightZ;
         grasslandCount = (int) total - ungrassTotal;
-        wetlandTMP.text = "Wetland: " + GetPercentEnv(wetlandCount) + "%";
-        riverTMP.text = "River: " + GetPercentEnv(riverCount) + "%";
-        intertidalTMP.text = "Intertidal: " + GetPercentEnv(coastCount) + "%";
-        woodlandTMP.text = "Woodland: " + GetPercentEnv(woodlandCount) + "%";
-        seaTMP.text = "Sea: " + GetPercentEnv(seaCount) + "%";
-        tundraTMP.text = "Tundra: " + GetPercentEnv(tundraCount) + "%";
-        grasslandTMP.text = "Grassland: " + GetPercentEnv(grasslandCount) + "%";
+        wetlandTMP.text = "Wetland: " + GetPercentEnv(wetlandCount).ToString("0.00") + "%";
+        riverTMP.text = "River: " + GetPercentEnv(riverCount).ToString("0.00") + "%";
+        intertidalTMP.text = "Intertidal: " + GetPercentEnv(coastCount).ToString("0.00") + "%";
+        woodlandTMP.text = "Woodland: " + GetPercentEnv(woodlandCount).ToString("0.00") + "%";
+        seaTMP.text = "Sea: " + GetPercentEnv(seaCount).ToString("0.00") + "%";
+        tundraTMP.text = "Tundra: " + GetPercentEnv(tundraCount).ToString("0.00") + "%";
+        grasslandTMP.text = "Grassland: " + GetPercentEnv(grasslandCount).ToString("0.00") + "%";
     }
 
     float GetPercentEnv(int pCount)
@@ -521,7 +523,7 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         return widthX;
     }
-    
+
     public float GetCoastSize() {
         return coastSize;
     }
