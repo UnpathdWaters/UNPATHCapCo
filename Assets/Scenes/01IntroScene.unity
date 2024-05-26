@@ -4731,14 +4731,6 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 89e96e31-6ea8-4c25-b5ee-ab6119439812
-      m_Path: <Gamepad>/buttonNorth
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Quit Btn
-      m_Flags: 0
-    - m_Name: 
       m_Id: 934f6d2e-33ac-456f-bc9d-2deb154d416f
       m_Path: <Keyboard>/escape
       m_Interactions: 
