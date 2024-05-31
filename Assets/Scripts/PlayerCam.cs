@@ -5,10 +5,11 @@ using UnityEngine.InputSystem;
 
 public class PlayerCam : MonoBehaviour
 {
-    public float zoomSpeed;
-    public float rotateSpeed;
-    public InputAction zoomControls;
-    public InputAction rotateControls;
+    [SerializeField] float zoomSpeed;
+    [SerializeField] float rotateSpeed;
+    [SerializeField] InputAction zoomControls;
+    [SerializeField] InputAction rotateControls;
+    [SerializeField] float minX, maxX, minZ, maxZ;
 
     float zoomAmount, rotateAmount;
 
@@ -43,6 +44,17 @@ public class PlayerCam : MonoBehaviour
         if (transform.position.y < 0) {
             transform.position = new Vector3(transform.position.x, 0, transform.position.z);
         }
+        if (transform.position.x < minX) {
+            transform.position = new Vector3(minX, transform.position.y, transform.position.z);
+        } else if (transform.position.x > maxX) {
+            transform.position = new Vector3(maxX, transform.position.y, transform.position.z);
+        }
+        if (transform.position.z < minZ) {
+            transform.position = new Vector3(transform.position.x, transform.position.y, minZ);
+        } else if (transform.position.z > maxZ) {
+            transform.position = new Vector3(transform.position.x, transform.position.y, maxZ);
+        }
+
         transform.Rotate((rotateAmount * rotateSpeed), 0.0f, 0.0f, Space.Self);
     }
 }

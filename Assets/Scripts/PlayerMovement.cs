@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
 {
 
     [Header("Movement")]
-    public float moveSpeed;
+    [SerializeField] float moveSpeed;
     public float minX, maxX, minZ, maxZ;
 
     public InputAction playerControls;
