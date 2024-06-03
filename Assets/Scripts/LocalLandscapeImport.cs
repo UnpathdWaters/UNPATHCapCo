@@ -168,7 +168,6 @@ public class LocalLandscapeImport : MonoBehaviour
     void LoadFeatures()
     {
 
-
         string fileString;
         features = new bool[widthX, heightZ];
         fileString = ".\\UNPATHfeatures.asc";
@@ -198,6 +197,25 @@ public class LocalLandscapeImport : MonoBehaviour
 
         Debug.Log("Feature file Cols = " + totCols);
         Debug.Log("Feature file Rows = " + totRows);
+
+        float Xcellwidth = (origXtotalSizeInCells * origXcellSizeInMetres) / importXcells;
+        float Ycellwidth = (origYtotalSizeInCells * origYcellSizeInMetres) / importYcells;
+        if (DataStore.selectedLocation.x * Xcellwidth < featuresXoffsetInMetres) {
+            // Location out of features bounds
+        } else if (DataStore.selectedLocation.x * Xcellwidth > featuresXoffsetInMetres + (totCols * featuresXsizeInMetres)) {
+            // Location out of features bounds
+        } else if (DataStore.selectedLocation.y * Ycellwidth < featuresYoffsetInMetres) {
+            // Location out of features bounds
+        } else if (DataStore.selectedLocation.y * Ycellwidth > featuresYoffsetInMetres + (totRows * featuresYsizeInMetres)) {
+            // Location out of features bounds
+        } else {
+            
+        }
+
+
+
+
+
 
         string[] readArray = new string[totCols];
 
