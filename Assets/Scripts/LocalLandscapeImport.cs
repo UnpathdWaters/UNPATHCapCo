@@ -10,6 +10,11 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(MeshFilter))]
 public class LocalLandscapeImport : MonoBehaviour
 {
+    protected FileInfo surfaceFile = null;
+    protected StreamReader surfaceStream = null;
+    protected string inputLine = " ";
+    string[,] headerText;
+
     int widthX = 256;
     int heightZ = 256;
     Vector3[] vertices;
@@ -27,6 +32,12 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] float riverCutoff, marshCutoff;
     [SerializeField] int timeJumpAmt;
     [SerializeField] TMP_Text tundraTMP, wetlandTMP, grasslandTMP, woodlandTMP, intertidalTMP, riverTMP, seaTMP;
+    [SerializeField] float featuresXoffsetInMetres, featuresYoffsetInMetres;
+    [SerializeField] float featuresXsizeInMetres, featuresYsizeInMetres;
+    [SerializeField] float origXcellSizeInMetres, origYcellSizeInMetres;
+    [SerializeField] float origXtotalSizeInCells, origYtotalSizeInCells;
+    [SerializeField] float importXcells, importYcells;
+
 
     public Color coastCol;
     public Color marshCol;
@@ -37,6 +48,7 @@ public class LocalLandscapeImport : MonoBehaviour
     bool[,] river;
     bool[,] marsh;
     float[,] depths;
+    bool[,] features;
 
     List<GameObject> allReeds = new List<GameObject>();
     List<GameObject> allTrees = new List<GameObject>();
@@ -100,6 +112,7 @@ public class LocalLandscapeImport : MonoBehaviour
     void RefreshEnvironment()
     {
         ImportLocalSection();
+        LoadFeatures();
         CreateMesh();
         UpdateMesh();
         GenerateRiverAndMarsh();
@@ -150,6 +163,63 @@ public class LocalLandscapeImport : MonoBehaviour
                 }
             }
         }
+    }
+
+    void LoadFeatures()
+    {
+
+
+        string fileString;
+        features = new bool[widthX, heightZ];
+        fileString = ".\\UNPATHfeatures.asc";
+        surfaceFile = new FileInfo (fileString);
+        surfaceStream = surfaceFile.OpenText();
+        string[] hdrArray;
+        headerText = new string[2,6];
+        int thisval = 0;
+        char[] separators = new char[] { ' ', '\t', ',' };
+
+        float clickedX = DataStore.selectedLocation.x;
+        float clickedY = DataStore.selectedLocation.y;
+
+        Debug.Log("Selected Location is " + DataStore.selectedLocation);
+
+        //Read ESRI ASCII header
+        for (int headline = 0; headline < 6; headline++)
+        {
+            inputLine = surfaceStream.ReadLine();
+            hdrArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+            headerText[0,headline] = hdrArray[0];
+            headerText[1,headline] = hdrArray[1];
+        }
+
+        int totCols = int.Parse(headerText[1,0]);
+        int totRows = int.Parse(headerText[1,1]);
+
+        Debug.Log("Feature file Cols = " + totCols);
+        Debug.Log("Feature file Rows = " + totRows);
+
+        string[] readArray = new string[totCols];
+
+/*        int xCount = 0;
+        int zCount = heightZ - 1;
+        for (int z = 0; z < totRows; z++)
+        {
+            inputLine = surfaceStream.ReadLine();
+            xCount = 0;
+            readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+            for (int x = 0; x < totCols; x++)
+            {
+                thisval = int.Parse(readArray[x]);
+
+                if (thisval > 1) {
+                    features[xCount, zCount] = true;
+                }
+
+                xCount++;
+            }
+            zCount--;
+        }*/
     }
 
     void CreateMesh()

@@ -532,11 +532,11 @@ public class MenuLandscapeImport : MonoBehaviour
 
 
         if (quitBtn.WasReleasedThisFrame() && quittable) {
-            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
-            float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
-            Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
-            loadingScreen.SetActive(true);
-            DataStore.selectedLocation = clickedPointAsPercent;
+//            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
+//            float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
+//            Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
+//            loadingScreen.SetActive(true);
+//            DataStore.selectedLocation = clickedPointAsPercent;
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
             DataStore.subsequentRun = true;
@@ -547,7 +547,7 @@ public class MenuLandscapeImport : MonoBehaviour
 //            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y, time.GetYear()));
             if (!glacierHit) {
                 loadingScreen.SetActive(true);
-//            DataStore.selectedLocation = clickedPointAsPercent;
+                DataStore.selectedLocation = clickedPoint;
                 DataStore.cameraPosition = cam.transform.position;
                 DataStore.cameraRotation = cam.transform.rotation;
                 DataStore.subsequentRun = true;
