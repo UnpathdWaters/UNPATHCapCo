@@ -167,7 +167,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void LoadFeatures()
     {
-
+        bool[,] inputFeatures;
         string fileString;
         features = new bool[widthX, heightZ];
         fileString = ".\\UNPATHfeatures.asc";
@@ -197,6 +197,61 @@ public class LocalLandscapeImport : MonoBehaviour
 
         Debug.Log("Feature file Cols = " + totCols);
         Debug.Log("Feature file Rows = " + totRows);
+
+        inputFeatures = new bool[totCols, totRows];
+        string[] readArray = new string[totCols];
+
+        for (int y = 0; y < totRows; y++)
+        {
+            inputLine = surfaceStream.ReadLine();
+            readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+            for (int x = 0; x < totCols; x++)
+            {
+                thisval = int.Parse(readArray[x]);
+                if (thisval > 1) {
+                    inputFeatures[x, y] = true;
+                }
+            }
+        }
+
+        float Xcellwidth = (origXtotalSizeInCells * origXcellSizeInMetres) / importXcells;
+        Debug.Log("Xcellwidth is " + Xcellwidth);
+        float Ycellwidth = (origYtotalSizeInCells * origYcellSizeInMetres) / importYcells;
+        Debug.Log("Ycellwidth is " + Ycellwidth);
+        float localXwidth = (Xcellwidth * 4) / (widthX - 1);
+        Debug.Log("localXwidth is " + localXwidth);
+        float localYwidth = (Ycellwidth * 4) / (heightZ - 1);
+        Debug.Log("localYwidth is " + localYwidth);
+
+        if (DataStore.selectedLocation.x * Xcellwidth < featuresXoffsetInMetres + (localXwidth * (widthX / 2))) {
+            Debug.Log("Clicked point to the left of the data");
+        } else if (DataStore.selectedLocation.x * Xcellwidth > featuresXoffsetInMetres + (localXwidth * totCols) - (localXwidth * (widthX / 2))) {
+            Debug.Log("Clicked point to the right of the data");
+        } else if (DataStore.selectedLocation.y * Ycellwidth < featuresYoffsetInMetres + (localYwidth * (heightZ / 2))) {
+            Debug.Log("Clicked point below the data");
+        } else if (DataStore.selectedLocation.y * Ycellwidth > featuresYoffsetInMetres + (localYwidth * totRows) - (localYwidth * (heightZ / 2))) {
+            Debug.Log("Clicked point above the data");
+        } else {
+            Debug.Log("Valid result!");
+        }/*
+
+            for (int y = 0; y < heightZ; y++)
+            {
+                for (int x = 0; x < widthX; x++)
+                {
+                    float XinM = featuresXoffsetInMetres + (DataStore.selectedLocation.x * 
+                }
+            }
+
+
+
+
+
+
+
+
+
+
 
         float Xcellwidth = (origXtotalSizeInCells * origXcellSizeInMetres) / importXcells;
         float Ycellwidth = (origYtotalSizeInCells * origYcellSizeInMetres) / importYcells;
@@ -256,7 +311,7 @@ public class LocalLandscapeImport : MonoBehaviour
                     yCount++;
                 }
             }
-        }
+        }*/
     }
 
     void CreateMesh()

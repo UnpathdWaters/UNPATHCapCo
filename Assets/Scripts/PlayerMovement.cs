@@ -36,16 +36,22 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate() 
     {
-        rb.velocity = new Vector3(moveDirection.x * moveSpeed, 0, moveDirection.y * moveSpeed);
+//        rb.velocity = new Vector3(moveDirection.x * moveSpeed, 0, moveDirection.y * moveSpeed);
+        rb.MovePosition(rb.position + new Vector3(moveDirection.x * moveSpeed, 0, moveDirection.y * moveSpeed));
+
         if (rb.position.x < minX) {
-            rb.position = new Vector3(minX, rb.position.y, rb.position.z);
+//            rb.position = new Vector3(minX, rb.position.y, rb.position.z);
+            Debug.Log("Exceeded minX which is " + minX);
         } else if (rb.position.x > maxX) {
-            rb.position = new Vector3(maxX, rb.position.y, rb.position.z);
+//            rb.position = new Vector3(maxX, rb.position.y, rb.position.z);
+            Debug.Log("Exceeded maxX which is " + maxX);
         }
         if (rb.position.z < minZ) {
-            rb.position = new Vector3(rb.position.x, rb.position.y, minZ);
+//            rb.position = new Vector3(rb.position.x, rb.position.y, minZ);
+            Debug.Log("Exceeded minZ which is " + minZ);
         } else if (rb.position.z > maxZ) {
-            rb.position = new Vector3(rb.position.x, rb.position.y, maxZ);
+//            rb.position = new Vector3(rb.position.x, rb.position.y, maxZ);
+            Debug.Log("Exceeded maxZ which is " + maxZ);
         }
         
     }

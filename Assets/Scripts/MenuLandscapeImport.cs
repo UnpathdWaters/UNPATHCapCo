@@ -35,6 +35,7 @@ public class MenuLandscapeImport : MonoBehaviour
     Vector2 clickedPoint;
     [SerializeField] float coastSize;
     [SerializeField] Camera cam;
+    [SerializeField] GameObject player;
     [SerializeField] GameObject glaciers20kmax;
     [SerializeField] GameObject glaciers19kmax;
     [SerializeField] GameObject glaciers18kmax;
@@ -204,6 +205,9 @@ public class MenuLandscapeImport : MonoBehaviour
         {
             cam.transform.position = DataStore.cameraPosition;
             cam.transform.rotation = DataStore.cameraRotation;
+            player.transform.position = DataStore.playerPosition;
+            player.transform.rotation = DataStore.playerRotation;
+            clickedPoint = DataStore.selectedLocation;
         }
     }
 
@@ -539,6 +543,8 @@ public class MenuLandscapeImport : MonoBehaviour
 //            DataStore.selectedLocation = clickedPointAsPercent;
             DataStore.cameraPosition = cam.transform.position;
             DataStore.cameraRotation = cam.transform.rotation;
+            DataStore.playerPosition = player.transform.position;
+            DataStore.playerRotation = player.transform.rotation;
             DataStore.subsequentRun = true;
             UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
         }
@@ -550,6 +556,8 @@ public class MenuLandscapeImport : MonoBehaviour
                 DataStore.selectedLocation = clickedPoint;
                 DataStore.cameraPosition = cam.transform.position;
                 DataStore.cameraRotation = cam.transform.rotation;
+                DataStore.playerPosition = player.transform.position;
+                DataStore.playerRotation = player.transform.rotation;
                 DataStore.subsequentRun = true;
 
                 int baseTerrainX = 5;
