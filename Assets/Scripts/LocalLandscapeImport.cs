@@ -201,43 +201,62 @@ public class LocalLandscapeImport : MonoBehaviour
         float Xcellwidth = (origXtotalSizeInCells * origXcellSizeInMetres) / importXcells;
         float Ycellwidth = (origYtotalSizeInCells * origYcellSizeInMetres) / importYcells;
         if (DataStore.selectedLocation.x * Xcellwidth < featuresXoffsetInMetres) {
-            // Location out of features bounds
+            Debug.Log("Clicked point to the left of the data");
         } else if (DataStore.selectedLocation.x * Xcellwidth > featuresXoffsetInMetres + (totCols * featuresXsizeInMetres)) {
-            // Location out of features bounds
+            Debug.Log("Clicked point to the right of the data");
         } else if (DataStore.selectedLocation.y * Ycellwidth < featuresYoffsetInMetres) {
-            // Location out of features bounds
+            Debug.Log("Clicked point below the data");
         } else if (DataStore.selectedLocation.y * Ycellwidth > featuresYoffsetInMetres + (totRows * featuresYsizeInMetres)) {
-            // Location out of features bounds
+            Debug.Log("Clicked point above the data");
         } else {
-            
-        }
+            float clickedXinMetres = DataStore.selectedLocation.x * Xcellwidth;
+            float clickedYinMetres = DataStore.selectedLocation.y * Ycellwidth;
 
+            int clickedXinCells = (int) ((clickedXinMetres - featuresXoffsetInMetres) / featuresXsizeInMetres);
+            int clickedYinCells = (int) ((clickedYinMetres - featuresYoffsetInMetres) / featuresYsizeInMetres);
 
+            int beginX = clickedXinCells - (widthX / 2);
+            int beginY = clickedYinCells - (heightZ / 2);
 
-
-
-
-        string[] readArray = new string[totCols];
-
-/*        int xCount = 0;
-        int zCount = heightZ - 1;
-        for (int z = 0; z < totRows; z++)
-        {
-            inputLine = surfaceStream.ReadLine();
-            xCount = 0;
-            readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
-            for (int x = 0; x < totCols; x++)
-            {
-                thisval = int.Parse(readArray[x]);
-
-                if (thisval > 1) {
-                    features[xCount, zCount] = true;
-                }
-
-                xCount++;
+            if (beginX < 0) {
+                beginX = 0;
+            } else if (beginX > totCols - widthX) {
+                beginX = totCols - widthX;
             }
-            zCount--;
-        }*/
+            if (beginY < 0) {
+                beginY = 0;
+            } else if (beginY > totRows - heightZ) {
+                beginY = totRows - heightZ;
+            }
+
+            string[] readArray = new string[totCols];
+
+            int xCount = 0;
+            int yCount = heightZ - 1;
+            bool lineUsed = false;
+            for (int y = 0; y < totRows; y++)
+            {
+                inputLine = surfaceStream.ReadLine();
+                xCount = 0;
+                lineUsed = false;            
+                readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
+                for (int x = 0; x < totCols; x++)
+                {
+                    thisval = int.Parse(readArray[x]);
+
+                    if (thisval > 1 && x >= beginX && x < beginX + widthX && y >= beginY && y < beginY + heightZ) {
+                        features[xCount, yCount] = true;
+                        xCount++;
+                        lineUsed = true;
+                        Debug.Log("Features " + xCount + "," + yCount + " is true");
+                    }
+
+                }
+                if (lineUsed) {
+                    yCount++;
+                }
+            }
+        }
     }
 
     void CreateMesh()
