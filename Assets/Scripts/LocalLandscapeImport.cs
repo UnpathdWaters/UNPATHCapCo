@@ -37,6 +37,7 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] float origXcellSizeInMetres, origYcellSizeInMetres;
     [SerializeField] float origXtotalSizeInCells, origYtotalSizeInCells;
     [SerializeField] float importXcells, importYcells;
+    [SerializeField] GameObject snippetTextGO;
 
 
     public Color coastCol;
@@ -73,6 +74,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     SeaLevelServer sls;
     TimeServer time;
+    SnippetManager snippetText;
 
     void OnEnable()
     {
@@ -100,6 +102,7 @@ public class LocalLandscapeImport : MonoBehaviour
         depths = new float[widthX, heightZ];
         sls = GameObject.Find("SeaLevelServer").GetComponent<SeaLevelServer>();
         time = GameObject.Find("TimeServer").GetComponent<TimeServer>();
+        snippetText = snippetTextGO.GetComponent<SnippetManager>();
         time.SetLocalMode(true);
 
         Debug.Log("Location is " + DataStore.selectedLocation);
@@ -543,6 +546,41 @@ public class LocalLandscapeImport : MonoBehaviour
         grasslandTMP.text = "Grassland: " + GetPercentEnv(grasslandCount).ToString("0.00") + "%";
     }
 
+    void UpdateSnippetText()
+    {
+        snippetText.ClearMessages();
+        if (GetPercentEnv(tundraCount) > 95.0f) {
+            snippetText.AddMessage("It's too cold and sparsely resourced for anyone to live here.");
+        } else if (GetPercentEnv(seaCount) > 95.0f) {
+            snippetText.AddMessage("This is mainly open sea. A fine home for fish but not for people.");
+        } else if (GetPercentEnv(wetlandCount) > 50.0f) {
+            snippetText.AddMessage("Modern drainage systems result in less extensive wetlands today than in the past.");
+        } else if (GetPercentEnv(riverCount) > 50.0f) {
+            snippetText.AddMessage("Rivers were less managed in prehistory and meandered across the landscape.");
+        } else if (GetPercentEnv(coastCount) > 50.0f) {
+            snippetText.AddMessage("This landscape has many intertidal resources, a valuable food source.");
+        } else if (GetPercentEnv(woodlandCount) > 50.0f) {
+            snippetText.AddMessage("Willow woodland with alder and birch was common in Doggerland.");
+        } else if (GetPercentEnv(seaCount) > 50.0f) {
+            snippetText.AddMessage("It was often easier to travel by sea than by land.");
+        } else if (GetPercentEnv(tundraCount) > 50.0f) {
+            snippetText.AddMessage("Tundra was common during colder periods. A harsh environment to survive.");
+        } else if (GetPercentEnv(grasslandCount) > 50.0f) {
+            snippetText.AddMessage("Open grassland could thrive in well drained locations where browsing animals roamed.");
+        }
+        if (time.GetTempFactor() > 0.8f) {
+            snippetText.AddMessage(time.GetYear() + " years before today, the climate was fairly similar.");
+        } else if (time.GetTempFactor() < 0.25f) {
+            snippetText.AddMessage(time.GetYear() + " years before today it's much colder across the whole region.");
+        }
+        if (time.GetYear() > 12890 && time.GetYear() < 14690) {
+            snippetText.AddMessage(time.GetYear() + "BP was part of a local warm period known as the Bølling-Allerød Interstadial.");
+        } else if (time.GetYear() > 11700 && time.GetYear() < 12900) {
+            snippetText.AddMessage(time.GetYear() + "BP was part of a cooler period called the Youger Dryas. The region is very cold again.");
+        }
+        snippetText.CycleMessages();
+    }
+
     float GetPercentEnv(int pCount)
     {
         return ((float) pCount / (widthX * heightZ)) * 100.0f;
@@ -721,8 +759,12 @@ public class LocalLandscapeImport : MonoBehaviour
     void Update()
     {
         RefreshSeaPos();
-        if (time.GetDay() % updateFrequency == 0 && time.GetHour() == 1 && time.GetMinute() == 1) {
+        if (time.GetDay() % updateFrequency == 0 && time.GetHour() == 1) {
             UpdateMeshColors();
+            snippetText.CycleMessages();
+        }
+        if (time.GetDay() == 1) {
+            UpdateSnippetText();
         }
         time.IncrementHour();
         if (quitBtn.WasPressedThisFrame()) {
@@ -738,12 +780,14 @@ public class LocalLandscapeImport : MonoBehaviour
 //            Debug.Log("Year is now " + time.GetYear());
             RefreshSeaPos();
             RefreshEnvironment();
+            UpdateSnippetText();
         }
         if (timeJumpMinus.WasReleasedThisFrame()) {
             time.AdjustYear(0 - timeJumpAmt);
 //            Debug.Log("Year is now " + time.GetYear());
             RefreshSeaPos();
             RefreshEnvironment();
+            UpdateSnippetText();
         }
 
     }

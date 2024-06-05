@@ -549,11 +549,6 @@ public class MenuLandscapeImport : MonoBehaviour
 
 
         if (quitBtn.WasReleasedThisFrame() && quittable) {
-//            float clickX = (clickedPoint.x - leftCol) / (rightCol - leftCol);
-//            float clickY = (clickedPoint.y - topRow) / (bottomRow - topRow);
-//            Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
-//            loadingScreen.SetActive(true);
-//            DataStore.selectedLocation = clickedPointAsPercent;
             SetCamPosition();
             DataStore.subsequentRun = true;
             UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
