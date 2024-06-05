@@ -161,9 +161,9 @@ public class MenuLandscapeImport : MonoBehaviour
             totRows = int.Parse(headerText[1,1]);
             noData = float.Parse(headerText[1,5]);
 
-            Debug.Log("Input file Cols = " + totCols);
-            Debug.Log("Input file Rows = " + totRows);
-            Debug.Log("Input noData val is " + noData);
+//            Debug.Log("Input file Cols = " + totCols);
+//            Debug.Log("Input file Rows = " + totRows);
+//            Debug.Log("Input noData val is " + noData);
 
             string[] readArray = new string[totCols];
 
@@ -193,7 +193,7 @@ public class MenuLandscapeImport : MonoBehaviour
                 }
                 zCount--;
             }
-            Debug.Log(fileString + " maxval is " + maxVal + " and minval is " + minVal);
+//            Debug.Log(fileString + " maxval is " + maxVal + " and minval is " + minVal);
             fileCount++;
         }
 
@@ -203,9 +203,12 @@ public class MenuLandscapeImport : MonoBehaviour
         clickedPoint = new Vector2(0, 0);
         if (DataStore.subsequentRun)
         {
-            cam.transform.position = DataStore.cameraPosition;
-            cam.transform.rotation = DataStore.cameraRotation;
-            player.transform.position = DataStore.playerPosition;
+//            cam.transform.position = DataStore.cameraPosition;
+//            Debug.Log("Cam position fixed at " + DataStore.cameraPosition);
+//            cam.transform.rotation = DataStore.cameraRotation;
+//            player.transform.position = DataStore.playerPosition;
+            player.GetComponent<Rigidbody>().MovePosition(DataStore.playerPosition);
+            Debug.Log("Player position fixed at " + DataStore.playerPosition);
             player.transform.rotation = DataStore.playerRotation;
             clickedPoint = DataStore.selectedLocation;
         }
@@ -513,6 +516,16 @@ public class MenuLandscapeImport : MonoBehaviour
 
     }
 
+    void SetCamPosition()
+    {
+            DataStore.cameraPosition = cam.transform.position;
+            Debug.Log("Setting cam position to " + cam.transform.position);
+            DataStore.cameraRotation = cam.transform.rotation;
+            DataStore.playerPosition = player.transform.position;
+            Debug.Log("Setting player position to " + player.transform.position);
+            DataStore.playerRotation = player.transform.rotation;
+    }
+
     void DisableGlacierWarning()
     {
         glacierWarningScreen.SetActive(false);
@@ -541,10 +554,7 @@ public class MenuLandscapeImport : MonoBehaviour
 //            Vector2 clickedPointAsPercent = new Vector2(clickX, 1.0f - clickY);
 //            loadingScreen.SetActive(true);
 //            DataStore.selectedLocation = clickedPointAsPercent;
-            DataStore.cameraPosition = cam.transform.position;
-            DataStore.cameraRotation = cam.transform.rotation;
-            DataStore.playerPosition = player.transform.position;
-            DataStore.playerRotation = player.transform.rotation;
+            SetCamPosition();
             DataStore.subsequentRun = true;
             UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
         }
@@ -554,10 +564,7 @@ public class MenuLandscapeImport : MonoBehaviour
             if (!glacierHit) {
                 loadingScreen.SetActive(true);
                 DataStore.selectedLocation = clickedPoint;
-                DataStore.cameraPosition = cam.transform.position;
-                DataStore.cameraRotation = cam.transform.rotation;
-                DataStore.playerPosition = player.transform.position;
-                DataStore.playerRotation = player.transform.rotation;
+                SetCamPosition();
                 DataStore.subsequentRun = true;
 
                 int baseTerrainX = 5;

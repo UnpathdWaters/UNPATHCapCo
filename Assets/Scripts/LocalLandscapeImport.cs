@@ -167,7 +167,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void LoadFeatures()
     {
-        bool[,] inputFeatures;
+/*        bool[,] inputFeatures;
         string fileString;
         features = new bool[widthX, heightZ];
         fileString = ".\\UNPATHfeatures.asc";
