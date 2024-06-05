@@ -29,7 +29,7 @@ public class SnippetManager : MonoBehaviour
     public void CycleMessages()
     {
         if (messages.Count == 0) {
-            currentMessage = "See if you can see the small camp within the landscape. It's got a fire to help you find it.";
+            currentMessage = "Can you see the small camp within the landscape? It's got a fire to help you find it.";
         } else if (count >= messages.Count - 1) {
             count = 0;
             currentMessage = messages[count];

@@ -569,9 +569,9 @@ public class LocalLandscapeImport : MonoBehaviour
             snippetText.AddMessage("Open grassland could thrive in well drained locations where browsing animals roamed.");
         }
         if (time.GetTempFactor() > 0.8f) {
-            snippetText.AddMessage(time.GetYear() + " years before today, the climate was fairly similar.");
+            snippetText.AddMessage(time.GetYear() + " years ago, the climate was fairly similar to today.");
         } else if (time.GetTempFactor() < 0.25f) {
-            snippetText.AddMessage(time.GetYear() + " years before today it's much colder across the whole region.");
+            snippetText.AddMessage(time.GetYear() + " years ago, it's much colder than today across the whole region.");
         }
         if (time.GetYear() > 12890 && time.GetYear() < 14690) {
             snippetText.AddMessage(time.GetYear() + "BP was part of a local warm period known as the Bølling-Allerød Interstadial.");
