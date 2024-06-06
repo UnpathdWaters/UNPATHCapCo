@@ -53,16 +53,21 @@ public class LocalLandscapeImport : MonoBehaviour
 
     List<GameObject> allReeds = new List<GameObject>();
     List<GameObject> allTrees = new List<GameObject>();
+    List<GameObject> allAnimals = new List<GameObject>();
 
     float maxTerrainForTundraCalc, minTerrainForTundraCalc;
     int tundraCount, wetlandCount, woodlandCount, coastCount, grasslandCount, riverCount, seaCount;
 
 
-    public GameObject tree;
-    public GameObject reeds;
+    [SerializeField] GameObject tree;
+    [SerializeField] GameObject reeds;
+    [SerializeField] GameObject willow;
+    [SerializeField] GameObject arcticFox;
+    [SerializeField] GameObject elk;
 
-    public int reedsPercent;
-    public int treesPercent;
+    [SerializeField] int reedsPercent;
+    [SerializeField] int treesPercent;
+    [SerializeField] int elkPercent;
 
     public InputAction quitBtn;
     public InputAction controlsBtn;
@@ -121,6 +126,8 @@ public class LocalLandscapeImport : MonoBehaviour
         GenerateRiverAndMarsh();
         CreateTrees();
         CreateReeds();
+        ClearAnimals();
+        CreateArcticFox();
         UpdateMeshColors();
         UpdateEnvironmentPanel();
         AddMeshCollider();
@@ -434,11 +441,11 @@ public class LocalLandscapeImport : MonoBehaviour
             {
                 for (int y = 0; y < heightZ; y++)
                 {
-                    if (depths[x, y] < seaPos - coastSize) {
+                    if (IsSea(x, y)) {
                         seaCount++;
-                    } else if (depths[x, y] > time.GetMaxSnowline()) {
+                    } else if (IsTundra(x, y)) {
                         tundraCount++;
-                    } else if (depths[x, y] > (seaPos - coastSize) && depths[x, y] < (seaPos + coastSize)) {
+                    } else if (IsCoast(x, y)) {
                         coastCount++;
                     } else if (flow[x, y] > riverCutoff)
                     {
@@ -468,17 +475,27 @@ public class LocalLandscapeImport : MonoBehaviour
             Destroy(thisTree);
         }
 
+        bool woodBool = false;
+
         for (int x = 2; x < widthX - 2; x++) {
             for (int y = 2; y < heightZ - 2; y++) {
                 if (UnityEngine.Random.Range(coastSize + 2, 20) < depths[x, y] && !river[x, y] && !marsh[x, y] && depths[x, y] < time.GetMaxSnowline()) {
                     if (treesPercent > 100) {
                         for (int t = 0; t < treesPercent / 100; t++) {
                             InstatiateTree(x, y);
+                            woodBool = true;
                         }
                     }
                     if (UnityEngine.Random.Range(0, 100) < treesPercent % 100) {
                         InstatiateTree(x, y);
+                        woodBool = true;
+                    }
+                    if (woodBool) {
                         woodlandCount++;
+                        woodBool = false;
+                    }
+                    if (UnityEngine.Random.Range(0, 100) < elkPercent) {
+                        CreateElk(x, y);
                     }
                 }
             }
@@ -508,6 +525,82 @@ public class LocalLandscapeImport : MonoBehaviour
         }
     }
 
+    int GetRandomX()
+    {
+        return UnityEngine.Random.Range(0, widthX);
+    }
+
+    int GetRandomY()
+    {
+        return UnityEngine.Random.Range(0, heightZ);
+    }
+
+    void ClearAnimals()
+    {
+        foreach(GameObject thisAnimal in allAnimals)
+        {
+            Destroy(thisAnimal);
+        }
+    }
+
+    void CreateArcticFox()
+    {
+        if (GetPercentEnv(tundraCount) > 20.0f) {
+            int x = GetRandomX();
+            int y = GetRandomY();
+            while(!IsTundra(x, y)) {
+                x = GetRandomX();
+                y = GetRandomY();
+            }
+            InstantiateArcticFox(x, y);
+        }
+    }
+
+    void CreateElk(int pX, int pY)
+    {
+        for (int x = 0; x < 3; x++) {
+            InstantiateElk(RandomNeighbour(pX), RandomNeighbour(pY));
+        }
+    }
+
+    int RandomNeighbour(int pX)
+    {
+        return pX + UnityEngine.Random.Range(-1, 2);
+    }
+
+    bool IsSea(int pX, int pY)
+    {
+        if (depths[pX, pY] < seaPos - coastSize) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool IsTundra(int pX, int pY) {
+        if (depths[pX, pY] > time.GetMaxSnowline()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool IsCoast(int pX, int pY) {
+        if (depths[pX, pY] > (seaPos - coastSize) && depths[pX, pY] < (seaPos + coastSize)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool IsSnow(int pX, int pY) {
+        if (depths[pX, pY] > seaPos + time.GetSnowline()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     void UpdateMeshColors()
     {
         // Assign colours to vertices
@@ -519,9 +612,9 @@ public class LocalLandscapeImport : MonoBehaviour
                     colours[x + (z * widthX)] = AddNoiseToColor(seaGradient.Evaluate((depths[x, z] - minTerrainForTundraCalc) / (maxTerrainForTundraCalc - minTerrainForTundraCalc)));
                 } else if (river[x, z]) {
                     colours[x + (z * widthX)] = AddNoiseToColor(riverCol);
-                } else if (depths[x, z] - seaPos < coastSize) {
+                } else if (IsCoast(x, z)) {
                     colours[x + (z * widthX)] = AddNoiseToColor(CreateSands(coastCol, depths[x, z] - seaPos));
-                } else if (depths[x, z] > seaPos + time.GetSnowline()) {
+                } else if (IsSnow(x, z)) {
                     colours[x + (z * widthX)] = Color.white;
                 } else if (marsh[x, z]) {
                     colours[x + (z * widthX)] = marshCol;
@@ -597,7 +690,11 @@ public class LocalLandscapeImport : MonoBehaviour
     void InstatiateTree(int pX, int  pY)
     {
         Vector3 treePos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
-        allTrees.Add(Instantiate(tree, treePos, Quaternion.identity));
+        if (UnityEngine.Random.Range(0, 100) > 10) {
+            allTrees.Add(Instantiate(tree, treePos, Quaternion.identity));
+        } else {
+            allTrees.Add(Instantiate(willow, treePos, Quaternion.identity));
+        }
     }
 
     void InstantiateReeds(int pX, int  pY)
@@ -606,6 +703,19 @@ public class LocalLandscapeImport : MonoBehaviour
         allReeds.Add(Instantiate(reeds, reedPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
     }
 
+    void InstantiateArcticFox(int pX, int pY)
+    {
+        Debug.Log("Creating an arctic fox!");
+        Vector3 foxPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
+        allAnimals.Add(Instantiate(arcticFox, foxPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+    }
+
+    void InstantiateElk(int pX, int pY)
+    {
+        Debug.Log("Creating an elk!");
+        Vector3 elkPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
+        allAnimals.Add(Instantiate(elk, elkPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+    }
 
     int NumberOfLowerNeighbours(int pX, int pY)
     {
@@ -737,13 +847,7 @@ public class LocalLandscapeImport : MonoBehaviour
         return coastSize;
     }
 
-    public bool IsSnow(int pX, int pY)
-    {
-        if (depths[pX, pY] > time.GetSnowline() + sls.GetGIAWaterHeight()) {
-            return true;
-        }
-        return false;
-    }
+
 
     public float GetLocationDepth(int pX, int pY)
     {
