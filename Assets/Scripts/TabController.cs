@@ -7,8 +7,8 @@ using TMPro;
 
 public class TabController : MonoBehaviour
 {
-    public GameObject[] tabs = new GameObject[3];
-    public GameObject[] tabBody = new GameObject[3];
+    public GameObject[] tabs = new GameObject[2];
+    public GameObject[] tabBody = new GameObject[2];
     public GameObject infoScreen;
     public InputAction tabRight;
     public InputAction tabLeft;
@@ -122,7 +122,7 @@ public class TabController : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.LoadScene("02MenuScene");
         }
         if (tabRight.WasReleasedThisFrame()) {
-            if (tabSelected < 2) {
+            if (tabSelected < tabs.Length - 1) {
                 tabSelected++;
                 RefreshTabs();
             }

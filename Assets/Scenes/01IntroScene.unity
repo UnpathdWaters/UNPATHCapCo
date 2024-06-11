@@ -1319,7 +1319,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &505975037
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1334,12 +1334,12 @@ RectTransform:
   m_Children:
   - {fileID: 2107573830}
   m_Father: {fileID: 2025981064}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 400, y: -320}
+  m_SizeDelta: {x: 800, y: 560}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &505975038
 MonoBehaviour:
@@ -1836,15 +1836,14 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Unpath'd Waters, Undream'd Shores is a simulation of life in Doggerland
-    between 20,000 and 5,000 years before present. \n\nSelect a location within the
-    submerged landscapes under the southern North Sea and a time and you will be
-    able to interact with simulated Doggerlanders as they live within a virtual environment.
-    Watch them make use of the resources in a seasonally changing landscape and influence
-    their decisions regarding where to live, when to move camp and how to interact
-    with the animals and other humans who share their environment.\n\nThis simulation
-    has been built upon data from archaeology, climate science, geology, anthropology
-    and ecology. It is a part of 'Unpath'd Waters', which is one of the AHRC's 'Towards
-    a National Collection' series of projects."
+    between 20,000 and 5,000 years before present. \n\nScroll backwards and forwards
+    in time to see how changing sea levels affected the areas around what is now
+    the British Isles and the North Sea. Go down to the local level and discover
+    how these changes affected the environment that the inhabitants called \"home\".\n\nThis
+    simulation has been built upon data from archaeology, climate science, geology,
+    anthropology and ecology. It is a part of 'Unpath'd Waters', which is one of
+    the AHRC's 'Towards a National Collection' series of projects.\n\nPress 'B' to
+    see the controls or 'A' to dive right in!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b6a94d6a0e377f0479eb12ab79dabdaa, type: 2}
   m_sharedMaterial: {fileID: 6069945575532142584, guid: b6a94d6a0e377f0479eb12ab79dabdaa, type: 2}
@@ -1878,7 +1877,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 8
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2290,7 +2289,7 @@ RectTransform:
   m_Children:
   - {fileID: 68253698}
   m_Father: {fileID: 922986738}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2310,7 +2309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.04705883, g: 0.14117648, b: 0.3803922, a: 1}
+  m_Color: {r: 0.23529413, g: 0.38823533, b: 0.50980395, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2367,8 +2366,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 917451827}
   - {fileID: 945626764}
+  - {fileID: 917451827}
   m_Father: {fileID: 2025981064}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2493,7 +2492,7 @@ RectTransform:
   m_Children:
   - {fileID: 1229858348}
   m_Father: {fileID: 922986738}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2513,7 +2512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.16470589, g: 0.3647059, b: 0.49019608, a: 1}
+  m_Color: {r: 0.04705883, g: 0.14117648, b: 0.3803922, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4085,7 +4084,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1816905970
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4100,12 +4099,12 @@ RectTransform:
   m_Children:
   - {fileID: 627051026}
   m_Father: {fileID: 2025981064}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 400, y: -320}
-  m_SizeDelta: {x: 800, y: 560}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1816905971
 MonoBehaviour:
@@ -4726,8 +4725,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 922986738}
-  - {fileID: 1816905970}
   - {fileID: 505975037}
+  - {fileID: 1816905970}
   m_Father: {fileID: 1082464971}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4775,13 +4774,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tabs:
-  - {fileID: 917451826}
   - {fileID: 945626763}
-  - {fileID: 0}
+  - {fileID: 917451826}
   tabBody:
-  - {fileID: 505975036}
   - {fileID: 1816905969}
-  - {fileID: 0}
+  - {fileID: 505975036}
   infoScreen: {fileID: 2007785372}
   tabRight:
     m_Name: Tab Right
@@ -5093,25 +5090,25 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'On this menu, use the X and B gamepad buttons or the left and right arrow
-    keys on the keyboard to flip between tabs.
+  m_text: '
+
+    On this menu, use the X and B gamepad buttons to flip between tabs.
 
 
 
-    Press the A button on the gamepad
-    or the space bar on the keyboard to advance to the space/time selection map.
-    Do the same again to advance to the local view.
+    Press
+    the A button on the gamepad to go to the space/time selection map. Do the same
+    again to advance to the local view.
 
 
 
-    Press the Y button on
-    the gamepad or ''Escape'' on the keyboard to quit.
+    Press the Y button on the gamepad
+    to quit.
 
 
 
-    Press the right trigger
-    button on the gamepad or ''i'' on the keyboard to see the controls relevant to
-    each subsequent screen.'
+    Press the right trigger button on the gamepad to see the controls
+    relevant to each subsequent screen.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b6a94d6a0e377f0479eb12ab79dabdaa, type: 2}
   m_sharedMaterial: {fileID: 6069945575532142584, guid: b6a94d6a0e377f0479eb12ab79dabdaa, type: 2}
@@ -5145,7 +5142,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 8
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
