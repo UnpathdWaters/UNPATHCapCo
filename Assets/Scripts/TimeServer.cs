@@ -15,7 +15,8 @@ public class TimeServer : MonoBehaviour
     bool localMode;
     Vector3 arrowPos;
 //    float[] SAT = new float[16] {1.0f, 1.0f, 1.0f, 0.916f, 0.833f, 0.833f, 0.75f, 0.666f, 0.5f, 0.5f, 0.417f, 0.0833f, 0.0833f, 0.0f, 0.0f, 0.0f};
-    float[] SAT = new float[16] {1.0f, 1.0f, 1.0f, 0.916f, 0.9f, 0.833f, 0.833f, 0.2f, 0.0f, 1.0f, 0.417f, 0.0833f, 0.0833f, 0.0f, 0.0f, 0.0f};
+    float[] SAT = new float[16] {1.0f, 1.0f, 1.0f, 0.916f, 0.9f, 0.833f, 0.833f, 0.0f, 0.5f, 1.0f, 0.417f, 0.0833f, 0.0833f, 0.0f, 0.0f, 0.0f};
+//                                5k    6k    7k     8k     9k     10k     11k    12k   13k   14k    15k     16k       17k    18k   19k   20k    
     [SerializeField] float baseSnowline;
     [SerializeField] float seasonMultiplier;
     [SerializeField] float tempMultiplier;

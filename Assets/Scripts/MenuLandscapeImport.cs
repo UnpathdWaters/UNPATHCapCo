@@ -60,6 +60,8 @@ public class MenuLandscapeImport : MonoBehaviour
     [SerializeField] int bottomRow;
     [SerializeField] int timeJumpAmt;
     [SerializeField] TMP_Text glacierText;
+    [SerializeField] GameObject[] attractScreens = new GameObject[8];
+    int attractCounter = 0;
     TimeServer time;
     SeaLevelServer sls;
 
@@ -86,6 +88,9 @@ public class MenuLandscapeImport : MonoBehaviour
     bool quittable;
     int timeChangeAmount;
     int glacierMode = 1;
+    float inputTimer = 0.0f;
+    bool attractMode = false;
+    [SerializeField] float timeDelay;
 
 
     // Start is called before the first frame update
@@ -526,20 +531,42 @@ public class MenuLandscapeImport : MonoBehaviour
             DataStore.playerRotation = player.transform.rotation;
     }
 
+    void ClearAttractScreens()
+    {
+        for (int x = 0; x < attractScreens.Length; x++) {
+            attractScreens[x].SetActive(false);
+        }
+    }
+
     void DisableGlacierWarning()
     {
         glacierWarningScreen.SetActive(false);
     }
 
+    void ResetAttractMode()
+    {
+        inputTimer = 0.0f;
+        attractMode = false;
+        ClearAttractScreens();
+    }
+
     void Update()
     {
+        inputTimer += Time.deltaTime;
+        if (inputTimer > timeDelay) {
+            attractMode = true;
+        }
         bool glacierHit = CheckClickedPointIsGlacier();
         bool timePeriodChanged = false;
         timeChangeAmount = (int) (timeControl.ReadValue<float>() * timeSpeed);
 
         if (timeChangeAmount != 0) {
-            time.AdjustYear(timeChangeAmount);
-            timePeriodChanged = true;
+            if (attractMode) {
+                attractMode = false;
+            } else {
+                time.AdjustYear(timeChangeAmount);
+                timePeriodChanged = true;
+            }
         }
 
         if (!pause) {
@@ -549,60 +576,88 @@ public class MenuLandscapeImport : MonoBehaviour
 
 
         if (quitBtn.WasReleasedThisFrame() && quittable) {
-            SetCamPosition();
-            DataStore.subsequentRun = true;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
+            if (attractMode) {
+                attractMode = false;
+            } else {
+                ResetAttractMode();
+                SetCamPosition();
+                DataStore.subsequentRun = true;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("01IntroScene");
+            }
         }
 
         if (loadSceneBtn.WasReleasedThisFrame()) {
+            if (attractMode) {
+                attractMode = false;
+            } else {
+                ResetAttractMode();
 //            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y, time.GetYear()));
-            if (!glacierHit) {
-                loadingScreen.SetActive(true);
-                DataStore.selectedLocation = clickedPoint;
-                SetCamPosition();
-                DataStore.subsequentRun = true;
+                if (!glacierHit) {
+                    loadingScreen.SetActive(true);
+                    DataStore.selectedLocation = clickedPoint;
+                    SetCamPosition();
+                    DataStore.subsequentRun = true;
 
-                int baseTerrainX = 5;
-                int baseTerrainY = 5;
+                    int baseTerrainX = 5;
+                    int baseTerrainY = 5;
 
-                float[,,] tempTerrain = new float[baseTerrainX, baseTerrainY, 15001];
-                int clickx = (int) clickedPoint.x;
-                int clicky = (int) clickedPoint.y;
-                for (int x = 0; x < baseTerrainX; x++) {
-                    for (int y = 0; y < baseTerrainY; y++) {
-                        for (int yr = 0; yr <= 15000; yr++) {
-                            tempTerrain[x, y, yr] = GetVertexDepth(clickx - (baseTerrainX / 2) + x, clicky - (baseTerrainY / 2) + y, yr + 5000);
-//                        Debug.Log("tempTerrain " + x + "," + y + " at year " + (yr + 5000) + " is " + tempTerrain[x, y, yr]);
+                    float[,,] tempTerrain = new float[baseTerrainX, baseTerrainY, 15001];
+                    int clickx = (int) clickedPoint.x;
+                    int clicky = (int) clickedPoint.y;
+                    for (int x = 0; x < baseTerrainX; x++) {
+                        for (int y = 0; y < baseTerrainY; y++) {
+                            for (int yr = 0; yr <= 15000; yr++) {
+                                tempTerrain[x, y, yr] = GetVertexDepth(clickx - (baseTerrainX / 2) + x, clicky - (baseTerrainY / 2) + y, yr + 5000);
+    //                        Debug.Log("tempTerrain " + x + "," + y + " at year " + (yr + 5000) + " is " + tempTerrain[x, y, yr]);
+                            }
                         }
                     }
+                    DataStore.baseTerrain = tempTerrain;
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");
+                } else {
+                    glacierWarningScreen.SetActive(true);
+                    Invoke("DisableGlacierWarning", 2.0f);
                 }
-                DataStore.baseTerrain = tempTerrain;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("03LocalScene");
-            } else {
-                glacierWarningScreen.SetActive(true);
-                Invoke("DisableGlacierWarning", 2.0f);
+
             }
         }
 
         if (timeJumpPlus.WasReleasedThisFrame()) {
-            time.AdjustYear(timeJumpAmt);
-            timePeriodChanged = true;
+            if (attractMode) {
+                ResetAttractMode();
+            } else {
+                ResetAttractMode();
+                time.AdjustYear(timeJumpAmt);
+                timePeriodChanged = true;
+            }
         }
         if (timeJumpMinus.WasReleasedThisFrame()) {
+            if (attractMode) {
+                ResetAttractMode();
+            } else {
+            ResetAttractMode();
             time.AdjustYear(0 - timeJumpAmt);
             timePeriodChanged = true;
+            }
         }
         if (controlsBtn.IsPressed()) {
+            ResetAttractMode();
             controlScreen.SetActive(true);
         } else {
             controlScreen.SetActive(false);
         }
         if (glacierModeBtn.WasReleasedThisFrame()) {
-            cycleGlacierCoverage();
-            SetGlacierVisibility();
+            if (attractMode) {
+                ResetAttractMode();
+            } else {
+                ResetAttractMode();
+                cycleGlacierCoverage();
+                SetGlacierVisibility();
+            }
         }
 
         if (timePeriodChanged) {
+            ResetAttractMode();
             Debug.Log("Year is now " + time.GetYear());
 //            DebugDepth();
             SetGlacierVisibility();
@@ -610,6 +665,16 @@ public class MenuLandscapeImport : MonoBehaviour
             UpdateMesh();
             UpdateMeshColors();
         }
+        if (attractMode && inputTimer > timeDelay) {
+            ClearAttractScreens();
+            attractCounter++;
+            if (attractCounter >= attractScreens.Length) {
+                attractCounter = 0;
+            }
+            attractScreens[attractCounter].SetActive(true);
+            inputTimer = 0.0f;
+        }
         quittable = true;
     }
+
 }
