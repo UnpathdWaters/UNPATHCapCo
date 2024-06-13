@@ -562,8 +562,9 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (timeChangeAmount != 0) {
             if (attractMode) {
-                attractMode = false;
+                ResetAttractMode();
             } else {
+                ResetAttractMode();
                 time.AdjustYear(timeChangeAmount);
                 timePeriodChanged = true;
             }
@@ -577,7 +578,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (quitBtn.WasReleasedThisFrame() && quittable) {
             if (attractMode) {
-                attractMode = false;
+                ResetAttractMode();
             } else {
                 ResetAttractMode();
                 SetCamPosition();
@@ -588,7 +589,7 @@ public class MenuLandscapeImport : MonoBehaviour
 
         if (loadSceneBtn.WasReleasedThisFrame()) {
             if (attractMode) {
-                attractMode = false;
+                ResetAttractMode();
             } else {
                 ResetAttractMode();
 //            Debug.Log("Depth of clicked point is " + GetVertexDepth((int) clickedPoint.x, (int) clickedPoint.y, time.GetYear()));
@@ -667,12 +668,12 @@ public class MenuLandscapeImport : MonoBehaviour
         }
         if (attractMode && inputTimer > timeDelay) {
             ClearAttractScreens();
-            attractCounter++;
             if (attractCounter >= attractScreens.Length) {
                 attractCounter = 0;
             }
             attractScreens[attractCounter].SetActive(true);
             inputTimer = 0.0f;
+            attractCounter++;
         }
         quittable = true;
     }
