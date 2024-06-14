@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class AnimalWithText : MonoBehaviour
 {
@@ -26,7 +27,8 @@ public class AnimalWithText : MonoBehaviour
 
     void DisplayText()
     {
-        Instantiate(floatingText, transform.position, Quaternion.identity);
+        var go = Instantiate(floatingText, transform.position, Quaternion.identity);
+        go.SetText("Moose");
     }
 
     // Update is called once per frame
