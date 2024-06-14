@@ -80,6 +80,7 @@ public class LocalLandscapeImport : MonoBehaviour
     SeaLevelServer sls;
     TimeServer time;
     SnippetManager snippetText;
+    PlayerCam cam;
 
     void OnEnable()
     {
@@ -109,6 +110,7 @@ public class LocalLandscapeImport : MonoBehaviour
         time = GameObject.Find("TimeServer").GetComponent<TimeServer>();
         snippetText = snippetTextGO.GetComponent<SnippetManager>();
         time.SetLocalMode(true);
+        cam = GameObject.Find("Camera").GetComponent<PlayerCam>();
 
         Debug.Log("Location is " + DataStore.selectedLocation);
         Debug.Log("Year is " + time.GetYear());
@@ -173,6 +175,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 }
             }
         }
+        cam.SetLowPoint(maxTerrainForTundraCalc * zScale);
     }
 
     void LoadFeatures()

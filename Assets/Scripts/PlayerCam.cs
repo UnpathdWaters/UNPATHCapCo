@@ -12,6 +12,7 @@ public class PlayerCam : MonoBehaviour
     [SerializeField] float minX, maxX, minZ, maxZ;
 
     float zoomAmount, rotateAmount;
+    float lowPoint = 0.0f;
 
 
     // Start is called before the first frame update
@@ -31,6 +32,11 @@ public class PlayerCam : MonoBehaviour
         rotateControls.Disable();
     }
 
+    public void SetLowPoint(float pLowPoint)
+    {
+        lowPoint = pLowPoint;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -41,8 +47,8 @@ public class PlayerCam : MonoBehaviour
     void FixedUpdate()
     {
         transform.position += transform.forward * (zoomAmount * zoomSpeed);
-        if (transform.position.y < 0) {
-            transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+        if (transform.position.y < lowPoint) {
+            transform.position = new Vector3(transform.position.x, lowPoint, transform.position.z);
         }
         if (transform.position.x < minX) {
             transform.position = new Vector3(minX, transform.position.y, transform.position.z);
