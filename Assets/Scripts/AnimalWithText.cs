@@ -8,7 +8,7 @@ public class AnimalWithText : MonoBehaviour
 {
     [SerializeField] GameObject floatingText;
     [SerializeField] InputAction showText;
-    Vector3 textOffset = new Vector3(0.0f, 100.0f, 0.0f);
+    [SerializeField] string animalName;
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +28,8 @@ public class AnimalWithText : MonoBehaviour
     void DisplayText()
     {
         var go = Instantiate(floatingText, transform.position, Quaternion.identity);
-        go.SetText("Moose");
+        TMP_Text thisText = go.GetComponent<TMP_Text>();
+        thisText.text = animalName;
     }
 
     // Update is called once per frame

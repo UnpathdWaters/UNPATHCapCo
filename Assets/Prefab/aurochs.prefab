@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &151927731298923368
+--- !u!1 &1733353106395149421
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,49 +8,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 671055980752677330}
-  - component: {fileID: 4539569388640347767}
-  - component: {fileID: 1809106776687497917}
-  - component: {fileID: -2824084349337429808}
-  - component: {fileID: 3636248745821186670}
-  - component: {fileID: 2199517169746221908}
+  - component: {fileID: 1388740205526183639}
+  - component: {fileID: 2659956460024226162}
+  - component: {fileID: 220367450241177016}
+  - component: {fileID: 5391350160845964695}
   m_Layer: 0
-  m_Name: arcticfox
-  m_TagString: animal
+  m_Name: aurochs
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &671055980752677330
+--- !u!4 &1388740205526183639
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151927731298923368}
-  m_LocalRotation: {x: 0.22460446, y: 0.67048705, z: 0.67048705, w: 0.22460438}
-  m_LocalPosition: {x: 1.7089816, y: 0.6052309, z: -0.0012068511}
-  m_LocalScale: {x: 0.0061302898, y: 0.00613029, z: 0.0061302898}
+  m_GameObject: {fileID: 1733353106395149421}
+  m_LocalRotation: {x: -0.07942286, y: 0.7026323, z: 0.70263207, w: -0.07942307}
+  m_LocalPosition: {x: -0, y: -0.00000023841858, z: 0.00000023841858}
+  m_LocalScale: {x: 0.027472071, y: 0.027472073, z: 0.027472071}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4539569388640347767
+--- !u!33 &2659956460024226162
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151927731298923368}
-  m_Mesh: {fileID: 5437237583681698853, guid: 150ba96bf3643214db53fcaea369ef32, type: 3}
---- !u!23 &1809106776687497917
+  m_GameObject: {fileID: 1733353106395149421}
+  m_Mesh: {fileID: 4942155364688328190, guid: 16bfdd1b76ea1f746bf5c2f9795366b6, type: 3}
+--- !u!23 &220367450241177016
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151927731298923368}
+  m_GameObject: {fileID: 1733353106395149421}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -64,8 +62,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3522955778539423533, guid: 150ba96bf3643214db53fcaea369ef32, type: 3}
-  - {fileID: -8274133419916619345, guid: 150ba96bf3643214db53fcaea369ef32, type: 3}
+  - {fileID: -876546973899608171, guid: 16bfdd1b76ea1f746bf5c2f9795366b6, type: 3}
+  - {fileID: 4874126678125670354, guid: 16bfdd1b76ea1f746bf5c2f9795366b6, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -87,13 +85,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-2824084349337429808
+--- !u!114 &5391350160845964695
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151927731298923368}
+  m_GameObject: {fileID: 1733353106395149421}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 79ce2476c9af63b4481ee5c719a68461, type: 3}
@@ -104,12 +102,12 @@ MonoBehaviour:
     m_Name: Show Text
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: ac87f698-4e78-4ded-b9b2-fe8a7aa66a11
+    m_Id: 575ee477-c5ee-4220-945c-2aed0089533b
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 29e89e43-b86f-4da3-8785-61d861fc527c
+      m_Id: d5f8590c-2940-4be5-8b21-36e533a16ad5
       m_Path: <Keyboard>/t
       m_Interactions: 
       m_Processors: 
@@ -117,33 +115,4 @@ MonoBehaviour:
       m_Action: Show Text
       m_Flags: 0
     m_Flags: 0
-  animalName: Arctic Fox
---- !u!54 &3636248745821186670
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151927731298923368}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!65 &2199517169746221908
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151927731298923368}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 21.872763, y: 22.541319, z: 25.108215}
-  m_Center: {x: 2.8517509, y: 11.519964, z: 1.1593355}
+  animalName: Aurochs

@@ -64,10 +64,13 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] GameObject willow;
     [SerializeField] GameObject arcticFox;
     [SerializeField] GameObject elk;
+    [SerializeField] GameObject beaver;
+    [SerializeField] GameObject aurochs;
 
     [SerializeField] int reedsPercent;
     [SerializeField] int treesPercent;
-    [SerializeField] int elkPercent;
+    [SerializeField] float elkPercent;
+    [SerializeField] float beaverPercent;
 
     public InputAction quitBtn;
     public InputAction controlsBtn;
@@ -125,13 +128,15 @@ public class LocalLandscapeImport : MonoBehaviour
         LoadFeatures();
         CreateMesh();
         UpdateMesh();
+        ClearAnimals();
         GenerateRiverAndMarsh();
         CreateTrees();
         CreateReeds();
-        ClearAnimals();
-        CreateArcticFox();
         UpdateMeshColors();
         UpdateEnvironmentPanel();
+        CreateArcticFox();
+        CreateBeaver();
+        CreateAurochs();
         AddMeshCollider();
     }
 
@@ -497,7 +502,7 @@ public class LocalLandscapeImport : MonoBehaviour
                         woodlandCount++;
                         woodBool = false;
                     }
-                    if (UnityEngine.Random.Range(0, 100) < elkPercent) {
+                    if (UnityEngine.Random.Range(0.0f, 100.0f) < elkPercent && depths[x, y] > time.GetMidSnowline()) {
                         CreateElk(x, y);
                     }
                 }
@@ -563,6 +568,30 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         for (int x = 0; x < 3; x++) {
             InstantiateElk(RandomNeighbour(pX), RandomNeighbour(pY));
+        }
+        snippetText.AddMessage("Elk were likely residents in wooded areas during the colder times.");
+    }
+
+    void CreateBeaver()
+    {
+        if (GetPercentEnv(riverCount) < 2.0) {
+            return;
+        } else {
+            for (int x = 0; x <= (int) GetPercentEnv(riverCount) / 2; x++) {
+                InstantiateBeaver();
+            }
+            snippetText.AddMessage("Beavers were active in changing the landscape and their DNA has been recovered from Doggerland.");
+        }
+    }
+
+    void CreateAurochs()
+    {
+        if (GetPercentEnv(wetlandCount) > 5.0 && GetPercentEnv(wetlandCount + woodlandCount) > 10.0 && time.GetMidSnowline() > maxTerrainForTundraCalc)
+        {
+            for (int x = 0; x <= (int) GetPercentEnv(wetlandCount + woodlandCount) / 5; x++) {
+                InstantiateAurochs();
+            }
+            snippetText.AddMessage("Aurochs were larger ancestors of today's cattle. They preferred wetland and woodland environments.");
         }
     }
 
@@ -718,6 +747,32 @@ public class LocalLandscapeImport : MonoBehaviour
         Debug.Log("Creating an elk!");
         Vector3 elkPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
         allAnimals.Add(Instantiate(elk, elkPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+    }
+
+    void InstantiateBeaver()
+    {
+        Debug.Log("Creating a beaver!");
+        int beaverX = GetRandomX();
+        int beaverY = GetRandomY();
+        while (!river[beaverX, beaverY]) {
+            beaverX = GetRandomX();
+            beaverY = GetRandomY();
+        }
+        Vector3 beaverPos = JigglePosition(new Vector3(beaverX, depths[beaverX, beaverY] * zScale, beaverY));
+        allAnimals.Add(Instantiate(beaver, beaverPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+    }
+
+    void InstantiateAurochs()
+    {
+        Debug.Log("Creating an aurochs");
+        int aurochsX = GetRandomX();
+        int aurochsY = GetRandomY();
+        while (!marsh[aurochsX, aurochsY]) {
+            aurochsX = GetRandomX();
+            aurochsY = GetRandomY();
+        }
+        Vector3 aurochsPos = JigglePosition(new Vector3(aurochsX, depths[aurochsX, aurochsY] * zScale, aurochsY));
+        allAnimals.Add(Instantiate(aurochs, aurochsPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
     }
 
     int NumberOfLowerNeighbours(int pX, int pY)

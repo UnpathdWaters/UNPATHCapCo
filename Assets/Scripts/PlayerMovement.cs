@@ -41,17 +41,17 @@ public class PlayerMovement : MonoBehaviour
 
         if (rb.position.x < minX) {
             rb.MovePosition(new Vector3(minX, rb.position.y, rb.position.z));
-            Debug.Log("Exceeded minX which is " + minX);
+//            Debug.Log("Exceeded minX which is " + minX);
         } else if (rb.position.x > maxX) {
             rb.MovePosition(new Vector3(maxX, rb.position.y, rb.position.z));
-            Debug.Log("Exceeded maxX which is " + maxX);
+//            Debug.Log("Exceeded maxX which is " + maxX);
         }
         if (rb.position.z < minZ) {
             rb.MovePosition(new Vector3(rb.position.x, rb.position.y, minZ));
-            Debug.Log("Exceeded minZ which is " + minZ);
+//            Debug.Log("Exceeded minZ which is " + minZ);
         } else if (rb.position.z > maxZ) {
             rb.MovePosition(new Vector3(rb.position.x, rb.position.y, maxZ));
-            Debug.Log("Exceeded maxZ which is " + maxZ);
+//            Debug.Log("Exceeded maxZ which is " + maxZ);
         }
         
     }

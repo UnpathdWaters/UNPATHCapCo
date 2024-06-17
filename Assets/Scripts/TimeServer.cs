@@ -88,6 +88,14 @@ public class TimeServer : MonoBehaviour
         return baseSnowline + ((GetTempFactor() * tempMultiplier) - (tempMultiplier / 2)) + ((1.0f * seasonMultiplier) - (seasonMultiplier / 2));
     }
 
+    public float GetMinSnowline() {
+        return baseSnowline + ((GetTempFactor() * tempMultiplier) - (tempMultiplier / 2)) + (0.0f - (seasonMultiplier / 2));
+    }
+
+    public float GetMidSnowline() {
+        return baseSnowline;
+    }
+
     public void IncrementYear() {
         year = ValidYear(--year);
         Debug.Log("Year is " + year);
