@@ -66,11 +66,13 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] GameObject elk;
     [SerializeField] GameObject beaver;
     [SerializeField] GameObject aurochs;
+    [SerializeField] GameObject boar;
 
     [SerializeField] int reedsPercent;
     [SerializeField] int treesPercent;
     [SerializeField] float elkPercent;
     [SerializeField] float beaverPercent;
+    [SerializeField] float boarPercent;
 
     public InputAction quitBtn;
     public InputAction controlsBtn;
@@ -504,6 +506,8 @@ public class LocalLandscapeImport : MonoBehaviour
                     }
                     if (UnityEngine.Random.Range(0.0f, 100.0f) < elkPercent && depths[x, y] > time.GetMidSnowline()) {
                         CreateElk(x, y);
+                    } else if (UnityEngine.Random.Range(0.0f, 100.0f) < boarPercent && depths[x, y] < time.GetMidSnowline()) {
+                        CreateBoar(x, y);
                     }
                 }
             }
@@ -572,6 +576,14 @@ public class LocalLandscapeImport : MonoBehaviour
         snippetText.AddMessage("Elk were likely residents in wooded areas during the colder times.");
     }
 
+    void CreateBoar(int pX, int pY)
+    {
+        for (int x = 0; x < 5; x++) {
+            InstantiateBoar(RandomNeighbour(pX), RandomNeighbour(pY));
+        }
+        snippetText.AddMessage("DNA of wild boar is found in samples from many different times in Doggerland.");
+    }
+
     void CreateBeaver()
     {
         if (GetPercentEnv(riverCount) < 2.0) {
@@ -588,7 +600,7 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         if (GetPercentEnv(wetlandCount) > 5.0 && GetPercentEnv(wetlandCount + woodlandCount) > 10.0 && time.GetMidSnowline() > maxTerrainForTundraCalc)
         {
-            for (int x = 0; x <= (int) GetPercentEnv(wetlandCount + woodlandCount) / 5; x++) {
+            for (int x = 0; x <= (int) GetPercentEnv(wetlandCount + woodlandCount) / 2; x++) {
                 InstantiateAurochs();
             }
             snippetText.AddMessage("Aurochs were larger ancestors of today's cattle. They preferred wetland and woodland environments.");
@@ -630,6 +642,17 @@ public class LocalLandscapeImport : MonoBehaviour
             return true;
         } else {
             return false;
+        }
+    }
+
+    void CheckForAnimalHit()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(cam.transform.position, cam.transform.TransformDirection(Vector3.forward), out hit)) {
+            if (hit.collider.gameObject.tag == "animal") {
+                AnimalWithText thisText = hit.collider.gameObject.GetComponent<AnimalWithText>();
+                thisText.DisplayText();
+            }
         }
     }
 
@@ -747,6 +770,13 @@ public class LocalLandscapeImport : MonoBehaviour
         Debug.Log("Creating an elk!");
         Vector3 elkPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
         allAnimals.Add(Instantiate(elk, elkPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
+    }
+
+    void InstantiateBoar(int pX, int pY)
+    {
+        Debug.Log("Creating a boar!");
+        Vector3 boarPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
+        allAnimals.Add(Instantiate(boar, boarPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
     }
 
     void InstantiateBeaver()
@@ -921,6 +951,7 @@ public class LocalLandscapeImport : MonoBehaviour
     void Update()
     {
         RefreshSeaPos();
+        CheckForAnimalHit();
         if (time.GetDay() % updateFrequency == 0 && time.GetHour() == 1) {
             UpdateMeshColors();
             snippetText.CycleMessages();

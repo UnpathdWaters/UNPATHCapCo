@@ -25,7 +25,7 @@ public class AnimalWithText : MonoBehaviour
         showText.Disable();
     }
 
-    void DisplayText()
+    public void DisplayText()
     {
         var go = Instantiate(floatingText, transform.position, Quaternion.identity);
         TMP_Text thisText = go.GetComponent<TMP_Text>();

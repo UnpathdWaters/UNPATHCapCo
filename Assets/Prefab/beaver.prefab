@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 6194302967021033570}
   - component: {fileID: 8219741066367020200}
   - component: {fileID: 3531956969244846590}
+  - component: {fileID: 441778184234662517}
   m_Layer: 0
   m_Name: beaver
-  m_TagString: Untagged
+  m_TagString: animal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,3 +117,16 @@ MonoBehaviour:
       m_Flags: 0
     m_Flags: 0
   animalName: Beaver
+--- !u!65 &441778184234662517
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7571288209323232637}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 300, y: 300, z: 300}
+  m_Center: {x: 5.8812704, y: -40.508106, z: 1.7732804}

@@ -18,6 +18,12 @@ public class SnippetManager : MonoBehaviour
 
     public void AddMessage(string pMessage)
     {
+        foreach (string x in messages)
+        {
+            if (x.Equals(pMessage)) {
+                break;
+            }
+        }
         messages.Add(pMessage);
     }
 

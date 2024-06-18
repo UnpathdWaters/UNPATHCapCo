@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 2659956460024226162}
   - component: {fileID: 220367450241177016}
   - component: {fileID: 5391350160845964695}
+  - component: {fileID: 5072933528083888044}
   m_Layer: 0
   m_Name: aurochs
-  m_TagString: Untagged
+  m_TagString: animal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,3 +117,16 @@ MonoBehaviour:
       m_Flags: 0
     m_Flags: 0
   animalName: Aurochs
+--- !u!65 &5072933528083888044
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733353106395149421}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 30, y: 30, z: 30}
+  m_Center: {x: -1.1653676, y: 7.4246087, z: -3.5620177}
