@@ -58,6 +58,7 @@ public class LocalLandscapeImport : MonoBehaviour
     float maxTerrainForTundraCalc, minTerrainForTundraCalc;
     int tundraCount, wetlandCount, woodlandCount, coastCount, grasslandCount, riverCount, seaCount;
 
+    bool foxAdd, boarAdd, elkAdd, aurochsAdd, beaverAdd;
 
     [SerializeField] GameObject tree;
     [SerializeField] GameObject reeds;
@@ -127,6 +128,7 @@ public class LocalLandscapeImport : MonoBehaviour
     void RefreshEnvironment()
     {
         ImportLocalSection();
+        ClearAnimalBooleans();
         LoadFeatures();
         CreateMesh();
         UpdateMesh();
@@ -183,6 +185,15 @@ public class LocalLandscapeImport : MonoBehaviour
             }
         }
         cam.SetLowPoint(maxTerrainForTundraCalc * zScale);
+    }
+
+    void ClearAnimalBooleans()
+    {
+        foxAdd = false;
+        boarAdd = false;
+        aurochsAdd = false;
+        beaverAdd = false;
+        elkAdd = false;
     }
 
     void LoadFeatures()
@@ -504,9 +515,9 @@ public class LocalLandscapeImport : MonoBehaviour
                         woodlandCount++;
                         woodBool = false;
                     }
-                    if (UnityEngine.Random.Range(0.0f, 100.0f) < elkPercent && depths[x, y] > time.GetMidSnowline()) {
+                    if (UnityEngine.Random.Range(0.0f, 100.0f) < elkPercent && depths[x, y] > time.GetMinSnowline()) {
                         CreateElk(x, y);
-                    } else if (UnityEngine.Random.Range(0.0f, 100.0f) < boarPercent && depths[x, y] < time.GetMidSnowline()) {
+                    } else if (UnityEngine.Random.Range(0.0f, 100.0f) < boarPercent && depths[x, y] < time.GetMinSnowline()) {
                         CreateBoar(x, y);
                     }
                 }
@@ -565,6 +576,7 @@ public class LocalLandscapeImport : MonoBehaviour
                 y = GetRandomY();
             }
             InstantiateArcticFox(x, y);
+            foxAdd = true;
         }
     }
 
@@ -573,7 +585,7 @@ public class LocalLandscapeImport : MonoBehaviour
         for (int x = 0; x < 3; x++) {
             InstantiateElk(RandomNeighbour(pX), RandomNeighbour(pY));
         }
-        snippetText.AddMessage("Elk were likely residents in wooded areas during the colder times.");
+        elkAdd = true;
     }
 
     void CreateBoar(int pX, int pY)
@@ -581,7 +593,7 @@ public class LocalLandscapeImport : MonoBehaviour
         for (int x = 0; x < 5; x++) {
             InstantiateBoar(RandomNeighbour(pX), RandomNeighbour(pY));
         }
-        snippetText.AddMessage("DNA of wild boar is found in samples from many different times in Doggerland.");
+        boarAdd = true;
     }
 
     void CreateBeaver()
@@ -592,7 +604,7 @@ public class LocalLandscapeImport : MonoBehaviour
             for (int x = 0; x <= (int) GetPercentEnv(riverCount) / 2; x++) {
                 InstantiateBeaver();
             }
-            snippetText.AddMessage("Beavers were active in changing the landscape and their DNA has been recovered from Doggerland.");
+            beaverAdd = true;
         }
     }
 
@@ -603,7 +615,7 @@ public class LocalLandscapeImport : MonoBehaviour
             for (int x = 0; x <= (int) GetPercentEnv(wetlandCount + woodlandCount) / 2; x++) {
                 InstantiateAurochs();
             }
-            snippetText.AddMessage("Aurochs were larger ancestors of today's cattle. They preferred wetland and woodland environments.");
+            aurochsAdd = true;
         }
     }
 
@@ -725,6 +737,21 @@ public class LocalLandscapeImport : MonoBehaviour
             snippetText.AddMessage(time.GetYear() + "BP was part of a local warm period known as the Bølling-Allerød Interstadial.");
         } else if (time.GetYear() > 11700 && time.GetYear() < 12900) {
             snippetText.AddMessage(time.GetYear() + "BP was part of a cooler period called the Youger Dryas. The region is very cold again.");
+        }
+        if (foxAdd) {
+            snippetText.AddMessage("Very little can live in this environment, maybe just the odd arctic fox.");
+        }
+        if (aurochsAdd) {
+            snippetText.AddMessage("Aurochs were larger ancestors of today's cattle. They preferred wetland and woodland environments.");
+        }
+        if (beaverAdd) {
+            snippetText.AddMessage("Beavers were active in changing the landscape and their DNA has been recovered from Doggerland.");
+        }
+        if (boarAdd) {
+            snippetText.AddMessage("DNA of wild boar is found in samples from many different times in Doggerland.");
+        }
+        if (elkAdd) {
+            snippetText.AddMessage("Elk were likely residents in wooded areas during the colder times.");
         }
         snippetText.CycleMessages();
     }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class SnippetManager : MonoBehaviour
 {
@@ -18,12 +19,6 @@ public class SnippetManager : MonoBehaviour
 
     public void AddMessage(string pMessage)
     {
-        foreach (string x in messages)
-        {
-            if (x.Equals(pMessage)) {
-                break;
-            }
-        }
         messages.Add(pMessage);
     }
 
