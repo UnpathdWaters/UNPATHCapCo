@@ -91,6 +91,7 @@ public class MenuLandscapeImport : MonoBehaviour
     float inputTimer = 0.0f;
     bool attractMode = false;
     [SerializeField] float timeDelay;
+    Vector2 lastClicked = new Vector2(0.0f, 0.0f);
 
 
     // Start is called before the first frame update
@@ -500,6 +501,12 @@ public class MenuLandscapeImport : MonoBehaviour
             clickedPoint.y = hit.point.z;
         }
 
+        if (Mathf.Abs(lastClicked.x - clickedPoint.x) > 1.0f || Mathf.Abs(lastClicked.y - clickedPoint.y) > 1.0f ) {
+            ResetAttractMode();
+        }
+
+        lastClicked = clickedPoint;
+
         if (clickedPoint.x < leftCol) {
             clickedPoint.x = leftCol;
         }
@@ -518,7 +525,6 @@ public class MenuLandscapeImport : MonoBehaviour
         } else {
             return false;
         }
-
     }
 
     void SetCamPosition()
