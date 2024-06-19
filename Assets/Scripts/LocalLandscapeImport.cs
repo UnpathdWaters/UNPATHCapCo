@@ -38,6 +38,7 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] float origXtotalSizeInCells, origYtotalSizeInCells;
     [SerializeField] float importXcells, importYcells;
     [SerializeField] GameObject snippetTextGO;
+    [SerializeField] float minFrameSpeed;
 
 
     public Color coastCol;
@@ -59,6 +60,7 @@ public class LocalLandscapeImport : MonoBehaviour
     int tundraCount, wetlandCount, woodlandCount, coastCount, grasslandCount, riverCount, seaCount;
 
     bool foxAdd, boarAdd, elkAdd, aurochsAdd, beaverAdd;
+    float frameTimer = 0.0f;
 
     [SerializeField] GameObject tree;
     [SerializeField] GameObject reeds;
@@ -142,6 +144,7 @@ public class LocalLandscapeImport : MonoBehaviour
         CreateBeaver();
         CreateAurochs();
         AddMeshCollider();
+        UpdateSnippetText();
     }
 
     void ImportLocalSection()
@@ -977,6 +980,12 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void Update()
     {
+        frameTimer += Time.deltaTime;
+        if (frameTimer > minFrameSpeed) {
+            frameTimer = 0.0f;
+            time.IncrementHour();
+        }
+
         RefreshSeaPos();
         CheckForAnimalHit();
         if (time.GetDay() % updateFrequency == 0 && time.GetHour() == 1) {
@@ -986,7 +995,6 @@ public class LocalLandscapeImport : MonoBehaviour
         if (time.GetDay() == 1) {
             UpdateSnippetText();
         }
-        time.IncrementHour();
         if (quitBtn.WasPressedThisFrame()) {
             UnityEngine.SceneManagement.SceneManager.LoadScene("02MenuScene");
         }
@@ -1009,7 +1017,6 @@ public class LocalLandscapeImport : MonoBehaviour
             RefreshEnvironment();
             UpdateSnippetText();
         }
-
     }
 }
 
