@@ -713,7 +713,7 @@ public class LocalLandscapeImport : MonoBehaviour
     {
         snippetText.ClearMessages();
         if (GetPercentEnv(tundraCount) > 95.0f) {
-            snippetText.AddMessage("It's too cold and sparsely resourced for anyone to live here.");
+            snippetText.AddMessage("It was probably too cold and sparsely resourced for anyone to live here at this time.");
         } else if (GetPercentEnv(seaCount) > 95.0f) {
             snippetText.AddMessage("This is mainly open sea. A fine home for fish but not for people.");
         } else if (GetPercentEnv(wetlandCount) > 50.0f) {
