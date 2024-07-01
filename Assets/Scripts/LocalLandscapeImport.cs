@@ -33,9 +33,7 @@ public class LocalLandscapeImport : MonoBehaviour
     [SerializeField] int timeJumpAmt;
     [SerializeField] TMP_Text tundraTMP, wetlandTMP, grasslandTMP, woodlandTMP, intertidalTMP, riverTMP, seaTMP;
     [SerializeField] float featuresXoffsetInMetres, featuresYoffsetInMetres;
-    [SerializeField] float featuresXsizeInMetres, featuresYsizeInMetres;
-    [SerializeField] float origXcellSizeInMetres, origYcellSizeInMetres;
-    [SerializeField] float origXtotalSizeInCells, origYtotalSizeInCells;
+    [SerializeField] float origXSizeInMetres, origYSizeInMetres;
     [SerializeField] float importXcells, importYcells;
     [SerializeField] GameObject snippetTextGO;
     [SerializeField] float minFrameSpeed;
@@ -201,7 +199,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void LoadFeatures()
     {
-/*        bool[,] inputFeatures;
+        bool[,] inputFeatures;
         string fileString;
         features = new bool[widthX, heightZ];
         fileString = ".\\UNPATHfeatures.asc";
@@ -228,9 +226,11 @@ public class LocalLandscapeImport : MonoBehaviour
 
         int totCols = int.Parse(headerText[1,0]);
         int totRows = int.Parse(headerText[1,1]);
+        float featuresCellSize = float.Parse(headerText[1, 4]);
 
         Debug.Log("Feature file Cols = " + totCols);
         Debug.Log("Feature file Rows = " + totRows);
+        Debug.Log("Feature cell size = " + featuresCellSize);
 
         inputFeatures = new bool[totCols, totRows];
         string[] readArray = new string[totCols];
@@ -248,22 +248,19 @@ public class LocalLandscapeImport : MonoBehaviour
             }
         }
 
-        float Xcellwidth = (origXtotalSizeInCells * origXcellSizeInMetres) / importXcells;
-        Debug.Log("Xcellwidth is " + Xcellwidth);
-        float Ycellwidth = (origYtotalSizeInCells * origYcellSizeInMetres) / importYcells;
-        Debug.Log("Ycellwidth is " + Ycellwidth);
-        float localXwidth = (Xcellwidth * 4) / (widthX - 1);
-        Debug.Log("localXwidth is " + localXwidth);
-        float localYwidth = (Ycellwidth * 4) / (heightZ - 1);
-        Debug.Log("localYwidth is " + localYwidth);
+        float featuresXSize = totCols * featuresCellSize;
+        float featuresYSize = totRows * featuresCellSize;
+        float origXSize = origXSizeInMetres / importXcells;
+        float origYSize = origYSizeInMetres / importYcells;
 
-        if (DataStore.selectedLocation.x * Xcellwidth < featuresXoffsetInMetres + (localXwidth * (widthX / 2))) {
+
+        if (DataStore.selectedLocation.x * origXSize < featuresXoffsetInMetres) {
             Debug.Log("Clicked point to the left of the data");
-        } else if (DataStore.selectedLocation.x * Xcellwidth > featuresXoffsetInMetres + (localXwidth * totCols) - (localXwidth * (widthX / 2))) {
+        } else if (DataStore.selectedLocation.x * origXSize > featuresXoffsetInMetres + featuresXSize) {
             Debug.Log("Clicked point to the right of the data");
-        } else if (DataStore.selectedLocation.y * Ycellwidth < featuresYoffsetInMetres + (localYwidth * (heightZ / 2))) {
+        } else if (DataStore.selectedLocation.y * origYSize < featuresYoffsetInMetres) {
             Debug.Log("Clicked point below the data");
-        } else if (DataStore.selectedLocation.y * Ycellwidth > featuresYoffsetInMetres + (localYwidth * totRows) - (localYwidth * (heightZ / 2))) {
+        } else if (DataStore.selectedLocation.y * origYSize > featuresYoffsetInMetres + featuresYSize) {
             Debug.Log("Clicked point above the data");
         } else {
             Debug.Log("Valid result!");
@@ -790,28 +787,28 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void InstantiateArcticFox(int pX, int pY)
     {
-        Debug.Log("Creating an arctic fox!");
+//        Debug.Log("Creating an arctic fox!");
         Vector3 foxPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
         allAnimals.Add(Instantiate(arcticFox, foxPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
     }
 
     void InstantiateElk(int pX, int pY)
     {
-        Debug.Log("Creating an elk!");
+//        Debug.Log("Creating an elk!");
         Vector3 elkPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
         allAnimals.Add(Instantiate(elk, elkPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
     }
 
     void InstantiateBoar(int pX, int pY)
     {
-        Debug.Log("Creating a boar!");
+//        Debug.Log("Creating a boar!");
         Vector3 boarPos = JigglePosition(new Vector3(pX, depths[pX, pY] * zScale, pY));
         allAnimals.Add(Instantiate(boar, boarPos, Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0, 360), 0))));
     }
 
     void InstantiateBeaver()
     {
-        Debug.Log("Creating a beaver!");
+//        Debug.Log("Creating a beaver!");
         int beaverX = GetRandomX();
         int beaverY = GetRandomY();
         while (!river[beaverX, beaverY]) {
@@ -824,7 +821,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void InstantiateAurochs()
     {
-        Debug.Log("Creating an aurochs");
+//        Debug.Log("Creating an aurochs");
         int aurochsX = GetRandomX();
         int aurochsY = GetRandomY();
         while (!marsh[aurochsX, aurochsY]) {
