@@ -243,7 +243,7 @@ public class LocalLandscapeImport : MonoBehaviour
         inputFeatures = new bool[totCols, totRows];
         string[] readArray = new string[totCols];
 
-        for (int y = 0; y < totRows; y++)
+        for (int y = totRows - 1; y > 0; y--)
         {
             inputLine = surfaceStream.ReadLine();
             readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
