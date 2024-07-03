@@ -49,6 +49,9 @@ public class LocalLandscapeImport : MonoBehaviour
     bool[,] marsh;
     float[,] depths;
     bool[,] features;
+    bool[,] localFeatures;
+    bool[,] inputFeatures;
+
 
     List<GameObject> allReeds = new List<GameObject>();
     List<GameObject> allTrees = new List<GameObject>();
@@ -59,6 +62,11 @@ public class LocalLandscapeImport : MonoBehaviour
 
     bool foxAdd, boarAdd, elkAdd, aurochsAdd, beaverAdd;
     float frameTimer = 0.0f;
+
+    int totCols, totRows;
+    float featuresCellSize;
+    float origXSize, origYSize;
+
 
     [SerializeField] GameObject tree;
     [SerializeField] GameObject reeds;
@@ -130,6 +138,7 @@ public class LocalLandscapeImport : MonoBehaviour
         ImportLocalSection();
         ClearAnimalBooleans();
         LoadFeatures();
+        AdjustDepths();
         CreateMesh();
         UpdateMesh();
         ClearAnimals();
@@ -199,7 +208,6 @@ public class LocalLandscapeImport : MonoBehaviour
 
     void LoadFeatures()
     {
-        bool[,] inputFeatures;
         string fileString;
         features = new bool[widthX, heightZ];
         fileString = ".\\UNPATHfeatures.asc";
@@ -224,9 +232,9 @@ public class LocalLandscapeImport : MonoBehaviour
             headerText[1,headline] = hdrArray[1];
         }
 
-        int totCols = int.Parse(headerText[1,0]);
-        int totRows = int.Parse(headerText[1,1]);
-        float featuresCellSize = float.Parse(headerText[1, 4]);
+        totCols = int.Parse(headerText[1,0]);
+        totRows = int.Parse(headerText[1,1]);
+        featuresCellSize = float.Parse(headerText[1, 4]);
 
         Debug.Log("Feature file Cols = " + totCols);
         Debug.Log("Feature file Rows = " + totRows);
@@ -242,107 +250,89 @@ public class LocalLandscapeImport : MonoBehaviour
             for (int x = 0; x < totCols; x++)
             {
                 thisval = int.Parse(readArray[x]);
-                if (thisval > 1) {
+                if (thisval < 0) {
                     inputFeatures[x, y] = true;
+                    Debug.Log(x + "," + y + " is true");
                 }
             }
         }
 
-        float featuresXSize = totCols * featuresCellSize;
-        float featuresYSize = totRows * featuresCellSize;
-        float origXSize = origXSizeInMetres / importXcells;
-        float origYSize = origYSizeInMetres / importYcells;
+        origXSize = origXSizeInMetres / importXcells;
+        origYSize = origYSizeInMetres / importYcells;
 
+        Vector2 clickedPoint = DataStore.selectedLocation;
 
-        if (DataStore.selectedLocation.x * origXSize < featuresXoffsetInMetres) {
-            Debug.Log("Clicked point to the left of the data");
-        } else if (DataStore.selectedLocation.x * origXSize > featuresXoffsetInMetres + featuresXSize) {
-            Debug.Log("Clicked point to the right of the data");
-        } else if (DataStore.selectedLocation.y * origYSize < featuresYoffsetInMetres) {
-            Debug.Log("Clicked point below the data");
-        } else if (DataStore.selectedLocation.y * origYSize > featuresYoffsetInMetres + featuresYSize) {
-            Debug.Log("Clicked point above the data");
-        } else {
-            Debug.Log("Valid result!");
-        }/*
-
+        for (int x = 0; x < widthX; x++)
+        {
             for (int y = 0; y < heightZ; y++)
             {
-                for (int x = 0; x < widthX; x++)
-                {
-                    float XinM = featuresXoffsetInMetres + (DataStore.selectedLocation.x * 
-                }
+                float offsetX = (x - (widthX / 2)) * featuresCellSize;
+                float offsetY = (y - (heightZ / 2)) * featuresCellSize;
+                Vector2 thisOffset = new Vector2(offsetX, offsetY);
+//                Debug.Log("Offset " + thisOffset);
+                Vector2 thisLocInM = thisOffset + ClickedPointToMetres(clickedPoint);
+//                Debug.Log("ThislocM " + thisLocInM);
+                features[x, y] = MetresToFeatureCell(thisLocInM);
             }
+        }      
+    }
 
-
-
-
-
-
-
-
-
-
-
-        float Xcellwidth = (origXtotalSizeInCells * origXcellSizeInMetres) / importXcells;
-        float Ycellwidth = (origYtotalSizeInCells * origYcellSizeInMetres) / importYcells;
-        if (DataStore.selectedLocation.x * Xcellwidth < featuresXoffsetInMetres) {
-            Debug.Log("Clicked point to the left of the data");
-        } else if (DataStore.selectedLocation.x * Xcellwidth > featuresXoffsetInMetres + (totCols * featuresXsizeInMetres)) {
-            Debug.Log("Clicked point to the right of the data");
-        } else if (DataStore.selectedLocation.y * Ycellwidth < featuresYoffsetInMetres) {
-            Debug.Log("Clicked point below the data");
-        } else if (DataStore.selectedLocation.y * Ycellwidth > featuresYoffsetInMetres + (totRows * featuresYsizeInMetres)) {
-            Debug.Log("Clicked point above the data");
-        } else {
-            float clickedXinMetres = DataStore.selectedLocation.x * Xcellwidth;
-            float clickedYinMetres = DataStore.selectedLocation.y * Ycellwidth;
-
-            int clickedXinCells = (int) ((clickedXinMetres - featuresXoffsetInMetres) / featuresXsizeInMetres);
-            int clickedYinCells = (int) ((clickedYinMetres - featuresYoffsetInMetres) / featuresYsizeInMetres);
-
-            int beginX = clickedXinCells - (widthX / 2);
-            int beginY = clickedYinCells - (heightZ / 2);
-
-            if (beginX < 0) {
-                beginX = 0;
-            } else if (beginX > totCols - widthX) {
-                beginX = totCols - widthX;
-            }
-            if (beginY < 0) {
-                beginY = 0;
-            } else if (beginY > totRows - heightZ) {
-                beginY = totRows - heightZ;
-            }
-
-            string[] readArray = new string[totCols];
-
-            int xCount = 0;
-            int yCount = heightZ - 1;
-            bool lineUsed = false;
-            for (int y = 0; y < totRows; y++)
+    void AdjustDepths()
+    {
+        for (int x = 0; x < widthX; x++)
+        {
+            for (int y = 0; y < heightZ; y++)
             {
-                inputLine = surfaceStream.ReadLine();
-                xCount = 0;
-                lineUsed = false;            
-                readArray = inputLine.Split(separators, System.StringSplitOptions.RemoveEmptyEntries);
-                for (int x = 0; x < totCols; x++)
+                if (features[x, y])
                 {
-                    thisval = int.Parse(readArray[x]);
-
-                    if (thisval > 1 && x >= beginX && x < beginX + widthX && y >= beginY && y < beginY + heightZ) {
-                        features[xCount, yCount] = true;
-                        xCount++;
-                        lineUsed = true;
-                        Debug.Log("Features " + xCount + "," + yCount + " is true");
-                    }
-
-                }
-                if (lineUsed) {
-                    yCount++;
+                    depths[x, y] = depths[x, y] - FeaturesNeighbours(x, y);
                 }
             }
-        }*/
+        }
+    }
+
+    int FeaturesNeighbours(int pX, int pY)
+    {
+        int count = 0;
+        for (int x = pX - 1; x <= pX + 1; x++)
+        {
+            for (int y = pY - 1; y <= pY + 1; y++)
+            {
+                if (x >= 0 && x < widthX && y >= 0 && y < heightZ)
+                {
+                    if (features[x, y])
+                    {
+                        if (x != pX && y != pY)
+                        {
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    bool MetresToFeatureCell(Vector2 pMetres)
+    {
+        float featuresX = (pMetres.x - featuresXoffsetInMetres) / featuresCellSize;
+        float featuresY = (pMetres.y - featuresYoffsetInMetres) / featuresCellSize;
+//        Debug.Log("fX=" + featuresX + " fy=" + featuresY);
+        if ((int) featuresX < 0 || (int) featuresX >= totCols) {
+            return false;
+        }
+        if ((int) featuresY < 0 || (int) featuresY >= totRows) {
+            return false;
+        }
+//        Debug.Log("fX= " + featuresX + " fY= " + featuresY + " so f[x,y]= " + inputFeatures[(int) featuresX, (int) featuresY]);
+        return inputFeatures[(int) featuresX, (int) featuresY];
+    }
+
+    Vector2 ClickedPointToMetres(Vector2 pClick)
+    {
+        float clickX = pClick.x * origXSize;
+        float clickY = pClick.y * origYSize;
+        return new Vector2(clickX, clickY);
     }
 
     void CreateMesh()
@@ -675,7 +665,9 @@ public class LocalLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                if (depths[x, z] < seaPos) {
+                if (features[x, z]) {
+                    colours[x + (z * widthX)] = Color.red;
+                } else if (depths[x, z] < seaPos) {
                     colours[x + (z * widthX)] = AddNoiseToColor(seaGradient.Evaluate((depths[x, z] - minTerrainForTundraCalc) / (maxTerrainForTundraCalc - minTerrainForTundraCalc)));
                 } else if (river[x, z]) {
                     colours[x + (z * widthX)] = AddNoiseToColor(riverCol);
