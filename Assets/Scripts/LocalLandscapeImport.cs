@@ -66,6 +66,7 @@ public class LocalLandscapeImport : MonoBehaviour
     int totCols, totRows;
     float featuresCellSize;
     float origXSize, origYSize;
+    bool featureShow;
 
 
     [SerializeField] GameObject tree;
@@ -87,6 +88,7 @@ public class LocalLandscapeImport : MonoBehaviour
     public InputAction controlsBtn;
     public InputAction timeJumpPlus;
     public InputAction timeJumpMinus;
+    public InputAction featureShowBtn;
 
     public GameObject controlScreen;
     public int updateFrequency;
@@ -102,6 +104,7 @@ public class LocalLandscapeImport : MonoBehaviour
         controlsBtn.Enable();
         timeJumpPlus.Enable();
         timeJumpMinus.Enable();
+        featureShowBtn.Enable();
     }
 
     void OnDisable()
@@ -110,6 +113,7 @@ public class LocalLandscapeImport : MonoBehaviour
         controlsBtn.Disable();
         timeJumpPlus.Disable();
         timeJumpMinus.Disable();
+        featureShowBtn.Disable();
     }
 
     void Start()
@@ -131,6 +135,7 @@ public class LocalLandscapeImport : MonoBehaviour
 
         seaPos = sls.GetGIAWaterHeight();
         RefreshEnvironment();
+        featureShow = true;
     }
 
     void RefreshEnvironment()
@@ -665,7 +670,7 @@ public class LocalLandscapeImport : MonoBehaviour
         {
             for (int x = 0; x < widthX; x++)
             {
-                if (features[x, z]) {
+                if (features[x, z] && featureShow) {
                     colours[x + (z * widthX)] = Color.red;
                 } else if (depths[x, z] < seaPos) {
                     colours[x + (z * widthX)] = AddNoiseToColor(seaGradient.Evaluate((depths[x, z] - minTerrainForTundraCalc) / (maxTerrainForTundraCalc - minTerrainForTundraCalc)));
@@ -1005,6 +1010,17 @@ public class LocalLandscapeImport : MonoBehaviour
             RefreshSeaPos();
             RefreshEnvironment();
             UpdateSnippetText();
+        }
+        if (featureShowBtn.WasReleasedThisFrame()) {
+            if (featureShow) {
+                featureShow = false;
+//                Debug.Log("Featureshow is false");
+                UpdateMeshColors();
+            } else {
+                featureShow = true;
+//                Debug.Log("Featureshow is true");
+                UpdateMeshColors();
+            }
         }
     }
 }
